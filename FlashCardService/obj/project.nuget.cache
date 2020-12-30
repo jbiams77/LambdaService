@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "JVC/oFAr6IuTnGuScHXWE/lp9gqzcK46u315ySR75Qc9PVc0VAfSeqHGSd/wDNLSsT1wnYqYIawYtFpzR3wALA==",
+  "success": true,
+  "projectFilePath": "E:\\Documents\\1_Code\\KidsReadAlong\\LambdaServices\\FlashCardService\\FlashCardService.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Brandon\\.nuget\\packages\\alexa.net\\1.14.0\\alexa.net.1.14.0.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.core\\1.2.0\\amazon.lambda.core.1.2.0.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.dynamodbevents\\1.2.0\\amazon.lambda.dynamodbevents.1.2.0.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.serialization.json\\1.8.0\\amazon.lambda.serialization.json.1.8.0.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.serialization.systemtextjson\\2.1.0\\amazon.lambda.serialization.systemtextjson.2.1.0.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\awssdk.core\\3.5.1.56\\awssdk.core.3.5.1.56.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\awssdk.dynamodbv2\\3.5.4.15\\awssdk.dynamodbv2.3.5.4.15.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\newtonsoft.json\\12.0.2\\newtonsoft.json.12.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
