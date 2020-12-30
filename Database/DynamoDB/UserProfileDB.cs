@@ -28,7 +28,7 @@ namespace Moyca.Database
             schedule = new List<int>();
         }
 
-        public async Task<int> GetFirstSchedule()
+        public async Task<int> GetFirstScheduleNumber()
         {
             await GetUserSchedule();
             return schedule.ElementAt(0);

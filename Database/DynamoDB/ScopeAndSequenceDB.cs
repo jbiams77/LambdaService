@@ -13,21 +13,30 @@ namespace Moyca.Database
     public class ScopeAndSequenceDB : DatabaseClient
     {
         public static string TableName { get { return "scope-and-sequence"; } }
-        public static string PrimaryPartitionKey { get { return "Index"; } }        
+        public static string PrimaryPartitionKey { get { return "Index"; } }
+
+        public List<string> wordsToRead;
+        public string teachMode;
+        public string skill;
 
         public ScopeAndSequenceDB() : base(ScopeAndSequenceDB.TableName, ScopeAndSequenceDB.PrimaryPartitionKey)
         {
-            
+            this.wordsToRead = new List<string>();
         }
 
-        public async Task<List<string>> GetWordsToReadWithNumber(int orderNumber)
+        public async Task GetSessionDataWithNumber(int orderNumber)
         {
             DatabaseItem item = await GetItemWithNumber(orderNumber);
 
-            item.TryGetValue("WordsToRead", out AttributeValue val);
+            item.TryGetValue("WordsToRead", out AttributeValue words);
+            this.wordsToRead = words.SS;
 
-            return val.SS;
-        }
+            item.TryGetValue("Mode", out AttributeValue Mode);
+            this.teachMode = Mode.S;
+
+            item.TryGetValue("Skill", out AttributeValue Skill);
+            this.skill = Skill.S;
+        }       
 
         public async Task<Dictionary<string, string>> GetOrder(int number)
         {

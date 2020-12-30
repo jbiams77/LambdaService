@@ -66,11 +66,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DatabaseClient.cs" />
-    <Compile Include="DictionaryDB.cs" />
+    <Compile Include="DynamoDB\DictionaryDB.cs" />
     <Compile Include="GlobalConstants.cs" />
+    <Compile Include="DynamoDB\LiveSessionDB.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScopeAndSequenceDB.cs" />
-    <Compile Include="UserProfileDB.cs" />
+    <Compile Include="DynamoDB\ScopeAndSequenceDB.cs" />
+    <Compile Include="DynamoDB\UserProfileDB.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
