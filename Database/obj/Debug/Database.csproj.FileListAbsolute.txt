@@ -22,4 +22,3 @@ E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.csp
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.csproj.CopyComplete
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.dll
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.pdb
-E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.csprojAssemblyReference.cache

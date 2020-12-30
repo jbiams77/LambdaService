@@ -29,10 +29,6 @@ namespace FlashCardService
         public UserProfileDB userProfile;
         public ScopeAndSequenceDB scopeAndSequence;
         public SkillResponse response;
-        public List<string> wordsToRead;
-        public MODE teachMode;
-        public STATE state;
-        public SKILL skill;
         public string userId;
 
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
@@ -46,16 +42,18 @@ namespace FlashCardService
             this.userProfile = new UserProfileDB(userId);
             this.scopeAndSequence = new ScopeAndSequenceDB();
 
+            info.LogLine("USERID: " + this.userId);
+
             switch (T.Name)
             {
                 case "LaunchRequest":
-                    await GetSessionDataFromSchedule();
+                    await TransferDataFromUserProfileToLiveSession();
                     await UpdateLiveSessionDatabase();
-                    response = AlexaResponse.Say("Launch");
+                    response = AlexaResponse.Introduction();
                     break;
 
-                case "IntentRequest":
-                    response = AlexaResponse.Say("Intent");
+                case "IntentRequest":                    
+                    response = await HandleIntentRequest((IntentRequest)input.Request);
                     break;
 
                 case "SessionEndedRequest":
@@ -70,22 +68,76 @@ namespace FlashCardService
             return response;
         }
 
-        private async Task GetSessionDataFromSchedule()
+        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent)
+        {
+            SkillResponse intentResponse;
+
+            switch (intent.Intent.Name)
+            {
+                case "AMAZON.YesIntent":
+                    intentResponse = await HandleYesIntent();
+                    break;
+                case "AMAZON.NoIntent":
+                    intentResponse = ResponseBuilder.Tell("No intent.");
+                    break;
+                case "AMAZON.CancelIntent":
+                    intentResponse = ResponseBuilder.Tell("Cancel intent.");
+                    break;
+                case "AMAZON.FallbackIntent":
+                    intentResponse = ResponseBuilder.Tell("Fallback intent");
+                    break;
+                case "AMAZON.StopIntent":
+                    intentResponse = ResponseBuilder.Tell("Stop intent.");
+                    break;
+                case "AMAZON.HelpIntent":
+                    intentResponse = ResponseBuilder.Tell("Help intent.");
+                    break;
+                case "WordsToReadIntent":
+                    intentResponse = await HandleWordsToReadIntent();
+                    break;
+                default:
+                    intentResponse = ResponseBuilder.Tell("Unhandled intent.");
+                    break;
+            }
+            return intentResponse;
+        }
+
+        private async Task<SkillResponse> HandleYesIntent()
+        {
+            await liveSession.GetDataFromLiveSession();
+
+            string currentWord = liveSession.GetCurrentWord();
+
+            string prompt = "Say the word on the flash card";
+
+            return AlexaResponse.GetResponse(currentWord, prompt, prompt);
+        }
+
+        private async Task<SkillResponse> HandleWordsToReadIntent()
+        {            
+
+            await liveSession.GetDataFromLiveSession();
+            string prompt = liveSession.GetCurrentWord();
+
+            return ResponseBuilder.Tell("Say " + prompt);
+        }
+
+        private async Task TransferDataFromUserProfileToLiveSession()
         {            
             int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();            
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
-            this.wordsToRead = scopeAndSequence.wordsToRead;
-            this.teachMode = (MODE)(int.Parse(scopeAndSequence.teachMode));
-            this.skill = (SKILL)(int.Parse(scopeAndSequence.skill));
-            this.state = STATE.Introduction;
+            liveSession.wordsToRead = scopeAndSequence.wordsToRead;
+            liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.teachMode));
+            liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.skill));
+            liveSession.State = STATE.Introduction;
         }
 
         private async Task UpdateLiveSessionDatabase( )
         {
-            await liveSession.UpdateLiveSession(this.userId, scopeAndSequence.wordsToRead,
-                                                             scopeAndSequence.teachMode, 
-                                                             scopeAndSequence.skill, 
-                                                             nameof(this.state));
+            await liveSession.UpdateLiveSession(this.userId, liveSession.wordsToRead,
+                                                             liveSession.TeachMode.ToString(),
+                                                             liveSession.Skill.ToString(),
+                                                             liveSession.State.ToString());
         }
     }
 }

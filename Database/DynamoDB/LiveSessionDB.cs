@@ -9,15 +9,25 @@ using Moyca.Database.GlobalConstants;
 
 namespace Moyca.Database
 {
+    using DatabaseItem = Dictionary<string, AttributeValue>;
+
     public class LiveSessionDB : DatabaseClient
     {
         public static string TableName { get { return "live-session"; } }
         public static string PrimaryPartitionKey { get { return "UserID"; } }
 
         public List<string> wordsToRead;
+        
+        private string userId;
+
+        public MODE TeachMode { get; set; }
+        public STATE State { get; set; }
+        public SKILL Skill { get; set; }
+
+
         public LiveSessionDB(string userId) : base(LiveSessionDB.TableName, LiveSessionDB.PrimaryPartitionKey)
         {
-
+            this.userId = userId;
         }
 
         public async Task UpdateLiveSession(string userId, List<string> wordsToRead, string teachMode, string skill, string state)
@@ -42,6 +52,34 @@ namespace Moyca.Database
 
             await SetItemsAttributeWithRequest(updateRequest);
         }
+
+        public async Task GetDataFromLiveSession()
+        {
+            DatabaseItem items = await GetItemWithString(this.userId);
+
+            items.TryGetValue("WordsToRead", out AttributeValue words);
+            this.wordsToRead = words.SS;
+
+            items.TryGetValue("TeachMode", out AttributeValue mode);
+            this.TeachMode = (MODE)Enum.Parse(typeof(MODE), mode.S);
+
+            items.TryGetValue("CurrentState", out AttributeValue state);
+            this.State = (STATE)Enum.Parse(typeof(STATE), state.S);
+
+            items.TryGetValue("Skill", out AttributeValue skill);
+            this.Skill = (SKILL)Enum.Parse(typeof(SKILL), skill.S);
+        }
+
+        public string GetCurrentWord()
+        {
+            if (wordsToRead[0] != null)
+            {
+                return wordsToRead[0];
+            }
+
+            return null;
+        }
+
 
     }
 }

@@ -27,24 +27,12 @@ namespace FlashCardService
             return BuildResponse(speechResponse, false, null, new Reprompt(reprompt), null);
         }
 
-        //public static SkillResponse Introduction(List<FlashCard> flashCards)
-        //{
-        //    string introduction = StartTag + "Greetings my fellow Moycan! Today, we are working on ";
+        public static SkillResponse Introduction()
+        {
+            string introduction = StartTag + "Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?" + EndTag;
 
-        //    int i;
-        //    for (i = 0; i < flashCards.Count - 1; i++)
-        //    {
-        //        introduction += flashCards[i] + ",";
-        //    }
-        //    if (flashCards.Count > 1)
-        //    {
-        //        introduction += " and ";
-        //    }
-        //    introduction += flashCards[i];
-        //    introduction += ", Are you ready to begin ?" + EndTag;
-
-        //    return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(introduction), "Say yes or no to continue. ");
-        //}
+            return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(introduction), "Say yes or no to continue. ");
+        }
 
         private static SkillResponse BuildResponse(IOutputSpeech outputSpeech, bool shouldEndSession, Session sessionAttributes, Reprompt reprompt, ICard card)
         {
