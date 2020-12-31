@@ -23,6 +23,7 @@ namespace Moyca.Database
         public MODE TeachMode { get; set; }
         public STATE State { get; set; }
         public SKILL Skill { get; set; }
+        public int CurrentSchedule { get; set; }
 
 
         public LiveSessionDB(string userId) : base(LiveSessionDB.TableName, LiveSessionDB.PrimaryPartitionKey)
@@ -30,24 +31,28 @@ namespace Moyca.Database
             this.userId = userId;
         }
 
-        public async Task UpdateLiveSession(string userId, List<string> wordsToRead, string teachMode, string skill, string state)
+        public async Task UpdateLiveSession()
         {
+            AttributeValue currentSchedule = new AttributeValue();
+            currentSchedule.N = this.CurrentSchedule.ToString();
+
             var updateRequest = new UpdateItemRequest
             {
                 TableName = LiveSessionDB.TableName,
                 Key = new Dictionary<string, AttributeValue>
                 {
-                    { LiveSessionDB.PrimaryPartitionKey, new AttributeValue(userId) }
+                    { LiveSessionDB.PrimaryPartitionKey, new AttributeValue(this.userId) }
                 },
                 ExpressionAttributeValues = new Dictionary<string, AttributeValue>
                 {
-                    { ":wordsToRead", new AttributeValue(wordsToRead) },
-                    { ":teachMode", new AttributeValue(teachMode) },
-                    { ":skill", new AttributeValue(skill) },
-                    { ":state", new AttributeValue(state) },
-
+                    { ":wordsToRead", new AttributeValue(this.wordsToRead) },
+                    { ":teachMode", new AttributeValue(this.TeachMode.ToString())},
+                    { ":skill", new AttributeValue(this.Skill.ToString()) },
+                    { ":state", new AttributeValue(this.State.ToString()) },
+                    { ":curSched", currentSchedule }
                 },
-                UpdateExpression = "SET WordsToRead = :wordsToRead,  TeachMode = :teachMode, Skill = :skill, CurrentState = :state"
+                UpdateExpression = "SET WordsToRead = :wordsToRead,  TeachMode = :teachMode, Skill = :skill, " +
+                                   "CurrentState = :state, CurrentSchedule = :curSched"
             };
 
             await SetItemsAttributeWithRequest(updateRequest);
@@ -68,6 +73,16 @@ namespace Moyca.Database
 
             items.TryGetValue("Skill", out AttributeValue skill);
             this.Skill = (SKILL)Enum.Parse(typeof(SKILL), skill.S);
+
+            items.TryGetValue("CurrentSchedule", out AttributeValue curSched);
+            this.CurrentSchedule = int.Parse(curSched.N);
+
+        }
+
+        public bool Remove(string currentWord)
+        {
+            wordsToRead.Remove(currentWord);
+            return (wordsToRead.Count == 0) ? true : false;            
         }
 
         public string GetCurrentWord()
@@ -78,6 +93,11 @@ namespace Moyca.Database
             }
 
             return null;
+        }
+
+        public string GetWordsRemaining()
+        {
+            return wordsToRead.Count.ToString();
         }
 
 

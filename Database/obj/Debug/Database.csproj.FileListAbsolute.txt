@@ -22,3 +22,15 @@ E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.csp
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.csproj.CopyComplete
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.dll
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.pdb
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\Amazon.Lambda.S3Events.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.CognitoIdentityProvider.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.S3.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.SQS.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\Amazon.Lambda.S3Events.xml
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.CognitoIdentityProvider.pdb
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.CognitoIdentityProvider.xml
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.S3.pdb
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.S3.xml
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.SQS.pdb
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.SQS.xml
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.csprojAssemblyReference.cache

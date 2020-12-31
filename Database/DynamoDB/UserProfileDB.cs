@@ -45,7 +45,55 @@ namespace Moyca.Database
             }
         }
 
+        public async Task RemoveCompletedScheduleFromUserProfile(int completedSchedule)
+        {
+            await GetUserSchedule();
 
+            schedule.Remove(completedSchedule);
+
+            AttributeValue scheduleAttr = new AttributeValue();
+            foreach(int num in this.schedule)
+            {
+                AttributeValue item = new AttributeValue();
+                item.N = num.ToString();
+                scheduleAttr.L.Add(item);
+            }                
+
+            var updateRequest = new UpdateItemRequest
+            {
+                TableName = UserProfileDB.TableName,
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    { UserProfileDB.PrimaryPartitionKey, new AttributeValue(this.UserID) }
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+                {
+                    { ":sched", scheduleAttr },
+                },
+                UpdateExpression = "SET Schedule = :sched"
+            };
+
+            await SetItemsAttributeWithRequest(updateRequest);
+        }
+
+        public async Task SetQueueUrl(string queueURL)
+        {
+            var updateRequest = new UpdateItemRequest
+            {
+                TableName = UserProfileDB.TableName,
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    { UserProfileDB.PrimaryPartitionKey, new AttributeValue(this.UserID) }
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+                {
+                    { ":queueURL", new AttributeValue(queueURL) },
+                },
+                UpdateExpression = "SET QueueURL = :queueURL"
+            };
+
+            await SetItemsAttributeWithRequest(updateRequest);
+        }
 
     }
 }

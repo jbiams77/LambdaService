@@ -30,30 +30,35 @@ namespace FlashCardService
         public ScopeAndSequenceDB scopeAndSequence;
         public SkillResponse response;
         public string userId;
+        SQS sqs;
 
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
-        {           
+        {
+            
             Type T = input.GetRequestType();
             info = context.Logger;
-            
-            this.userId = input.Session.User.UserId;
+            CognitoUserPool cognitoUserPool = new CognitoUserPool();
+            this.userId = await GetUsername(cognitoUserPool, input.Session.User.AccessToken);            
 
             this.liveSession = new LiveSessionDB(userId);
             this.userProfile = new UserProfileDB(userId);
             this.scopeAndSequence = new ScopeAndSequenceDB();
+            this.sqs = new SQS();
 
-            info.LogLine("USERID: " + this.userId);
+            await InitializeUserQueue();                        
 
             switch (T.Name)
             {
                 case "LaunchRequest":
                     await TransferDataFromUserProfileToLiveSession();
-                    await UpdateLiveSessionDatabase();
+                    await UpdateLiveSessionDatabase();                    
                     response = AlexaResponse.Introduction();
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     break;
 
                 case "IntentRequest":                    
                     response = await HandleIntentRequest((IntentRequest)input.Request);
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     break;
 
                 case "SessionEndedRequest":
@@ -93,7 +98,7 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Help intent.");
                     break;
                 case "WordsToReadIntent":
-                    intentResponse = await HandleWordsToReadIntent();
+                    intentResponse = await HandleWordsToReadIntent(intent);
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -113,13 +118,38 @@ namespace FlashCardService
             return AlexaResponse.GetResponse(currentWord, prompt, prompt);
         }
 
-        private async Task<SkillResponse> HandleWordsToReadIntent()
+        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent)
         {            
 
             await liveSession.GetDataFromLiveSession();
-            string prompt = liveSession.GetCurrentWord();
 
-            return ResponseBuilder.Tell("Say " + prompt);
+            string currentWord = liveSession.GetCurrentWord();
+
+            string prompt = "Say the word";
+
+            if (ReaderSaidTheWord(intent))
+            {
+                prompt = "Great!";
+                if (liveSession.Remove(currentWord))
+                {   
+                    prompt = "Congratulations! You can move on to the next session.";
+                    await this.userProfile.RemoveCompletedScheduleFromUserProfile(liveSession.CurrentSchedule);
+                    await TransferDataFromUserProfileToLiveSession();
+                }
+                
+                currentWord = liveSession.GetCurrentWord();
+
+                await UpdateLiveSessionDatabase();
+                LogSessionInfo(liveSession, info);
+            }
+
+            return AlexaResponse.GetResponse(currentWord, prompt, prompt);
+        }
+        // Creates or updates the queue and sets the queue URL in the user database
+        public async Task InitializeUserQueue()
+        {
+            this.sqs.QueueURL = await sqs.CreateQueue(this.userId);
+            await this.userProfile.SetQueueUrl(this.sqs.QueueURL);
         }
 
         private async Task TransferDataFromUserProfileToLiveSession()
@@ -130,14 +160,58 @@ namespace FlashCardService
             liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.teachMode));
             liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.skill));
             liveSession.State = STATE.Introduction;
+            liveSession.CurrentSchedule = currentScheduleNumber;
         }
 
-        private async Task UpdateLiveSessionDatabase( )
+        private async Task UpdateLiveSessionDatabase()
         {
-            await liveSession.UpdateLiveSession(this.userId, liveSession.wordsToRead,
-                                                             liveSession.TeachMode.ToString(),
-                                                             liveSession.Skill.ToString(),
-                                                             liveSession.State.ToString());
+            await liveSession.UpdateLiveSession();
         }
+
+        private bool ReaderSaidTheWord(IntentRequest input)
+        {   
+
+            foreach (ResolutionAuthority auth in input.Intent.Slots.Last().Value.Resolution.Authorities)
+            {
+                if (auth.Status.Code == ResolutionStatusCode.SuccessfulMatch)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void LogSessionInfo(LiveSessionDB session, ILambdaLogger info)
+        {            
+            info.LogLine("Teach Mode: " + session.TeachMode);
+            info.LogLine("Current State: " + session.State);
+            info.LogLine("Current Word: " + session.GetCurrentWord());
+            info.LogLine("CLive Session Schedule: " + session.CurrentSchedule);
+
+        }
+
+        private string FormatSessionDataAsJSON()
+        {
+            return "{CurrentWord:" + this.liveSession.GetCurrentWord() +
+                   ", CurrentSchedule:" + this.liveSession.CurrentSchedule +
+                   ", WordsRemaining:" + this.liveSession.GetWordsRemaining() + "}";
+        }
+
+        private async Task<string> GetUsername(CognitoUserPool userPool, string accessToken)
+        {
+            if (accessToken != null )
+            {
+                var userData = await userPool.GetUserData(accessToken);
+
+                if (userData != null)
+                {
+                    return userData.Username;
+                }
+            }
+
+            return "default";
+        }
+
     }
 }

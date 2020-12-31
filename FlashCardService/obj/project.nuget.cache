@@ -1,16 +1,20 @@
 {
   "version": 2,
-  "dgSpecHash": "jI7nzwFJ+zw92DflJuWKhgi9H4naJqCj14HzWcLg8bI/J577mkWgIO7IOatgZq1KkIzU6aTpvz7dN9EQ5/QbVA==",
+  "dgSpecHash": "ekrmMY0RJJvvjgK9DTcSmi4VuLAjsZ4ogLU+/xdzjLNHP2NUrvaqEJIbQEc/1jEgW1a+uuW0Og826IgMjpf55A==",
   "success": true,
   "projectFilePath": "E:\\Documents\\1_Code\\KidsReadAlong\\LambdaServices\\FlashCardService\\FlashCardService.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Brandon\\.nuget\\packages\\alexa.net\\1.14.0\\alexa.net.1.14.0.nupkg.sha512",
     "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.core\\1.2.0\\amazon.lambda.core.1.2.0.nupkg.sha512",
     "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.dynamodbevents\\1.2.0\\amazon.lambda.dynamodbevents.1.2.0.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.s3events\\1.2.0\\amazon.lambda.s3events.1.2.0.nupkg.sha512",
     "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.serialization.json\\1.8.0\\amazon.lambda.serialization.json.1.8.0.nupkg.sha512",
     "C:\\Users\\Brandon\\.nuget\\packages\\amazon.lambda.serialization.systemtextjson\\2.1.0\\amazon.lambda.serialization.systemtextjson.2.1.0.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\awssdk.cognitoidentityprovider\\3.5.1.14\\awssdk.cognitoidentityprovider.3.5.1.14.nupkg.sha512",
     "C:\\Users\\Brandon\\.nuget\\packages\\awssdk.core\\3.5.1.56\\awssdk.core.3.5.1.56.nupkg.sha512",
     "C:\\Users\\Brandon\\.nuget\\packages\\awssdk.dynamodbv2\\3.5.4.15\\awssdk.dynamodbv2.3.5.4.15.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\awssdk.s3\\3.5.7.3\\awssdk.s3.3.5.7.3.nupkg.sha512",
+    "C:\\Users\\Brandon\\.nuget\\packages\\awssdk.sqs\\3.5.1.5\\awssdk.sqs.3.5.1.5.nupkg.sha512",
     "C:\\Users\\Brandon\\.nuget\\packages\\newtonsoft.json\\12.0.2\\newtonsoft.json.12.0.2.nupkg.sha512"
   ],
   "logs": []

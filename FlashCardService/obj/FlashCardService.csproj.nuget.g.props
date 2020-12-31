@@ -17,6 +17,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
     <PkgAWSSDK_Core Condition=" '$(PkgAWSSDK_Core)' == '' ">C:\Users\Brandon\.nuget\packages\awssdk.core\3.5.1.56</PkgAWSSDK_Core>
+    <PkgAWSSDK_SQS Condition=" '$(PkgAWSSDK_SQS)' == '' ">C:\Users\Brandon\.nuget\packages\awssdk.sqs\3.5.1.5</PkgAWSSDK_SQS>
+    <PkgAWSSDK_S3 Condition=" '$(PkgAWSSDK_S3)' == '' ">C:\Users\Brandon\.nuget\packages\awssdk.s3\3.5.7.3</PkgAWSSDK_S3>
     <PkgAWSSDK_DynamoDBv2 Condition=" '$(PkgAWSSDK_DynamoDBv2)' == '' ">C:\Users\Brandon\.nuget\packages\awssdk.dynamodbv2\3.5.4.15</PkgAWSSDK_DynamoDBv2>
+    <PkgAWSSDK_CognitoIdentityProvider Condition=" '$(PkgAWSSDK_CognitoIdentityProvider)' == '' ">C:\Users\Brandon\.nuget\packages\awssdk.cognitoidentityprovider\3.5.1.14</PkgAWSSDK_CognitoIdentityProvider>
   </PropertyGroup>
 </Project>

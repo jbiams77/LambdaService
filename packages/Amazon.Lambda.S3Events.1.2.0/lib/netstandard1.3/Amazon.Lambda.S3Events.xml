@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Amazon.Lambda.S3Events</name>
+    </assembly>
+    <members>
+        <member name="T:Amazon.Lambda.S3Events.S3Event">
+            <summary>
+            AWS S3 event
+            http://docs.aws.amazon.com/lambda/latest/dg/with-s3.html
+            http://docs.aws.amazon.com/lambda/latest/dg/eventsources.html#eventsources-s3-put
+            </summary>
+        </member>
+    </members>
+</doc>
