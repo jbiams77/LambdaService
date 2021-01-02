@@ -53,12 +53,12 @@ namespace FlashCardService
                     await TransferDataFromUserProfileToLiveSession();
                     await UpdateLiveSessionDatabase();                    
                     response = AlexaResponse.Introduction();
+                    LogSessionInfo(liveSession, info);
                     await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     break;
 
                 case "IntentRequest":                    
                     response = await HandleIntentRequest((IntentRequest)input.Request);
-                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     break;
 
                 case "SessionEndedRequest":
@@ -99,6 +99,8 @@ namespace FlashCardService
                     break;
                 case "WordsToReadIntent":
                     intentResponse = await HandleWordsToReadIntent(intent);
+                    LogSessionInfo(liveSession, info);
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -186,7 +188,7 @@ namespace FlashCardService
         {            
             info.LogLine("Teach Mode: " + session.TeachMode);
             info.LogLine("Current State: " + session.State);
-            info.LogLine("Current Word: " + session.GetCurrentWord());
+            //info.LogLine("Current Word: " + session?.GetCurrentWord());
             info.LogLine("CLive Session Schedule: " + session.CurrentSchedule);
 
         }

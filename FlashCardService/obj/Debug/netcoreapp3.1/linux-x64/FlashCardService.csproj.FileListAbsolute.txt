@@ -20,3 +20,7 @@ E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\obj\Debug\netc
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\obj\Debug\netcoreapp3.1\linux-x64\FlashCardService.dll
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\obj\Debug\netcoreapp3.1\linux-x64\FlashCardService.pdb
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\obj\Debug\netcoreapp3.1\linux-x64\FlashCardService.genruntimeconfig.cache
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\linux-x64\Amazon.Lambda.S3Events.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\linux-x64\AWSSDK.CognitoIdentityProvider.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\linux-x64\AWSSDK.S3.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\linux-x64\AWSSDK.SQS.dll
