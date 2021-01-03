@@ -7,8 +7,10 @@ using Amazon.DynamoDBv2.Model;
 namespace Moyca.Database
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
-
-    /// Class handles all interactions with DynamoDB
+    
+    /// <summary>Class <c>DatabaseClient</c>: Provides all Moycan specific DynamoDB
+    /// databases with a common utility for queries, scan's, and getItems.</summary>
+    ///
     public abstract class DatabaseClient
     {
         private string tableName;
@@ -49,7 +51,7 @@ namespace Moyca.Database
             }
             catch (Exception e)
             {
-                //info.Log("Failed to GetEntry + " + primaryKey + " from " + tableName + ": " + e);
+                //TODO: Log exception thrown.
             }
 
             return item;
@@ -79,7 +81,7 @@ namespace Moyca.Database
             }
             catch (Exception e)
             {
-                //Function.info.Log("Failed to GetEntry + " + primaryKey + " from " + tableName + ": " + e);
+                //TODO: Log exception thrown.
             }
 
             return item;
@@ -112,7 +114,7 @@ namespace Moyca.Database
             }
             catch (Exception e)
             {
-                //Function.info.Log("Failed to GetEntriesBySecondaryIndex by " + secondaryIndexName + " from " + tableName + ": " + e);
+                //TODO: Log exception thrown.
             }
 
             return new List<DatabaseItem>();
@@ -132,7 +134,7 @@ namespace Moyca.Database
             }
             catch (Exception e)
             {
-                //Function.info.Log("Failed to get items by query request: "  + e);
+                //TODO: Log exception thrown.
             }
 
             return new List<DatabaseItem>();
@@ -165,7 +167,7 @@ namespace Moyca.Database
             }
             catch (Exception e)
             {
-               // Function.info.Log("Failed to set + " + tableName + "." + attributeKey + ": " + e);
+                //TODO: Log exception thrown.
                 return false;
             }
         }
@@ -182,7 +184,7 @@ namespace Moyca.Database
             }
             catch (Exception e)
             {
-                // Function.info.Log("Failed to set + " + tableName + "." + attributeKey + ": " + e);
+                //TODO: Log exception thrown.
                 return false;
             }
         }
@@ -209,7 +211,7 @@ namespace Moyca.Database
             }
             catch (Exception e)
             {
-               // Function.info.Log("Failed to put item for key " + primaryKey + " in table " + tableName + ": " + e);
+                //TODO: Log exception thrown.
                 return false;
             }
         }

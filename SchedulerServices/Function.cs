@@ -28,17 +28,16 @@ namespace SchedulerService
             dictionary = new DictionaryDB();
             int i;
             for(i=1000; i<1005; i++)
-            {
+            {                
                 await GetAndSetWords(i);
             }
-
             
         }
 
         public async Task GetAndSetWords(int orderNumber)
         {            
             await dictionary.GetWordsToReadWithOrder(await scopeAndSequence.GetOrder(orderNumber));
-            await scopeAndSequence.PutItemBackWithWordsToRead(orderNumber, dictionary.GetWordsToRead());
+            await scopeAndSequence.PutItemBackWithWordsToRead(orderNumber, dictionary.GetWordsToRead());            
         }
 
     }

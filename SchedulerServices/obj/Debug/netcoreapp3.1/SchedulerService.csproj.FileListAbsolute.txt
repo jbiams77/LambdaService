@@ -21,3 +21,8 @@ E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\bin\Debug\net
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\bin\Debug\netcoreapp3.1\Database.pdb
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\obj\Debug\netcoreapp3.1\SchedulerService.csprojAssemblyReference.cache
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\bin\Debug\netcoreapp3.1\Alexa.NET.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\bin\Debug\netcoreapp3.1\Amazon.Lambda.S3Events.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\bin\Debug\netcoreapp3.1\AWSSDK.CognitoIdentityProvider.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\bin\Debug\netcoreapp3.1\AWSSDK.S3.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\bin\Debug\netcoreapp3.1\AWSSDK.SQS.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\SchedulerServices\bin\Debug\netcoreapp3.1\Database.xml

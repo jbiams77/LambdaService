@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>bin\Debug\Database.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -98,6 +99,9 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy  /Y "$(ProjectDir)bin\Debug\Database.dll" "$(SolutionDir)FlashCardService\bin\Debug"
-xcopy  /Y "$(ProjectDir)bin\Debug\Database.dll" "$(SolutionDir)SchedulerServices\bin\Debug"</PostBuildEvent>
+xcopy  /Y "$(ProjectDir)bin\Debug\Database.xml" "$(SolutionDir)FlashCardService\bin\Debug"
+
+xcopy  /Y "$(ProjectDir)bin\Debug\Database.dll" "$(SolutionDir)SchedulerServices\bin\Debug"
+xcopy  /Y "$(ProjectDir)bin\Debug\Database.xml" "$(SolutionDir)SchedulerServices\bin\Debug"</PostBuildEvent>
   </PropertyGroup>
 </Project>

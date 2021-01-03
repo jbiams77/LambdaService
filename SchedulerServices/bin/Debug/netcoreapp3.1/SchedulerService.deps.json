@@ -8,11 +8,15 @@
     ".NETCoreApp,Version=v3.1": {
       "SchedulerService/1.0.0": {
         "dependencies": {
+          "AWSSDK.CognitoIdentityProvider": "3.5.1.14",
           "AWSSDK.Core": "3.5.1.56",
           "AWSSDK.DynamoDBv2": "3.5.4.15",
+          "AWSSDK.S3": "3.5.7.3",
+          "AWSSDK.SQS": "3.5.1.5",
           "Alexa.NET": "1.14.0",
           "Amazon.Lambda.Core": "1.2.0",
           "Amazon.Lambda.DynamoDBEvents": "1.2.0",
+          "Amazon.Lambda.S3Events": "1.2.0",
           "Amazon.Lambda.Serialization.Json": "1.8.0",
           "Amazon.Lambda.Serialization.SystemTextJson": "2.1.0",
           "Database": "1.0.0.0"
@@ -51,6 +55,17 @@
           }
         }
       },
+      "Amazon.Lambda.S3Events/1.2.0": {
+        "dependencies": {
+          "AWSSDK.S3": "3.5.7.3"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Amazon.Lambda.S3Events.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
       "Amazon.Lambda.Serialization.Json/1.8.0": {
         "dependencies": {
           "Amazon.Lambda.Core": "1.2.0",
@@ -74,6 +89,17 @@
           }
         }
       },
+      "AWSSDK.CognitoIdentityProvider/3.5.1.14": {
+        "dependencies": {
+          "AWSSDK.Core": "3.5.1.56"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/AWSSDK.CognitoIdentityProvider.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.5.1.14"
+          }
+        }
+      },
       "AWSSDK.Core/3.5.1.56": {
         "runtime": {
           "lib/netcoreapp3.1/AWSSDK.Core.dll": {
@@ -90,6 +116,28 @@
           "lib/netcoreapp3.1/AWSSDK.DynamoDBv2.dll": {
             "assemblyVersion": "3.3.0.0",
             "fileVersion": "3.5.4.15"
+          }
+        }
+      },
+      "AWSSDK.S3/3.5.7.3": {
+        "dependencies": {
+          "AWSSDK.Core": "3.5.1.56"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/AWSSDK.S3.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.5.7.3"
+          }
+        }
+      },
+      "AWSSDK.SQS/3.5.1.5": {
+        "dependencies": {
+          "AWSSDK.Core": "3.5.1.56"
+        },
+        "runtime": {
+          "lib/netcoreapp3.1/AWSSDK.SQS.dll": {
+            "assemblyVersion": "3.3.0.0",
+            "fileVersion": "3.5.1.5"
           }
         }
       },
@@ -138,6 +186,13 @@
       "path": "amazon.lambda.dynamodbevents/1.2.0",
       "hashPath": "amazon.lambda.dynamodbevents.1.2.0.nupkg.sha512"
     },
+    "Amazon.Lambda.S3Events/1.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-0Q092CYTFPeI0mYAo9NKsBKEtof2Q5dweGtBVQsH8u/gjMYph1kPJYNEMCkFOLZQDqQe1fRNfoITkzUiioByCQ==",
+      "path": "amazon.lambda.s3events/1.2.0",
+      "hashPath": "amazon.lambda.s3events.1.2.0.nupkg.sha512"
+    },
     "Amazon.Lambda.Serialization.Json/1.8.0": {
       "type": "package",
       "serviceable": true,
@@ -152,6 +207,13 @@
       "path": "amazon.lambda.serialization.systemtextjson/2.1.0",
       "hashPath": "amazon.lambda.serialization.systemtextjson.2.1.0.nupkg.sha512"
     },
+    "AWSSDK.CognitoIdentityProvider/3.5.1.14": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-yH2Un2duCPGlLiTjTTqoH+xRmSiwCFolLHL2JN9nPbfJmIVetj7uQTMN72byOYZreXLpfuhpVJoKocAPTNULLA==",
+      "path": "awssdk.cognitoidentityprovider/3.5.1.14",
+      "hashPath": "awssdk.cognitoidentityprovider.3.5.1.14.nupkg.sha512"
+    },
     "AWSSDK.Core/3.5.1.56": {
       "type": "package",
       "serviceable": true,
@@ -165,6 +227,20 @@
       "sha512": "sha512-weswHBNqIjGc59RRqfmuVsx1m74PQga4vOAsrbalRmo614dFH7TFJCnSplcCkgEBnqAIWrWMpK7WHuIOnngSAw==",
       "path": "awssdk.dynamodbv2/3.5.4.15",
       "hashPath": "awssdk.dynamodbv2.3.5.4.15.nupkg.sha512"
+    },
+    "AWSSDK.S3/3.5.7.3": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-3Y6hYemnaOooe4LEsCqeeOyjVOcBeJ5V69AWaz95RxNM5b+a7FH+zWxh0vNugWF4ODVrH/6an4Jy54sEcAXVdQ==",
+      "path": "awssdk.s3/3.5.7.3",
+      "hashPath": "awssdk.s3.3.5.7.3.nupkg.sha512"
+    },
+    "AWSSDK.SQS/3.5.1.5": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AxGdDm0eCqLXqYuyJwVPznRb/wXRrCMglr7Bv2m4lQib1KZEzYD4KiZwQb5m8X07KByRgeaNRPXTA/HMRN7nHA==",
+      "path": "awssdk.sqs/3.5.1.5",
+      "hashPath": "awssdk.sqs.3.5.1.5.nupkg.sha512"
     },
     "Newtonsoft.Json/12.0.2": {
       "type": "package",

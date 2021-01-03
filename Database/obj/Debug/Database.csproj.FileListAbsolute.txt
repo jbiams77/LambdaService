@@ -34,3 +34,4 @@ E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.S3.xm
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.SQS.pdb
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\AWSSDK.SQS.xml
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\obj\Debug\Database.csprojAssemblyReference.cache
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\Database\bin\Debug\Database.xml

@@ -7,37 +7,51 @@ using Moyca.Database.GlobalConstants;
 
 namespace Moyca.Database
 {
+    
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
+    /// <summary>Class <c>DictionaryDB</c>: For accessing the dictionary database
+    /// for retrieving words and for handling any changes to the scope and sequence
+    /// and dictionary word additions.</summary>
+    ///
     public class DictionaryDB : DatabaseClient
     {
-        public static string TableName { get { return "dictionary"; } }
-        public static string PrimaryPartitionKey { get { return "Word"; } }
+        /// <summary> Required to access dictionary in dynamoDB, cannot be changed. </summary>
+        private static string TableName { get { return "dictionary"; } }
 
-        public static string keyCondition = "#partitionKey = :partition AND #sortKey = :sort";
-        public int MaxWordCount { get { return 10; } }
+        /// <summary> Represents collumn name in dynamoDB for accessing unique keyed words. </summary>
+        private static string PrimaryPartitionKey { get { return "Word"; } }
 
-        private bool useWF;
-        private bool useCVC;
-        private bool useCD;
-        private bool useCB;
-        private bool useSW;
-        private bool useE;
-        private bool useR;
-        private bool useL;
-        private bool useVB;
-        private bool useVT;
-        private bool useV;
-        private bool useS;
+        /// <summary> All global secondary indexes use this condition to access content by query. </summary>
+        private static string keyCondition = "#partitionKey = :partition AND #sortKey = :sort";
 
+        /// <summary> For queries that produce more words than required by a session, limit to 10. </summary>
+        private int MaxWordCount { get { return 10; } }
+
+        private bool useWF;  // Word Family
+        private bool useCVC; // consonant vowel consnant
+        private bool useCD;  // consonant digraph
+        private bool useCB;  // consonant blend
+        private bool useSW;  // sight words
+        private bool useE;   // e-controlled vowels
+        private bool useR;   // r-controlled vowels
+        private bool useL;   // l-controlled vowels
+        private bool useVB;  // vowel-blend
+        private bool useVT;  // vowel-type
+        private bool useV;   // vowel
+        private bool useS;   // syllable
+
+        // for additional filtering due to limitation of dynamo GSI and to avoid costly scan's
         private Filter filter;
 
-        private CVC_WF_index cVC_WF_Index;
+        // global secondary indexes specific to dictionary
+        private CVC_WF_index cVC_WF_Index; 
         private SW_VT_index  sW_VT_Index;
         private CVC_V_index  cVC_V_Index;
         private BE_V_index   bE_V_Index;
         private CD_CB_index cD_CB_Index;
 
+        // words retrieved from dictionary based on scope and sequence
         private List<string> wordsToRead;
 
         public DictionaryDB() : base(DictionaryDB.TableName, DictionaryDB.PrimaryPartitionKey)
@@ -51,10 +65,22 @@ namespace Moyca.Database
             this.wordsToRead = new List<string>();
         }
 
+        /// <summary>If GetWordsToReadWithOrder() is not called, returns null.</summary>
+        /// /// <returns>List of strings to either populate dictionary with
+        ///  or to populate live-session with. Will return no more than 10</returns>
         public List<string> GetWordsToRead()
         {
             return this.wordsToRead;
         }
+
+
+        /// <summary>Retrieves words from dictionary based on order provided by scope-and-sequence.
+        /// Must be awaited to ensure dynamoDB response is aquired.
+        /// A Key Value Pair of:
+        /// Dictionary order = {{WF, "at"}, {CVC, TRUE}};        
+        /// This will grab all words from dictionary that are in the "at" family
+        /// and a consonant-vowel-consonant. </summary>
+        /// <param name="order">Key is lesson type mapped to lesson value.</param>
         public async Task GetWordsToReadWithOrder( Dictionary<string, string> order)
         {            
 
@@ -67,35 +93,35 @@ namespace Moyca.Database
             this.InitializeBoolsToFalse();
         }
 
-        public async Task<List<string>> GetCVCwithWordFamily(string wordFamily)
+        private async Task<List<string>> GetCVCwithWordFamily(string wordFamily)
         {
             List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(cVC_WF_Index, "TRUE", wordFamily));
 
             return ExtractWordsFromItem(databaseItem);
         }
 
-        public async Task<List<string>> GetCVCwithVowel(string vowel)
+        private async Task<List<string>> GetCVCwithVowel(string vowel)
         {
             List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(cVC_V_Index, "TRUE", vowel));
 
             return ExtractWordsFromItem(databaseItem);
         }
 
-        public async Task<List<string>> GetSightWordWithVowelType(string vowelType)
+        private async Task<List<string>> GetSightWordWithVowelType(string vowelType)
         {
             List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(sW_VT_Index, "TRUE", vowelType));
 
             return ExtractWordsFromItem(databaseItem);
         }
 
-        public async Task<List<string>> GetBossyEwithVowel(string vowel)
+        private async Task<List<string>> GetBossyEwithVowel(string vowel)
         {
             List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(bE_V_Index, "TRUE", vowel));
 
             return ExtractWordsFromItem(databaseItem);
         }
 
-        public async Task<List<string>> GetConsonantDigraphWithConsonantBlend(string consonantDigraph, string consonantBlend)
+        private async Task<List<string>> GetConsonantDigraphWithConsonantBlend(string consonantDigraph, string consonantBlend)
         {            
             List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(cD_CB_Index, consonantDigraph, consonantBlend));
 
@@ -192,6 +218,14 @@ namespace Moyca.Database
             return extractedWords;
         }
 
+        /// <summary>
+        /// The global secondary index can only query one column in table. When the requirement
+        /// for additional filtering exist, this will reduce the database item based on 
+        /// additional filters. 
+        /// </summary>
+        /// <param name="item">one item with all collumn attributes retrieved from dynamoDB</param>
+        /// <param name="word">filter produces null if this item does not meet filter requirements.</param>
+        /// <returns></returns>
         private bool FilterWord(DatabaseItem item, out string word)
         {
             AttributeValue wordVal = new AttributeValue();
@@ -222,7 +256,15 @@ namespace Moyca.Database
             }
             
         }
-
+        /// <summary>
+        /// Creates the query paylod that is sent to AWS dynamoDB. The query is based
+        /// on a Global index which is more effient than database scan. The projected
+        /// expression ensures only Word, VowelType, Vowel, and syllables are retrieved.
+        /// </summary>
+        /// <param name="gi">interface that contains the propery global index name</param>
+        /// <param name="pKey">primary key</param>
+        /// <param name="sKey">secondary key</param>
+        /// <returns></returns>
         private QueryRequest GenerateQuery(GlobalIndex gi, string pKey, string sKey)
         {   
             return new QueryRequest
@@ -243,9 +285,9 @@ namespace Moyca.Database
             };
         }
 
-        /*********************** GLOBAL INDEXES ***********************/
+        /*********************** GLOBAL SECONDARY INDEXES ***********************/
 
-        public class CVC_WF_index : GlobalIndex
+        private class CVC_WF_index : GlobalIndex
         {
             public virtual string Name { get { return "CVC-WF-index"; } }
             public virtual string PartitionKey { get { return "CVC"; } }
@@ -253,7 +295,7 @@ namespace Moyca.Database
             public CVC_WF_index() { }
         }
 
-        public class SW_VT_index : GlobalIndex
+        private class SW_VT_index : GlobalIndex
         {
             public virtual string Name { get { return "SW-VT-index"; } }
             public virtual string PartitionKey { get { return "SightWord"; } }
@@ -261,7 +303,7 @@ namespace Moyca.Database
             public SW_VT_index() { }
         }
 
-        public class CVC_V_index : GlobalIndex
+        private class CVC_V_index : GlobalIndex
         {
             public virtual string Name { get { return "CVC-V-index"; } }
             public virtual string PartitionKey { get { return "CVC"; } }
@@ -269,7 +311,7 @@ namespace Moyca.Database
             public CVC_V_index() { }
         }
 
-        public class BE_V_index : GlobalIndex
+        private class BE_V_index : GlobalIndex
         {
             public virtual string Name { get { return "BE-V-index"; } }
             public virtual string PartitionKey { get { return "BossyE"; } }
@@ -277,7 +319,7 @@ namespace Moyca.Database
             public BE_V_index() { }
         }
 
-        public class CD_CB_index : GlobalIndex
+        private class CD_CB_index : GlobalIndex
         {
             public virtual string Name { get { return "CD-CB-index"; } }
             public virtual string PartitionKey { get { return "ConsonantDigraph"; } }
