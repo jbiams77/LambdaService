@@ -20,7 +20,7 @@ namespace Moyca.Database
         private static string PrimaryPartitionKey { get { return "UserID"; } }
         
         // local place holder for current words to read
-        private List<string> wordsToRead;
+        public List<string> wordsToRead;
         // uniqe userID used to access database with primary key
         private string userId;
         
