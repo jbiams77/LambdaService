@@ -35,7 +35,7 @@ namespace Moyca.Database
         /// <summary> Alexa can currently teach or assess using words to read. </summary>
         public MODE TeachMode { get; set; }
         /// <summary> live-session state machine  </summary>
-        public STATE State { get; set; }
+        public STATE CurrentState { get; set; }
         /// <summary> The common-core skill Alexa is currently teaching to. </summary>
         public SKILL Skill { get; set; }
         /// <summary> Four digit index value that corresponds with scope and sequence database. </summary>
@@ -71,11 +71,11 @@ namespace Moyca.Database
                     { ":wordsToRead", new AttributeValue(this.wordsToRead) },
                     { ":teachMode", new AttributeValue(this.TeachMode.ToString())},
                     { ":skill", new AttributeValue(this.Skill.ToString()) },
-                    { ":state", new AttributeValue(this.State.ToString()) },
+                    { ":currentstate", new AttributeValue(this.CurrentState.ToString()) },
                     { ":curSched", currentSchedule }
                 },
                 UpdateExpression = "SET WordsToRead = :wordsToRead,  TeachMode = :teachMode, Skill = :skill, " +
-                                   "CurrentState = :state, CurrentSchedule = :curSched"
+                                   "CurrentState = :currentstate, CurrentSchedule = :curSched"
             };
 
             await SetItemsAttributeWithRequest(updateRequest);
@@ -102,7 +102,7 @@ namespace Moyca.Database
 
             if (items.TryGetValue("CurrentState", out AttributeValue state))
             {
-                this.State = (STATE)Enum.Parse(typeof(STATE), state.S);
+                this.CurrentState = (STATE)Enum.Parse(typeof(STATE), state.S);
             }
 
             if (items.TryGetValue("Skill", out AttributeValue skill))

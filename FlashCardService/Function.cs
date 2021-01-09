@@ -63,7 +63,7 @@ namespace FlashCardService
 
                 case "SessionEndedRequest":
                     await TransferDataFromUserProfileToLiveSession();
-                    liveSession.State = STATE.Off;
+                    liveSession.CurrentState = STATE.Off;
                     await UpdateLiveSessionDatabase();
                     await sqs.Send(GetSessionUpdate());
                     response = AlexaResponse.Say("Session End"); 
@@ -85,35 +85,35 @@ namespace FlashCardService
             {
                 case "AMAZON.YesIntent":
                     await TransferDataFromUserProfileToLiveSession();
-                    liveSession.State = STATE.FirstWord;
+                    liveSession.CurrentState = STATE.FirstWord;
                     await UpdateLiveSessionDatabase();
                     await sqs.Send(GetSessionUpdate());
                     intentResponse = await HandleYesIntent();
                     break;
                 case "AMAZON.NoIntent":
                     await TransferDataFromUserProfileToLiveSession();
-                    liveSession.State = STATE.Off;
+                    liveSession.CurrentState = STATE.Off;
                     await UpdateLiveSessionDatabase();
                     await sqs.Send(GetSessionUpdate());
                     intentResponse = ResponseBuilder.Tell("No intent.");
                     break;
                 case "AMAZON.CancelIntent":
                     await TransferDataFromUserProfileToLiveSession();
-                    liveSession.State = STATE.Off;
+                    liveSession.CurrentState = STATE.Off;
                     await UpdateLiveSessionDatabase();
                     await sqs.Send(GetSessionUpdate());
                     intentResponse = ResponseBuilder.Tell("Cancel intent.");
                     break;
                 case "AMAZON.FallbackIntent":
                     await TransferDataFromUserProfileToLiveSession();
-                    liveSession.State = STATE.Off;
+                    liveSession.CurrentState = STATE.Off;
                     await UpdateLiveSessionDatabase();
                     await sqs.Send(GetSessionUpdate());
                     intentResponse = ResponseBuilder.Tell("Fallback intent");
                     break;
                 case "AMAZON.StopIntent":
                     await TransferDataFromUserProfileToLiveSession();
-                    liveSession.State = STATE.Off;
+                    liveSession.CurrentState = STATE.Off;
                     await UpdateLiveSessionDatabase();
                     await sqs.Send(GetSessionUpdate());
                     intentResponse = ResponseBuilder.Tell("Goodbye.");
@@ -164,7 +164,7 @@ namespace FlashCardService
                 }
                 
                 currentWord = liveSession.GetCurrentWord();
-                liveSession.State = STATE.Assess;
+                liveSession.CurrentState = STATE.Assess;
                 await UpdateLiveSessionDatabase();
                 LogSessionInfo(liveSession, info);
             }
@@ -185,7 +185,7 @@ namespace FlashCardService
             liveSession.wordsToRead = scopeAndSequence.wordsToRead;
             liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.teachMode));
             liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.skill));
-            liveSession.State = STATE.Introduction;
+            liveSession.CurrentState = STATE.Introduction;
             liveSession.CurrentSchedule = currentScheduleNumber;
         }
 
@@ -211,7 +211,7 @@ namespace FlashCardService
         private void LogSessionInfo(LiveSessionDB session, ILambdaLogger info)
         {            
             info.LogLine("Teach Mode: " + session.TeachMode);
-            info.LogLine("Current State: " + session.State);            
+            info.LogLine("Current State: " + session.CurrentState);            
             info.LogLine("CLive Session Schedule: " + session.CurrentSchedule);
 
         }
@@ -222,6 +222,7 @@ namespace FlashCardService
             {
                 CurrentWord = this.liveSession.GetCurrentWord(),
                 CurrentSchedule = this.liveSession.CurrentSchedule,
+                CurrentState = this.liveSession.CurrentState.ToString(),
                 WordsRemaining = this.liveSession.GetWordsRemaining()
             };
         }
