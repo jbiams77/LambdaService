@@ -15,3 +15,4 @@ E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netc
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\publish\AWSSDK.SQS.dll
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\publish\Newtonsoft.Json.dll
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\publish\Database.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\publish\Database.xml

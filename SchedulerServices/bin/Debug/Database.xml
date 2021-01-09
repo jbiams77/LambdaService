@@ -134,6 +134,12 @@
             Used primarily by FlashCardService to populate live-session with session data
             to ensure lambda function follow servless design criteria.</summary>
         </member>
+        <member name="P:Moyca.Database.LiveSessionDB.AppReady">
+            <summary>
+            Indicates if Unity application is running, is set by Unity 
+            application and known through live-session database
+            </summary>
+        </member>
         <member name="P:Moyca.Database.LiveSessionDB.TeachMode">
             <summary> Alexa can currently teach or assess using words to read. </summary>
         </member>

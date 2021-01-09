@@ -62,6 +62,10 @@ namespace FlashCardService
                     break;
 
                 case "SessionEndedRequest":
+                    await TransferDataFromUserProfileToLiveSession();
+                    liveSession.State = STATE.Off;
+                    await UpdateLiveSessionDatabase();
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     response = AlexaResponse.Say("Session End"); 
                     break;
 
@@ -80,19 +84,39 @@ namespace FlashCardService
             switch (intent.Intent.Name)
             {
                 case "AMAZON.YesIntent":
+                    await TransferDataFromUserProfileToLiveSession();
+                    liveSession.State = STATE.FirstWord;
+                    await UpdateLiveSessionDatabase();
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     intentResponse = await HandleYesIntent();
                     break;
                 case "AMAZON.NoIntent":
+                    await TransferDataFromUserProfileToLiveSession();
+                    liveSession.State = STATE.Off;
+                    await UpdateLiveSessionDatabase();
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     intentResponse = ResponseBuilder.Tell("No intent.");
                     break;
                 case "AMAZON.CancelIntent":
+                    await TransferDataFromUserProfileToLiveSession();
+                    liveSession.State = STATE.Off;
+                    await UpdateLiveSessionDatabase();
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     intentResponse = ResponseBuilder.Tell("Cancel intent.");
                     break;
                 case "AMAZON.FallbackIntent":
+                    await TransferDataFromUserProfileToLiveSession();
+                    liveSession.State = STATE.Off;
+                    await UpdateLiveSessionDatabase();
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
                     intentResponse = ResponseBuilder.Tell("Fallback intent");
                     break;
                 case "AMAZON.StopIntent":
-                    intentResponse = ResponseBuilder.Tell("Stop intent.");
+                    await TransferDataFromUserProfileToLiveSession();
+                    liveSession.State = STATE.Off;
+                    await UpdateLiveSessionDatabase();
+                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
+                    intentResponse = ResponseBuilder.Tell("Goodbye.");
                     break;
                 case "AMAZON.HelpIntent":
                     intentResponse = ResponseBuilder.Tell("Help intent.");
@@ -140,7 +164,7 @@ namespace FlashCardService
                 }
                 
                 currentWord = liveSession.GetCurrentWord();
-
+                liveSession.State = STATE.Assess;
                 await UpdateLiveSessionDatabase();
                 LogSessionInfo(liveSession, info);
             }
@@ -187,8 +211,7 @@ namespace FlashCardService
         private void LogSessionInfo(LiveSessionDB session, ILambdaLogger info)
         {            
             info.LogLine("Teach Mode: " + session.TeachMode);
-            info.LogLine("Current State: " + session.State);
-            //info.LogLine("Current Word: " + session?.GetCurrentWord());
+            info.LogLine("Current State: " + session.State);            
             info.LogLine("CLive Session Schedule: " + session.CurrentSchedule);
 
         }
@@ -197,7 +220,8 @@ namespace FlashCardService
         {
             return "{CurrentWord:" + this.liveSession.GetCurrentWord() +
                    ", CurrentSchedule:" + this.liveSession.CurrentSchedule +
-                   ", WordsRemaining:" + this.liveSession.GetWordsRemaining() + "}";
+                   ", WordsRemaining:" + this.liveSession.GetWordsRemaining() + 
+                    ", CurrentState: " + this.liveSession.State.ToString() + "}";
         }
 
         private async Task<string> GetUsername(CognitoUserPool userPool, string accessToken)

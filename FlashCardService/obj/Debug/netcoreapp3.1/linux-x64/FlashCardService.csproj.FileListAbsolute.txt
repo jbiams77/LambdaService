@@ -24,3 +24,4 @@ E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netc
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\linux-x64\AWSSDK.CognitoIdentityProvider.dll
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\linux-x64\AWSSDK.S3.dll
 E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\linux-x64\AWSSDK.SQS.dll
+E:\Documents\1_Code\KidsReadAlong\LambdaServices\FlashCardService\bin\Debug\netcoreapp3.1\linux-x64\Database.xml

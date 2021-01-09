@@ -22,11 +22,10 @@ namespace Moyca.Database.GlobalConstants
     /// </summary>
     public enum STATE
     {
+        Off,
         Introduction,
-        WordFamilyModel,
-        WordFamilyAssess,
-        SightWordModel,
-        SightWordAssess
+        FirstWord,
+        Assess        
     }
 
     /// <summary>
