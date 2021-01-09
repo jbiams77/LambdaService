@@ -11,6 +11,7 @@ namespace Moyca.Database
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
+
     public class UserProfileDB : DatabaseClient
     {
         public static string TableName { get { return "user-profile"; } }
@@ -21,6 +22,10 @@ namespace Moyca.Database
         public string LastLogin { get; set; }
 
         public List<int> schedule;
+
+        // Keys used to access database elements
+        private readonly string DEFAULT_DB_KEY = "default";
+        private readonly string SCHEDULE_KEY = "Schedule";
 
         public UserProfileDB(string userId) : base (UserProfileDB.TableName, UserProfileDB.PrimaryPartitionKey)
         {
@@ -36,10 +41,21 @@ namespace Moyca.Database
 
         private async Task GetUserSchedule()
         {
-            DatabaseItem items = await GetItemWithString(this.UserID);
-            items.TryGetValue("Schedule", out AttributeValue val);            
+            DatabaseItem items = await GetEntryByKey(this.UserID);
+            AttributeValue dbSchedule;
+            if (!items.TryGetValue(SCHEDULE_KEY, out dbSchedule))
+            {
+                // The user profile didnt contain a schedule, copy the default schedule into this user's profile
+                DatabaseItem defaultDb = await GetEntryByKey(DEFAULT_DB_KEY);
+                defaultDb.TryGetValue(SCHEDULE_KEY, out AttributeValue defaultSchedule);
 
-            foreach(AttributeValue item in val.L)
+                AttributeValue key = new AttributeValue{ S = this.UserID };
+                await SetItemsAttribute(key, SCHEDULE_KEY, defaultSchedule);
+
+                dbSchedule = defaultSchedule;
+            }
+
+            foreach (AttributeValue item in dbSchedule.L)
             {
                 schedule.Add(int.Parse(item.N));
             }

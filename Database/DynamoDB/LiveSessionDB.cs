@@ -88,7 +88,7 @@ namespace Moyca.Database
         /// <returns></returns>
         public async Task GetDataFromLiveSession()
         {
-            DatabaseItem items = await GetItemWithString(this.userId);
+            DatabaseItem items = await GetEntryByKey(this.userId);
 
             items.TryGetValue("WordsToRead", out AttributeValue words);
             this.wordsToRead = words.SS;

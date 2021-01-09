@@ -12,9 +12,29 @@ namespace FlashCardService
 {
     class CognitoUserPool
     {
-        private AmazonCognitoIdentityProviderClient _provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.USWest2);
+        private readonly string DEFAULT_USERNAME = "default";
 
-        public async Task<GetUserResponse> GetUserData(string accessToken)
+        private AmazonCognitoIdentityProviderClient _provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.USWest2);
+        /// <summary>
+        /// Get Username from Cognito UserPool Account
+        /// </summary>
+        /// <returns>the string username if it exists, otherwise a defautl username is used</returns>
+        public async Task<string> GetUsername(string accessToken)
+        {
+            if (accessToken != null)
+            {
+                var userData = await GetUserData(accessToken);
+
+                if (userData != null)
+                {
+                    return userData.Username;
+                }
+            }
+
+            return DEFAULT_USERNAME;
+        }
+
+        private async Task<GetUserResponse> GetUserData(string accessToken)
         {
             var getUserRequest = new GetUserRequest();
             getUserRequest.AccessToken = accessToken;
@@ -31,5 +51,7 @@ namespace FlashCardService
 
             return response;
         }
+
+       
     }
 }

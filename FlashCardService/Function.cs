@@ -38,7 +38,7 @@ namespace FlashCardService
             Type T = input.GetRequestType();
             info = context.Logger;
             CognitoUserPool cognitoUserPool = new CognitoUserPool();
-            this.userId = await GetUsername(cognitoUserPool, input.Session.User.AccessToken);            
+            this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);            
 
             this.liveSession = new LiveSessionDB(userId);
             this.userProfile = new UserProfileDB(userId);
@@ -224,21 +224,6 @@ namespace FlashCardService
                 CurrentSchedule = this.liveSession.CurrentSchedule,
                 WordsRemaining = this.liveSession.GetWordsRemaining()
             };
-        }
-
-        private async Task<string> GetUsername(CognitoUserPool userPool, string accessToken)
-        {
-            if (accessToken != null )
-            {
-                var userData = await userPool.GetUserData(accessToken);
-
-                if (userData != null)
-                {
-                    return userData.Username;
-                }
-            }
-
-            return "default";
         }
 
     }

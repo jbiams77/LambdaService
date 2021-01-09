@@ -26,7 +26,7 @@ namespace Moyca.Database
 
         public async Task GetSessionDataWithNumber(int orderNumber)
         {
-            DatabaseItem item = await GetItemWithNumber(orderNumber);
+            DatabaseItem item = await GetEntryByKey(orderNumber);
 
             item.TryGetValue("WordsToRead", out AttributeValue words);
             this.wordsToRead = words.SS;
@@ -40,7 +40,7 @@ namespace Moyca.Database
 
         public async Task<Dictionary<string, string>> GetOrder(int number)
         {
-            DatabaseItem items = await GetItemWithNumber(number);
+            DatabaseItem items = await GetEntryByKey(number);
 
             Dictionary<string, string> wordOrder = new Dictionary<string, string>();
 
