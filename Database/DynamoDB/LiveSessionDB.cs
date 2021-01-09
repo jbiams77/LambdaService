@@ -20,10 +20,18 @@ namespace Moyca.Database
         private static string PrimaryPartitionKey { get { return "UserID"; } }
         
         // local place holder for current words to read
-        private List<string> wordsToRead;
+        public List<string> wordsToRead;
         // uniqe userID used to access database with primary key
         private string userId;
-        
+
+        private string timeStamp;        
+
+        /// <summary>
+        /// Indicates if Unity application is running, is set by Unity 
+        /// application and known through live-session database
+        /// </summary>
+        public bool AppReady { get; set; }
+
         /// <summary> Alexa can currently teach or assess using words to read. </summary>
         public MODE TeachMode { get; set; }
         /// <summary> live-session state machine  </summary>
@@ -64,7 +72,7 @@ namespace Moyca.Database
                     { ":teachMode", new AttributeValue(this.TeachMode.ToString())},
                     { ":skill", new AttributeValue(this.Skill.ToString()) },
                     { ":state", new AttributeValue(this.State.ToString()) },
-                    { ":curSched", currentSchedule }
+                    { ":curSched", currentSchedule }                    
                 },
                 UpdateExpression = "SET WordsToRead = :wordsToRead,  TeachMode = :teachMode, Skill = :skill, " +
                                    "CurrentState = :state, CurrentSchedule = :curSched"
@@ -96,6 +104,12 @@ namespace Moyca.Database
 
             items.TryGetValue("CurrentSchedule", out AttributeValue curSched);
             this.CurrentSchedule = int.Parse(curSched.N);
+
+            items.TryGetValue("Timestamp", out AttributeValue timeStamp);
+            this.timeStamp = timeStamp.S;
+
+            items.TryGetValue("AppReady", out AttributeValue appReady );
+            this.AppReady = appReady.BOOL;
 
         }
 

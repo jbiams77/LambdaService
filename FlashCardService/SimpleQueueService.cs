@@ -88,14 +88,14 @@ namespace FlashCardService
             string messageAsJson = ToJson(message);
             if (messageAsJson != "")
             {
-                SendMessageRequest smr = new SendMessageRequest(QueueURL, ToJson(message));
+                SendMessageRequest smr = new SendMessageRequest(QueueURL, messageAsJson);
                 try
                 {
                     await sqsClient.SendMessageAsync(smr);
+                    Function.info.Log("Sent message to " + QueueURL + ": \n" + messageAsJson);
                 }
                 catch (Exception e)
                 {
-                    Function.info.Log("Unable to send message to " + QueueURL + ": " + e);
                 }
             }
         }
