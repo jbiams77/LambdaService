@@ -130,10 +130,10 @@ namespace Moyca.Database
         /// Get the amount of words left to read. Used by unity to 
         /// populate progress bar.
         /// </summary>
-        /// <returns>The string amount after converted from int.</returns>
-        public string GetWordsRemaining()
+        /// <returns>The number of words remaining.</returns>
+        public int GetWordsRemaining()
         {
-            return wordsToRead.Count.ToString();
+            return wordsToRead.Count;
         }
 
 

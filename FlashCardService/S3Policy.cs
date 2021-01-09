@@ -19,14 +19,12 @@ namespace FlashCardService
 
         public async Task<string> GetFile(string key)
         {
-            // Create a GetObject request
             GetObjectRequest request = new GetObjectRequest
             {
                 BucketName = this.BucketName,
                 Key = key
             };
 
-            // Issue request and remember to dispose of the response
             using (GetObjectResponse response = await client.GetObjectAsync(request))
             {
                 // convert stream to string

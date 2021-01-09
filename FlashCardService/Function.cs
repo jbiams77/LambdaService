@@ -45,16 +45,16 @@ namespace FlashCardService
             this.scopeAndSequence = new ScopeAndSequenceDB();
             this.sqs = new SQS();
 
-            await InitializeUserQueue();                        
 
             switch (T.Name)
             {
                 case "LaunchRequest":
+                    await InitializeUserQueue();                        
                     await TransferDataFromUserProfileToLiveSession();
                     await UpdateLiveSessionDatabase();                    
                     response = AlexaResponse.Introduction();
                     LogSessionInfo(liveSession, info);
-                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
+                    await sqs.SendMessageToSQS(GetSessionUpdate());
                     break;
 
                 case "IntentRequest":                    
@@ -100,7 +100,7 @@ namespace FlashCardService
                 case "WordsToReadIntent":
                     intentResponse = await HandleWordsToReadIntent(intent);
                     LogSessionInfo(liveSession, info);
-                    await sqs.SendMessageToSQS(FormatSessionDataAsJSON());
+                    await sqs.SendMessageToSQS(GetSessionUpdate());
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -158,7 +158,7 @@ namespace FlashCardService
         {            
             int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();            
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
-            liveSession.wordsToRead = scopeAndSequence.wordsToRead;
+            //liveSession.wordsToRead = scopeAndSequence.wordsToRead;
             liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.teachMode));
             liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.skill));
             liveSession.State = STATE.Introduction;
@@ -193,11 +193,13 @@ namespace FlashCardService
 
         }
 
-        private string FormatSessionDataAsJSON()
+        private MessageSchema.SessionUpdate GetSessionUpdate()
         {
-            return "{CurrentWord:" + this.liveSession.GetCurrentWord() +
-                   ", CurrentSchedule:" + this.liveSession.CurrentSchedule +
-                   ", WordsRemaining:" + this.liveSession.GetWordsRemaining() + "}";
+            return new MessageSchema.SessionUpdate
+            {
+                CurrentWord = this.liveSession.GetCurrentWord(),
+                WordsRemaining = this.liveSession.GetWordsRemaining()
+            };
         }
 
         private async Task<string> GetUsername(CognitoUserPool userPool, string accessToken)
