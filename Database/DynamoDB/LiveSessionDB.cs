@@ -18,13 +18,13 @@ namespace Moyca.Database
     {
         private static string TableName { get { return "live-session"; } }
         private static string PrimaryPartitionKey { get { return "UserID"; } }
-        
+
         // local place holder for current words to read
         public List<string> wordsToRead;
         // uniqe userID used to access database with primary key
         private string userId;
 
-        private string timeStamp;        
+        private string timeStamp;
 
         /// <summary>
         /// Indicates if Unity application is running, is set by Unity 
@@ -72,7 +72,7 @@ namespace Moyca.Database
                     { ":teachMode", new AttributeValue(this.TeachMode.ToString())},
                     { ":skill", new AttributeValue(this.Skill.ToString()) },
                     { ":state", new AttributeValue(this.State.ToString()) },
-                    { ":curSched", currentSchedule }                    
+                    { ":curSched", currentSchedule }
                 },
                 UpdateExpression = "SET WordsToRead = :wordsToRead,  TeachMode = :teachMode, Skill = :skill, " +
                                    "CurrentState = :state, CurrentSchedule = :curSched"
@@ -90,26 +90,40 @@ namespace Moyca.Database
         {
             DatabaseItem items = await GetEntryByKey(this.userId);
 
-            items.TryGetValue("WordsToRead", out AttributeValue words);
-            this.wordsToRead = words.SS;
+            if (items.TryGetValue("WordsToRead", out AttributeValue words))
+            {
+                this.wordsToRead = words.SS;
+            }
 
-            items.TryGetValue("TeachMode", out AttributeValue mode);
-            this.TeachMode = (MODE)Enum.Parse(typeof(MODE), mode.S);
+            if (items.TryGetValue("TeachMode", out AttributeValue mode))
+            {
+                this.TeachMode = (MODE)Enum.Parse(typeof(MODE), mode.S);
+            }
 
-            items.TryGetValue("CurrentState", out AttributeValue state);
-            this.State = (STATE)Enum.Parse(typeof(STATE), state.S);
+            if (items.TryGetValue("CurrentState", out AttributeValue state))
+            {
+                this.State = (STATE)Enum.Parse(typeof(STATE), state.S);
+            }
 
-            items.TryGetValue("Skill", out AttributeValue skill);
-            this.Skill = (SKILL)Enum.Parse(typeof(SKILL), skill.S);
+            if (items.TryGetValue("Skill", out AttributeValue skill))
+            {
+                this.Skill = (SKILL)Enum.Parse(typeof(SKILL), skill.S);
+            }
 
-            items.TryGetValue("CurrentSchedule", out AttributeValue curSched);
-            this.CurrentSchedule = int.Parse(curSched.N);
+            if (items.TryGetValue("CurrentSchedule", out AttributeValue curSched))
+            {
+                this.CurrentSchedule = int.Parse(curSched.N);
+            }
 
-            items.TryGetValue("Timestamp", out AttributeValue timeStamp);
-            this.timeStamp = timeStamp.S;
+            if (items.TryGetValue("Timestamp", out AttributeValue timeStamp))
+            {
+                this.timeStamp = timeStamp.S;
+            }
 
-            items.TryGetValue("AppReady", out AttributeValue appReady );
-            this.AppReady = appReady.BOOL;
+            if (items.TryGetValue("AppReady", out AttributeValue appReady))
+            {
+                this.AppReady = appReady.BOOL;
+            }
 
         }
 
@@ -123,7 +137,7 @@ namespace Moyca.Database
         public bool Remove(string currentWord)
         {
             wordsToRead.Remove(currentWord);
-            return (wordsToRead.Count == 0) ? true : false;            
+            return (wordsToRead.Count == 0) ? true : false;
         }
 
         /// <summary>
