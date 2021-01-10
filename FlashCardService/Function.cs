@@ -143,7 +143,8 @@ namespace FlashCardService
 
             string currentWord = liveSession.GetCurrentWord();
 
-            string prompt = "Say the word";
+            string prompt = "";
+            string rePrompt = "Say the word";
 
             if (ReaderSaidTheWord(intent))
             {
@@ -167,7 +168,7 @@ namespace FlashCardService
                 await UpdateLiveSessionDatabase();
             }
 
-            return AlexaResponse.GetResponse(currentWord, prompt, prompt);
+            return AlexaResponse.GetResponse(currentWord, prompt, rePrompt);
         }
         // Creates or updates the queue and sets the queue URL in the user database
         public async Task InitializeUserQueue()
