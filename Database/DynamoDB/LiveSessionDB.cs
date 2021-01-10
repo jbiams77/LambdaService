@@ -146,7 +146,7 @@ namespace Moyca.Database
         /// <returns>Current word to prompt user.</returns>
         public string GetCurrentWord()
         {
-            if (wordsToRead[0] != null)
+            if (wordsToRead.Any())
             {
                 return wordsToRead[0];
             }
