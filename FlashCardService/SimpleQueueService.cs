@@ -86,6 +86,7 @@ namespace FlashCardService
         public async Task Send<MessageType>(MessageType message)
         {
             string messageAsJson = ToJson(message);
+            Function.info.Log("Attempting to send on SQS\n: " + messageAsJson);
             if (messageAsJson != "")
             {
                 SendMessageRequest smr = new SendMessageRequest(QueueURL, messageAsJson);
@@ -96,6 +97,7 @@ namespace FlashCardService
                 }
                 catch (Exception e)
                 {
+                    Function.info.Log("Failed to send message to " + QueueURL + ": " + e);
                 }
             }
         }

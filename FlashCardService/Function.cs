@@ -34,39 +34,36 @@ namespace FlashCardService
 
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
         {
-            
+
             Type T = input.GetRequestType();
             info = context.Logger;
             CognitoUserPool cognitoUserPool = new CognitoUserPool();
-            this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);            
+            this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);
 
             this.liveSession = new LiveSessionDB(userId);
             this.userProfile = new UserProfileDB(userId);
             this.scopeAndSequence = new ScopeAndSequenceDB();
             this.sqs = new SQS();
+            await InitializeUserQueue();
 
 
             switch (T.Name)
             {
                 case "LaunchRequest":
-                    await InitializeUserQueue();                        
                     await TransferDataFromUserProfileToLiveSession();
-                    await UpdateLiveSessionDatabase();                    
+                    await UpdateLiveSessionDatabase();
                     response = AlexaResponse.Introduction();
                     LogSessionInfo(liveSession, info);
                     await sqs.Send(GetSessionUpdate());
                     break;
 
-                case "IntentRequest":                    
+                case "IntentRequest":
                     response = await HandleIntentRequest((IntentRequest)input.Request);
                     break;
 
                 case "SessionEndedRequest":
-                    await TransferDataFromUserProfileToLiveSession();
-                    liveSession.CurrentState = STATE.Off;
-                    await UpdateLiveSessionDatabase();
-                    await sqs.Send(GetSessionUpdate());
-                    response = AlexaResponse.Say("Session End"); 
+                    await SetStateToOffAndExit();
+                    response = AlexaResponse.Say("Session End");
                     break;
 
                 default:
@@ -91,31 +88,19 @@ namespace FlashCardService
                     intentResponse = await HandleYesIntent();
                     break;
                 case "AMAZON.NoIntent":
-                    await TransferDataFromUserProfileToLiveSession();
-                    liveSession.CurrentState = STATE.Off;
-                    await UpdateLiveSessionDatabase();
-                    await sqs.Send(GetSessionUpdate());
+                    await SetStateToOffAndExit();
                     intentResponse = ResponseBuilder.Tell("No intent.");
                     break;
                 case "AMAZON.CancelIntent":
-                    await TransferDataFromUserProfileToLiveSession();
-                    liveSession.CurrentState = STATE.Off;
-                    await UpdateLiveSessionDatabase();
-                    await sqs.Send(GetSessionUpdate());
+                    await SetStateToOffAndExit();
                     intentResponse = ResponseBuilder.Tell("Cancel intent.");
                     break;
                 case "AMAZON.FallbackIntent":
-                    await TransferDataFromUserProfileToLiveSession();
-                    liveSession.CurrentState = STATE.Off;
-                    await UpdateLiveSessionDatabase();
-                    await sqs.Send(GetSessionUpdate());
+                    await SetStateToOffAndExit();
                     intentResponse = ResponseBuilder.Tell("Fallback intent");
                     break;
                 case "AMAZON.StopIntent":
-                    await TransferDataFromUserProfileToLiveSession();
-                    liveSession.CurrentState = STATE.Off;
-                    await UpdateLiveSessionDatabase();
-                    await sqs.Send(GetSessionUpdate());
+                    await SetStateToOffAndExit();
                     intentResponse = ResponseBuilder.Tell("Goodbye.");
                     break;
                 case "AMAZON.HelpIntent":
@@ -123,7 +108,6 @@ namespace FlashCardService
                     break;
                 case "WordsToReadIntent":
                     intentResponse = await HandleWordsToReadIntent(intent);
-                    LogSessionInfo(liveSession, info);
                     await sqs.Send(GetSessionUpdate());
                     break;
                 default:
@@ -132,6 +116,14 @@ namespace FlashCardService
             }
             return intentResponse;
         }
+        private async Task SetStateToOffAndExit()
+        {
+            await TransferDataFromUserProfileToLiveSession();
+            liveSession.CurrentState = STATE.Off;
+            await UpdateLiveSessionDatabase();
+            await sqs.Send(GetSessionUpdate());
+        }
+
 
         private async Task<SkillResponse> HandleYesIntent()
         {
@@ -145,7 +137,7 @@ namespace FlashCardService
         }
 
         private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent)
-        {            
+        {
 
             await liveSession.GetDataFromLiveSession();
 
@@ -155,18 +147,24 @@ namespace FlashCardService
 
             if (ReaderSaidTheWord(intent))
             {
-                prompt = "Great!";
+                //prompt = "Great!";  UNCOMMENT IF NEEDING ALEXA FEEDBACK, OTHERWISE THIS GETS TO BE TOO MUCH
+
                 if (liveSession.Remove(currentWord))
-                {   
-                    prompt = "Congratulations! You can move on to the next session.";
+                {
+                    prompt = "Congratulations! You finished this session! Another reading assession awaits you. Just say, Alexa, open Moycan Readers!";
                     await this.userProfile.RemoveCompletedScheduleFromUserProfile(liveSession.CurrentSchedule);
-                    await TransferDataFromUserProfileToLiveSession();
+                    liveSession.CurrentState = STATE.Off;
+                    info.LogLine("SESSION COMPLETED.");
+                    return ResponseBuilder.Tell(prompt);
                 }
-                
-                currentWord = liveSession.GetCurrentWord();
-                liveSession.CurrentState = STATE.Assess;
+                else
+                {
+                    currentWord = liveSession.GetCurrentWord();
+                    liveSession.CurrentState = STATE.Assess;
+                    LogSessionInfo(liveSession, info);
+                }
+
                 await UpdateLiveSessionDatabase();
-                LogSessionInfo(liveSession, info);
             }
 
             return AlexaResponse.GetResponse(currentWord, prompt, prompt);
@@ -179,8 +177,8 @@ namespace FlashCardService
         }
 
         private async Task TransferDataFromUserProfileToLiveSession()
-        {            
-            int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();            
+        {
+            int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
             liveSession.wordsToRead = scopeAndSequence.wordsToRead;
             liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.teachMode));
@@ -195,7 +193,7 @@ namespace FlashCardService
         }
 
         private bool ReaderSaidTheWord(IntentRequest input)
-        {   
+        {
 
             foreach (ResolutionAuthority auth in input.Intent.Slots.Last().Value.Resolution.Authorities)
             {
@@ -209,9 +207,9 @@ namespace FlashCardService
         }
 
         private void LogSessionInfo(LiveSessionDB session, ILambdaLogger info)
-        {            
+        {
             info.LogLine("Teach Mode: " + session.TeachMode);
-            info.LogLine("Current State: " + session.CurrentState);            
+            info.LogLine("Current State: " + session.CurrentState);
             info.LogLine("CLive Session Schedule: " + session.CurrentSchedule);
 
         }
@@ -226,6 +224,5 @@ namespace FlashCardService
                 WordsRemaining = this.liveSession.GetWordsRemaining()
             };
         }
-
     }
 }
