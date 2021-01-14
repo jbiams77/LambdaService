@@ -46,15 +46,14 @@ namespace FlashCardService
             this.sqs = new SQS();
             await InitializeUserQueue();
 
-
             switch (T.Name)
             {
                 case "LaunchRequest":
-                    response = await HandleLaunchRequest();
+                    response = await HandleLaunchRequest(input.APLSupported());
                     break;
 
                 case "IntentRequest":
-                    response = await HandleIntentRequest((IntentRequest)input.Request);
+                    response = await HandleIntentRequest((IntentRequest)input.Request, input.APLSupported());
                     break;
 
                 case "SessionEndedRequest":
@@ -70,7 +69,7 @@ namespace FlashCardService
             return response;
         }
 
-        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent)
+        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent, bool displaySupported)
         {
             SkillResponse intentResponse;
 
@@ -81,7 +80,7 @@ namespace FlashCardService
                     liveSession.CurrentState = STATE.FirstWord;
                     await UpdateLiveSessionDatabase();
                     await sqs.Send(GetSessionUpdate());
-                    intentResponse = await HandleYesIntent();
+                    intentResponse = await HandleYesIntent(displaySupported);
                     break;
                 case "AMAZON.NoIntent":
                     await SetStateToOffAndExit();
@@ -103,7 +102,7 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Help intent.");
                     break;
                 case "WordsToReadIntent":
-                    intentResponse = await HandleWordsToReadIntent(intent);
+                    intentResponse = await HandleWordsToReadIntent(intent, displaySupported);
                     await sqs.Send(GetSessionUpdate());
                     break;
                 default:
@@ -120,7 +119,7 @@ namespace FlashCardService
             await sqs.Send(GetSessionUpdate());
         }
 
-        private async Task<SkillResponse> HandleLaunchRequest()
+        private async Task<SkillResponse> HandleLaunchRequest(bool displaySupported)
         {   
             await TransferDataFromUserProfileToLiveSession();
             await UpdateLiveSessionDatabase();
@@ -129,16 +128,16 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
-                return TeachMode.Introduction(liveSession, wordAttributes);
+                return TeachMode.Introduction(liveSession, wordAttributes, displaySupported);
             }
             else
             {
-                return AlexaResponse.Introduction();
+                return AlexaResponse.Introduction(displaySupported);
             }
             
         }
 
-        private async Task<SkillResponse> HandleYesIntent()
+        private async Task<SkillResponse> HandleYesIntent(bool displaySupported)
         {
             await liveSession.GetDataFromLiveSession();
 
@@ -146,10 +145,10 @@ namespace FlashCardService
 
             string prompt = "Say the word on the flash card";
 
-            return AlexaResponse.GetResponse(currentWord, prompt, prompt);
+            return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
         }
 
-        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent)
+        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent, bool displaySupported)
         {
 
             await liveSession.GetDataFromLiveSession();
@@ -180,7 +179,7 @@ namespace FlashCardService
                 await UpdateLiveSessionDatabase();
             }
 
-            return AlexaResponse.GetResponse(currentWord, prompt, prompt);
+            return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
         }
         // Creates or updates the queue and sets the queue URL in the user database
         public async Task InitializeUserQueue()
