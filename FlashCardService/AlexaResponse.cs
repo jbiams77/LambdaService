@@ -31,11 +31,30 @@ namespace FlashCardService
             return BuildResponse(speechResponse, false, null, new Reprompt(reprompt), null);
         }
 
-        public static SkillResponse Introduction()
+        public static SkillResponse Introduction(IOutputSpeech introduction, string reprompt, bool displaySupported)
+        {
+            var response = AlexaResponse.SayWithReprompt(introduction, reprompt);
+
+            if (displaySupported)
+            {
+                response.Response.Directives.Add(Create_IntroPresentation_Directive());
+            }
+
+            return response;
+        }
+
+        public static SkillResponse Introduction(bool displaySupported)
         {
             string introduction = StartTag + "Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?" + EndTag;
 
-            return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(introduction), "Say yes or no to continue. ");
+            var response = AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(introduction), "Say yes or no to continue. ");
+            
+            if (displaySupported)
+            {
+                response.Response.Directives.Add(Create_IntroPresentation_Directive());
+            }
+
+            return response;
         }
 
         private static SkillResponse BuildResponse(IOutputSpeech outputSpeech, bool shouldEndSession, Session sessionAttributes, Reprompt reprompt, ICard card)
@@ -150,80 +169,32 @@ namespace FlashCardService
             return directive;
         }
 
-        //private static RenderDocumentDirective Create_CurrentWordPresentation_Directive(string currentWord)
-        //{
+        private static RenderDocumentDirective Create_IntroPresentation_Directive()
+        {
 
-        //    var directive = new RenderDocumentDirective
-        //    {
-        //        Token = "randomToken",
-        //        Document = new APLDocument
-        //        {
-        //            MainTemplate = new Layout(new[]
-        //            {
-        //                new Container(
-        //                    new Image("https://moyca-alexa-display.s3-us-west-2.amazonaws.com/Logo-01.png") { Width = "100%", Height = "100%", Align = "center" }
-        //                )
-        //                {
-        //                    Width = "100%",
-        //                    Height = "100%",
-        //                    AlignItems = "center",
-        //                    JustifyContent = "center",
-        //                    Direction = "column",
-        //                }
-        //            })
-        //        }
-        //    };
+            var directive = new RenderDocumentDirective
+            {
+                Token = "randomToken",
+                Document = new APLDocument
+                {
+                    MainTemplate = new Layout(new[]
+                    {
+                        new Container(
+                            new Image("https://moyca-alexa-display.s3-us-west-2.amazonaws.com/Logo-01.png") { Width = "100%", Height = "100%", Align = "center" }
+                        )
+                        {
+                            Width = "100%",
+                            Height = "100%",
+                            AlignItems = "center",
+                            JustifyContent = "center",
+                            Direction = "column",
+                        }
+                    })
+                }
+            };
 
-        //    return directive;
-        //}
-
-        //private static RenderDocumentDirective Create_CurrentWordPresentation_Directive(string currentWord)
-        //{
-
-        //    var flashcard = new Frame(new APLComponent[] {
-        //        new Text(currentWord){
-        //            Width="100%",
-        //            Height="100%",
-        //            FontSize="160dp",
-        //            TextAlign="center",
-        //            TextAlignVertical="center",
-        //            Color="black"},
-        //    }){
-        //        Width = "75%",
-        //        Height = "70%",
-        //        ShadowHorizontalOffset = "10",
-        //        ShadowRadius = "10",
-        //        ShadowVerticalOffset = "10",
-        //        ShadowColor = "darkgrey",
-        //        AlignSelf = "center",
-        //        Position = "relative",
-        //        BackgroundColor="white",
-        //        BorderRadius="40"
-        //    };
-
-        //    var directive = new RenderDocumentDirective
-        //    {
-        //        Token = "randomToken",
-        //        Document = new APLDocument
-        //        {
-        //            MainTemplate = new Layout(new[]
-        //            {
-        //                new Container(new APLComponent[]{
-        //                    flashcard
-        //                })
-        //                {
-        //                    Width="100%",
-        //                    Height="100%",
-        //                    AlignItems="center",
-        //                    Direction="column",
-        //                    JustifyContent="center",
-        //                }
-        //            })
-        //        }
-        //    };
-
-        //    return directive;
-        //}
+            return directive;
+        }
 
     }
 

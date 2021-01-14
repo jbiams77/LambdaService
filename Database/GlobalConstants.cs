@@ -6,6 +6,23 @@ using Amazon.DynamoDBv2.Model;
 
 namespace Moyca.Database.GlobalConstants
 {
+
+    /// <summary>
+    /// Which lesson Alexa will teach
+    /// </summary>
+    public enum LESSON
+    {
+        WordFamilies,       
+        CVC,
+        ConsonantBlend,
+        ConsonantDigraph,
+        SightWords,
+        EControlledVowel,
+        RControlledVowel,
+        LControlledVowel,
+        VowelBlends
+    }
+
     /// <summary>
     /// Determined by scope and sequence to tell FlashCardService 
     /// which lesson to teach or  assess word to read.

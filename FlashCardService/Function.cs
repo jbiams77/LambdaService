@@ -49,12 +49,7 @@ namespace FlashCardService
             switch (T.Name)
             {
                 case "LaunchRequest":
-                    return AlexaResponse.GetResponse("sat", "Say the word", "Say the word", input.APLSupported());
-                    await TransferDataFromUserProfileToLiveSession();
-                    await UpdateLiveSessionDatabase();
-                    response = AlexaResponse.Introduction();
-                    LogSessionInfo(liveSession, info);
-                    await sqs.Send(GetSessionUpdate());
+                    response = await HandleLaunchRequest(input.APLSupported());
                     break;
 
                 case "IntentRequest":
@@ -124,6 +119,23 @@ namespace FlashCardService
             await sqs.Send(GetSessionUpdate());
         }
 
+        private async Task<SkillResponse> HandleLaunchRequest(bool displaySupported)
+        {   
+            await TransferDataFromUserProfileToLiveSession();
+            await UpdateLiveSessionDatabase();
+            await sqs.Send(GetSessionUpdate());
+
+            if (liveSession.TeachMode == MODE.Teach)
+            {
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
+                return TeachMode.Introduction(liveSession, wordAttributes, displaySupported);
+            }
+            else
+            {
+                return AlexaResponse.Introduction(displaySupported);
+            }
+            
+        }
 
         private async Task<SkillResponse> HandleYesIntent(bool displaySupported)
         {
@@ -147,11 +159,11 @@ namespace FlashCardService
 
             if (ReaderSaidTheWord(intent))
             {
-                //prompt = "Great!";  UNCOMMENT IF NEEDING ALEXA FEEDBACK, OTHERWISE THIS GETS TO BE TOO MUCH
+                prompt = "Great!";  
 
                 if (liveSession.Remove(currentWord))
                 {
-                    prompt = "Congratulations! You finished this session! Another reading assession awaits you. Just say, Alexa, open Moycan Readers!";
+                    prompt = "Congratulations! You finished this session! Another reading assession awaits you. Just say, Alexa, open Moycan Readers!";                    
                     await this.userProfile.RemoveCompletedScheduleFromUserProfile(liveSession.CurrentSchedule);
                     liveSession.CurrentState = STATE.Off;
                     info.LogLine("SESSION COMPLETED.");
@@ -180,11 +192,13 @@ namespace FlashCardService
         {
             int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
-            liveSession.wordsToRead = scopeAndSequence.wordsToRead;
-            liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.teachMode));
-            liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.skill));
-            liveSession.CurrentState = STATE.Introduction;
+            liveSession.wordsToRead = scopeAndSequence.WordsToRead;
+            liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.TeachMode));
+            liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.Skill));
+            liveSession.Lesson = scopeAndSequence.Lesson;
             liveSession.CurrentSchedule = currentScheduleNumber;
+            liveSession.CurrentState = STATE.Introduction;
+            
         }
 
         private async Task UpdateLiveSessionDatabase()

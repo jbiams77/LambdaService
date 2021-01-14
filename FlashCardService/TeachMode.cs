@@ -11,11 +11,36 @@ using Alexa.NET.Response.Converters;
 using Alexa.NET.Response.Directive;
 using Newtonsoft.Json;
 using Alexa.NET;
-
+using Amazon.DynamoDBv2.Model;
+using Moyca.Database;
+using Moyca.Database.GlobalConstants;
 
 namespace FlashCardService
 {
-    static class TeachMode
+    
+    public class TeachMode
+    {
+
+        public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
+        {
+            SsmlOutputSpeech teachingPrompts = new SsmlOutputSpeech();
+
+            if (liveSession.Lesson == LESSON.WordFamilies)
+            {
+                teachingPrompts = TeachingPrompts.WordFamilyIntroduction(wordAttributes);
+            }
+            else if (liveSession.Lesson == LESSON.CVC)
+            {
+                teachingPrompts = TeachingPrompts.CVCWordIntroduction(wordAttributes);
+            }
+            return AlexaResponse.Introduction(teachingPrompts, "You can say yes to continue or no to stop", displaySupported);
+        }
+
+
+    }
+
+
+    public class TeachingPrompts
     {
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
@@ -28,7 +53,7 @@ namespace FlashCardService
             });
         }
 
-        public static SkillResponse SigthWordsIntroduction()
+        public static SsmlOutputSpeech SigthWordsIntroduction()
         {
             string teachModel = StartTag;
             teachModel += "There are words used over, and over, and over, and over, and ";
@@ -38,37 +63,47 @@ namespace FlashCardService
             teachModel += " Are you ready to start? ";
             teachModel += EndTag;
 
-            return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(teachModel), "Say yes");
+            return new SsmlOutputSpeech(teachModel);
         }
 
-        public static SkillResponse WordFamilyIntroduction(string familyPhoneme, List<string> wordFamilyList)
+        public static SsmlOutputSpeech WordFamilyIntroduction(WordAttributes wordAttributes)
         {
-            string teachModel = StartTag + "A word family is a group of words that are related " +
-                                "because they have a common spelling or sound. Word families " +
-                                "often rhyme or end the same.";
-            teachModel += PauseFor(1.5);
-            teachModel += " Lets begin with the " + Phoneme(familyPhoneme) + ", word family. ";
-            teachModel += " Remember, all of these words will end with " + Phoneme(familyPhoneme) + ".";
-            teachModel += PauseFor(1.5);
-            teachModel += " Listen for " + SayExtraSlow(Phoneme(familyPhoneme)) + ", At the end of each word.";
-            teachModel += PauseFor(1.5);
+            string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
 
-            foreach (string word in wordFamilyList)
-            {
-                teachModel += PauseFor(1.0);
-                teachModel += ", ";
-                teachModel += SayExtraSlow(word);
-            }
+            string teachModel = StartTag + "Hello my Moycan! We are working with word families. ";
+            teachModel += PauseFor(0.5);
 
-            teachModel += PauseFor(1.0);
-            teachModel += " Are your ready to give it a try?";
+            teachModel +=  "A word family is a group of words that are related " +
+                           "because they have a common spelling or sound. Word families " +
+                           "often rhyme or end the same.";
+            teachModel += PauseFor(1.5);
+            teachModel += " Lets begin with the " + Phoneme(wfPhoneme) + ", word family. ";
+            teachModel += " Remember, all of these words will end with " + Phoneme(wfPhoneme) + ".";
+            teachModel += " Are you ready to begin?";
+
             teachModel += EndTag;
 
             // change this from "Say yes" to something more helpful
-            return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(teachModel), "Say yes");
+            return new SsmlOutputSpeech(teachModel);
         }
 
-        public static SkillResponse NextWordFamily(string familyPhoneme, List<string> wordFamilyList)
+        public static SsmlOutputSpeech CVCWordIntroduction(WordAttributes wordAttributes)
+        {
+            string teachModel = StartTag + "Lets work on the " + Phoneme("æ") + " sound.";//wordAttributes.VowelPhoneme + " sound.";
+            teachModel += PauseFor(1.5);
+            teachModel += " Lets begin with the " + Phoneme(wordAttributes.WordFamily) + ", word family. ";
+            teachModel += " Remember, all of these words will end with " + Phoneme(wordAttributes.WordFamily) + ".";
+            teachModel += PauseFor(1.5);
+            teachModel += " Listen for " + SayExtraSlow(Phoneme(wordAttributes.WordFamily)) + ", At the end of each word.";
+
+            teachModel += EndTag;
+
+            // change this from "Say yes" to something more helpful
+            return new SsmlOutputSpeech(teachModel);
+        }
+
+
+        public static SsmlOutputSpeech NextWordFamily(string familyPhoneme, List<string> wordFamilyList)
         {
             string teachModel = StartTag;
             teachModel += " Next is the " + Phoneme(familyPhoneme) + ", word family. ";
@@ -88,10 +123,10 @@ namespace FlashCardService
             teachModel += " Are your ready to give it a try?";
             teachModel += EndTag;
 
-            return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(teachModel), "Say yes");
+            return new SsmlOutputSpeech(teachModel);
         }
 
-        public static SkillResponse WordFamilyModel(string currentWord, string wordFamily, string endPhoneme)
+        public static SsmlOutputSpeech WordFamilyModel(string currentWord, string wordFamily, string endPhoneme)
         {
             string teachModel = StartTag;
             string reprompt = "Say the word " + currentWord;
@@ -117,10 +152,10 @@ namespace FlashCardService
             teachModel += " Now its your turn. Say the word ";
             teachModel += SayExtraSlow(currentWord);
             teachModel += EndTag;
-            return AlexaResponse.GetResponse(currentWord, new SsmlOutputSpeech(teachModel), reprompt);
+            return  new SsmlOutputSpeech(teachModel);
         }
 
-        public static SkillResponse SightWordModel(string currentWord, string phoneme, string example)
+        public static SsmlOutputSpeech SightWordModel(string currentWord, string phoneme, string example)
         {
             string teachModel = StartTag;
             string reprompt = "Say the word " + currentWord;
@@ -161,7 +196,7 @@ namespace FlashCardService
             teachModel += SayExtraSlow(Phoneme(phoneme));
             teachModel += EndTag;
 
-            return AlexaResponse.GetResponse(currentWord, new SsmlOutputSpeech(teachModel), reprompt);
+            return new SsmlOutputSpeech(teachModel);
         }
 
         public static string PauseFor(double delay)
@@ -180,6 +215,38 @@ namespace FlashCardService
             return @"<prosody rate=""x-slow"">" + word + @"</prosody>";
         }
 
+        public static string RetrieveWordFamilyPhoneme(WordAttributes wordAttributes)
+        {
+            string[] phoneme = wordAttributes.DecodedPhoneme.Split('-');
+            return phoneme[1] + phoneme[2];
+        }
+
+        private static readonly Dictionary<string, string> PhonemesConsonants = new Dictionary<string, string>
+        {
+         // sound | IPA
+            {"b" , "b" },
+            {"d" , "d" },
+            {"j" , "d͡ʒ"},
+            {"f" , "f" },
+            {"g" , "g" },
+            {"h" , "h" },
+            {"y" , "j" },
+            {"c" , "k" },
+            {"l" , "l" },
+            {"m" , "m" },
+            {"n" , "n" },
+            {"ng", "ŋ" },
+            {"p" , "p" },
+            {"r" , "ɹ" },
+            {"s" , "s" },
+            {"sh", "ʃ" },
+            {"t" , "t" },
+            {"ch", "t͡ʃ"},
+            {"th", "θ" },
+            {"v" , "v" },
+            {"w" , "w" },
+            {"z" , "z" }
+        };
     }
 
 }
