@@ -85,7 +85,6 @@ namespace FlashCardService
             teachModel += SayExtraSlow(wordAttributes.Word);
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
-            teachModel += EndTag;
             return teachModel;
         }
 
