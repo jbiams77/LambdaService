@@ -65,6 +65,7 @@ namespace FlashCardService
 
         public static SkillResponse GetResponse(string slotWord, string output, string reprompt, bool displaySupported)
         {
+            string speech = StartTag + output + EndTag;
 
             if (displaySupported)
             {
@@ -76,7 +77,7 @@ namespace FlashCardService
                 ResponseBody body = new ResponseBody
                 {
                     ShouldEndSession = false,
-                    OutputSpeech = new PlainTextOutputSpeech(output),
+                    OutputSpeech = new SsmlOutputSpeech(speech),
                     Reprompt = new Reprompt(reprompt)
                 };
 

@@ -45,6 +45,7 @@ namespace FlashCardService
             {
                 teachingPrompts = TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
             }
+
             return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word, displaySupported);
         }
     }

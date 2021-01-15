@@ -151,6 +151,10 @@ namespace FlashCardService
 
             string prompt = "Say the word on the flash card";
 
+            info.LogLine("Lesson: " + liveSession.Lesson.ToString());
+            info.LogLine("TeachMode: " + liveSession.TeachMode.ToString());
+            info.LogLine("Is display supported?" + displaySupported);
+
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
