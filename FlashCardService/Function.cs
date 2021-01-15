@@ -129,7 +129,7 @@ namespace FlashCardService
             }
             else
             {
-                return AlexaResponse.Introduction(displaySupported);
+                return AlexaResponse.Introduction("Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?", "Say yes or no to continue.", displaySupported);
             }
             
         }

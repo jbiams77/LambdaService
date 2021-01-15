@@ -28,14 +28,12 @@ namespace FlashCardService
 
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
-                teachingPrompts = TeachingPrompts.WordFamilyIntroduction(wordAttributes);
+                return TeachingPrompts.WordFamilyIntroduction(wordAttributes, displaySupported);
             }
             else if (liveSession.Lesson == LESSON.CVC)
             {
-                teachingPrompts = TeachingPrompts.CVCWordIntroduction(wordAttributes);
+                return TeachingPrompts.CVCWordIntroduction(wordAttributes, displaySupported);
             }
-            return AlexaResponse.Introduction(teachingPrompts, "You can say yes to continue or no to stop", displaySupported);
-        }
 
         public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
@@ -91,22 +89,20 @@ namespace FlashCardService
 
         public static SsmlOutputSpeech SigthWordsIntroduction()
         {
-            string teachModel = StartTag;
-            teachModel += "There are words used over, and over, and over, and over, and ";
+            string teachModel = "There are words used over, and over, and over, and over, and ";
             teachModel += PauseFor(.5);
             teachModel += " Well " + PauseFor(.5) + " you get the point. These are called sight words. ";
             teachModel += " It is helpful to just memorize them by sight. To see them and know what they say.";
             teachModel += " Are you ready to start? ";
-            teachModel += EndTag;
 
-            return new SsmlOutputSpeech(teachModel);
+            return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop", displaySupported);
         }
 
-        public static SsmlOutputSpeech WordFamilyIntroduction(WordAttributes wordAttributes)
+        public static SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes, bool displaySupported)
         {
             string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
 
-            string teachModel = StartTag + "Hello my Moycan! We are working with word families. ";
+            string teachModel = "Hello my Moycan! We are working with word families. ";
             teachModel += PauseFor(0.5);
 
             teachModel +=  "A word family is a group of words that are related " +
@@ -117,15 +113,12 @@ namespace FlashCardService
             teachModel += " Remember, all of these words will end with " + Phoneme(wfPhoneme) + ".";
             teachModel += " Are you ready to begin?";
 
-            teachModel += EndTag;
-
-            // change this from "Say yes" to something more helpful
-            return new SsmlOutputSpeech(teachModel);
+            return AlexaResponse.GetResponse(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop", displaySupported);
         }
 
-        public static SsmlOutputSpeech CVCWordIntroduction(WordAttributes wordAttributes)
+        public static SkillResponse CVCWordIntroduction(WordAttributes wordAttributes, bool displaySupported)
         {
-            string teachModel = StartTag + "Lets work on the " + Phoneme("æ") + " sound.";//wordAttributes.VowelPhoneme + " sound.";
+            string teachModel = "Lets work on the " + Phoneme("æ") + " sound.";//wordAttributes.VowelPhoneme + " sound.";
             teachModel += PauseFor(1.5);
             teachModel += " Lets begin with the " + Phoneme(wordAttributes.WordFamily) + ", word family. ";
             teachModel += " Remember, all of these words will end with " + Phoneme(wordAttributes.WordFamily) + ".";
@@ -137,8 +130,8 @@ namespace FlashCardService
             teachModel += EndTag;
 
             // change this from "Say yes" to something more helpful
-            return new SsmlOutputSpeech(teachModel);
-        }
+            return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop", displaySupported);
+            }
 
 
         public static SsmlOutputSpeech NextWordFamily(string familyPhoneme, List<string> wordFamilyList)
