@@ -23,6 +23,7 @@ namespace FlashCardService
         public string VowelPhoneme { get; set; }
         public string VowelType { get; set; }
         public string WordFamily { get; set; }
+        public string Word { get; set; }
 
         DictionaryDB dictionaryDB;
 
@@ -93,6 +94,11 @@ namespace FlashCardService
             if (items.TryGetValue("WordFamily", out AttributeValue wf))
             {
                 this.WordFamily = wf.S;
+            }
+
+            if (items.TryGetValue("Word", out AttributeValue w))
+            {
+                this.Word = w.S;
             }
 
         }

@@ -36,7 +36,16 @@ namespace FlashCardService
             return AlexaResponse.SayWithReprompt(teachingPrompts, "You can say yes to continue or no to stop");
         }
 
+        public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes)
+        {
+            SsmlOutputSpeech teachingPrompts = new SsmlOutputSpeech();
 
+            if (liveSession.Lesson == LESSON.WordFamilies)
+            {
+                teachingPrompts = TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
+            }
+            return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
+        }
     }
 
 
@@ -51,6 +60,31 @@ namespace FlashCardService
             {
                 Ssml = StartTag + "Hello" + EndTag
             });
+        }
+
+        public static SsmlOutputSpeech WordFamilyTeachTheWord(WordAttributes wordAttributes)
+        {
+            string[] decodedPhoneme = wordAttributes.DecodedPhoneme.Split('-');
+            string[] decodedWord = wordAttributes.Decoded.Split('-');
+            string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
+
+            string teachModel = StartTag;
+
+            teachModel += "This word is spelled ";
+            foreach (string sound in decodedWord)
+            {
+                teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
+            }
+            teachModel += PauseFor(.5);
+            teachModel += "The sounds are ";
+            
+            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(decodedPhoneme[0])) + PauseFor(0.2);
+            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(wfPhoneme)) + PauseFor(0.2);
+            teachModel += SayExtraSlow(wordAttributes.Word);
+            teachModel += PauseFor(0.5);
+            teachModel += "Now you try. Say the word ";
+            teachModel += EndTag;
+            return new SsmlOutputSpeech(teachModel);
         }
 
         public static SsmlOutputSpeech SigthWordsIntroduction()
@@ -219,6 +253,11 @@ namespace FlashCardService
         {
             string[] phoneme = wordAttributes.DecodedPhoneme.Split('-');
             return phoneme[1] + phoneme[2];
+        }
+
+        public static string SpellOut(string word)
+        {
+            return @"<say-as interpret-as=""spell-out"">" + word + @"</say-as>";
         }
 
         private static readonly Dictionary<string, string> PhonemesConsonants = new Dictionary<string, string>
