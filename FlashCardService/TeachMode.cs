@@ -11,11 +11,46 @@ using Alexa.NET.Response.Converters;
 using Alexa.NET.Response.Directive;
 using Newtonsoft.Json;
 using Alexa.NET;
+using Amazon.DynamoDBv2.Model;
+using Moyca.Database;
+using Moyca.Database.GlobalConstants;
 
 
 namespace FlashCardService
 {
-    static class TeachMode
+    
+    public class TeachMode
+    {
+
+        public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
+        {
+
+            if (liveSession.Lesson == LESSON.WordFamilies)
+            {
+                return TeachingPrompts.WordFamilyIntroduction(wordAttributes, displaySupported);
+            }
+            else if (liveSession.Lesson == LESSON.CVC)
+            {
+                return TeachingPrompts.CVCWordIntroduction(wordAttributes, displaySupported);
+            }
+            // Default introduction             
+            return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop", displaySupported);
+        }
+
+        public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
+        {
+            string teachingPrompts = "";
+
+            if (liveSession.Lesson == LESSON.WordFamilies)
+            {
+                teachingPrompts = TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
+            }
+            return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word, displaySupported);
+        }
+    }
+
+
+    public class TeachingPrompts
     {
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
@@ -29,47 +64,78 @@ namespace FlashCardService
             });
         }
 
-        public static SkillResponse SigthWordsIntroduction()
+        public static string WordFamilyTeachTheWord(WordAttributes wordAttributes)
         {
-            string teachModel = StartTag;
-            teachModel += "There are words used over, and over, and over, and over, and ";
+            string[] decodedPhoneme = wordAttributes.DecodedPhoneme.Split('-');
+            string[] decodedWord = wordAttributes.Decoded.Split('-');
+            string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
+
+            
+            string teachModel = "This word is spelled ";
+            foreach (string sound in decodedWord)
+            {
+                teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
+            }
+            teachModel += PauseFor(.5);
+            teachModel += "The sounds are ";
+            
+            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(decodedPhoneme[0])) + PauseFor(0.2);
+            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(wfPhoneme)) + PauseFor(0.2);
+            teachModel += SayExtraSlow(wordAttributes.Word);
+            teachModel += PauseFor(0.5);
+            teachModel += "Now you try. Say the word ";
+            teachModel += EndTag;
+            return teachModel;
+        }
+
+        public static string SigthWordsIntroduction(bool displaySupported)
+        {
+            string teachModel = "There are words used over, and over, and over, and over, and ";
             teachModel += PauseFor(.5);
             teachModel += " Well " + PauseFor(.5) + " you get the point. These are called sight words. ";
             teachModel += " It is helpful to just memorize them by sight. To see them and know what they say.";
             teachModel += " Are you ready to start? ";
-            teachModel += EndTag;
 
-            return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(teachModel), "Say yes");
+            return teachModel;
         }
 
-        public static SkillResponse WordFamilyIntroduction(string familyPhoneme, List<string> wordFamilyList)
+        public static SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes, bool displaySupported)
         {
-            string teachModel = StartTag + "A word family is a group of words that are related " +
+            string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
+
+            string teachModel = "Hello my Moycan! We are working with word families. ";
+            teachModel += PauseFor(0.5);
+
+            teachModel +=  "A word family is a group of words that are related " +
                                 "because they have a common spelling or sound. Word families " +
                                 "often rhyme or end the same.";
             teachModel += PauseFor(1.5);
-            teachModel += " Lets begin with the " + Phoneme(familyPhoneme) + ", word family. ";
-            teachModel += " Remember, all of these words will end with " + Phoneme(familyPhoneme) + ".";
-            teachModel += PauseFor(1.5);
-            teachModel += " Listen for " + SayExtraSlow(Phoneme(familyPhoneme)) + ", At the end of each word.";
-            teachModel += PauseFor(1.5);
+            teachModel += " Lets begin with the " + Phoneme(wfPhoneme) + ", word family. ";
+            teachModel += " Remember, all of these words will end with " + Phoneme(wfPhoneme) + ".";
+            teachModel += " Are you ready to begin?";
 
-            foreach (string word in wordFamilyList)
-            {
-                teachModel += PauseFor(1.0);
-                teachModel += ", ";
-                teachModel += SayExtraSlow(word);
-            }
+            return AlexaResponse.GetResponse(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop", displaySupported);
+        }
+
+        public static SkillResponse CVCWordIntroduction(WordAttributes wordAttributes, bool displaySupported)
+        {
+            string teachModel = "Lets work on the " + Phoneme("æ") + " sound.";//wordAttributes.VowelPhoneme + " sound.";
+            teachModel += PauseFor(1.5);
+            teachModel += " Lets begin with the " + Phoneme(wordAttributes.WordFamily) + ", word family. ";
+            teachModel += " Remember, all of these words will end with " + Phoneme(wordAttributes.WordFamily) + ".";
+            teachModel += PauseFor(1.5);
+            teachModel += " Listen for " + SayExtraSlow(Phoneme(wordAttributes.WordFamily)) + ", At the end of each word.";
 
             teachModel += PauseFor(1.0);
             teachModel += " Are your ready to give it a try?";
             teachModel += EndTag;
 
             // change this from "Say yes" to something more helpful
-            return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(teachModel), "Say yes");
-        }
+            return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop", displaySupported);
+            }
 
-        public static SkillResponse NextWordFamily(string familyPhoneme, List<string> wordFamilyList)
+
+        public static SsmlOutputSpeech NextWordFamily(string familyPhoneme, List<string> wordFamilyList)
         {
             string teachModel = StartTag;
             teachModel += " Next is the " + Phoneme(familyPhoneme) + ", word family. ";
@@ -89,10 +155,10 @@ namespace FlashCardService
             teachModel += " Are your ready to give it a try?";
             teachModel += EndTag;
 
-            return AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(teachModel), "Say yes");
+            return new SsmlOutputSpeech(teachModel);
         }
 
-        public static SkillResponse WordFamilyModel(string currentWord, string wordFamily, string endPhoneme)
+        public static SsmlOutputSpeech WordFamilyModel(string currentWord, string wordFamily, string endPhoneme)
         {
             string teachModel = StartTag;
             string reprompt = "Say the word " + currentWord;
@@ -118,10 +184,10 @@ namespace FlashCardService
             teachModel += " Now its your turn. Say the word ";
             teachModel += SayExtraSlow(currentWord);
             teachModel += EndTag;
-            return AlexaResponse.GetResponse(currentWord, new SsmlOutputSpeech(teachModel), reprompt);
+            return  new SsmlOutputSpeech(teachModel);
         }
 
-        public static SkillResponse SightWordModel(string currentWord, string phoneme, string example)
+        public static SsmlOutputSpeech SightWordModel(string currentWord, string phoneme, string example)
         {
             string teachModel = StartTag;
             string reprompt = "Say the word " + currentWord;
@@ -162,7 +228,7 @@ namespace FlashCardService
             teachModel += SayExtraSlow(Phoneme(phoneme));
             teachModel += EndTag;
 
-            return AlexaResponse.GetResponse(currentWord, new SsmlOutputSpeech(teachModel), reprompt);
+            return new SsmlOutputSpeech(teachModel);
         }
 
         public static string PauseFor(double delay)
@@ -181,6 +247,43 @@ namespace FlashCardService
             return @"<prosody rate=""x-slow"">" + word + @"</prosody>";
         }
 
+        public static string RetrieveWordFamilyPhoneme(WordAttributes wordAttributes)
+        {
+            string[] phoneme = wordAttributes.DecodedPhoneme.Split('-');
+            return phoneme[1] + phoneme[2];
+        }
+
+        public static string SpellOut(string word)
+        {
+            return @"<say-as interpret-as=""spell-out"">" + word + @"</say-as>";
+        }
+
+        private static readonly Dictionary<string, string> PhonemesConsonants = new Dictionary<string, string>
+        {
+         // sound | IPA
+            {"b" , "b" },
+            {"d" , "d" },
+            {"j" , "d͡ʒ"},
+            {"f" , "f" },
+            {"g" , "g" },
+            {"h" , "h" },
+            {"y" , "j" },
+            {"c" , "k" },
+            {"l" , "l" },
+            {"m" , "m" },
+            {"n" , "n" },
+            {"ng", "ŋ" },
+            {"p" , "p" },
+            {"r" , "ɹ" },
+            {"s" , "s" },
+            {"sh", "ʃ" },
+            {"t" , "t" },
+            {"ch", "t͡ʃ"},
+            {"th", "θ" },
+            {"v" , "v" },
+            {"w" , "w" },
+            {"z" , "z" }
+        };
     }
 
 }

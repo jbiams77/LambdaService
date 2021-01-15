@@ -93,6 +93,18 @@ namespace Moyca.Database
             this.InitializeBoolsToFalse();
         }
 
+        /// <summary>Retrieves words attributes from dictionary using primary index, word.
+        /// /// <param name="word">The word to find in dictionary.</param>
+        /// /// <returns>Dictionary<string, AttributeValues> : List of attributes as a 
+        ///  database item.</returns>
+        public async Task<DatabaseItem> GetWordAttributesFromDictionary(string word)
+        {
+            return await base.GetEntryByKey(word);
+        }
+
+
+
+        /*********************** PRIVATE METHODS ***********************/
         private async Task<List<string>> GetCVCwithWordFamily(string wordFamily)
         {
             List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(cVC_WF_Index, "TRUE", wordFamily));
@@ -126,9 +138,7 @@ namespace Moyca.Database
             List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(cD_CB_Index, consonantDigraph, consonantBlend));
 
             return ExtractWordsFromItem(databaseItem);
-        }
-
-        /*********************** PRIVATE METHODS ***********************/
+        }       
         private async Task GetWordsWithBestMethod(Dictionary<string, string> order)
         {
             if (useVT && useV && useS)

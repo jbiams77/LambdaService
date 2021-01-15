@@ -30,8 +30,8 @@ namespace FlashCardService
         public ScopeAndSequenceDB scopeAndSequence;
         public SkillResponse response;
         public string userId;
-        SQS sqs;
-
+        //SQS sqs;
+        
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
         {
 
@@ -43,22 +43,18 @@ namespace FlashCardService
             this.liveSession = new LiveSessionDB(userId);
             this.userProfile = new UserProfileDB(userId);
             this.scopeAndSequence = new ScopeAndSequenceDB();
-            this.sqs = new SQS();
-            await InitializeUserQueue();
+            //this.sqs = new SQS();
+            //await InitializeUserQueue();
 
 
             switch (T.Name)
             {
                 case "LaunchRequest":
-                    await TransferDataFromUserProfileToLiveSession();
-                    await UpdateLiveSessionDatabase();
-                    response = AlexaResponse.Introduction();
-                    LogSessionInfo(liveSession, info);
-                    await sqs.Send(GetSessionUpdate());
+                    response = await HandleLaunchRequest(input.APLSupported());
                     break;
 
                 case "IntentRequest":
-                    response = await HandleIntentRequest((IntentRequest)input.Request);
+                    response = await HandleIntentRequest((IntentRequest)input.Request, input.APLSupported());
                     break;
 
                 case "SessionEndedRequest":
@@ -74,18 +70,14 @@ namespace FlashCardService
             return response;
         }
 
-        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent)
+        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent, bool displaySupported)
         {
             SkillResponse intentResponse;
 
             switch (intent.Intent.Name)
             {
                 case "AMAZON.YesIntent":
-                    await TransferDataFromUserProfileToLiveSession();
-                    liveSession.CurrentState = STATE.FirstWord;
-                    await UpdateLiveSessionDatabase();
-                    await sqs.Send(GetSessionUpdate());
-                    intentResponse = await HandleYesIntent();
+                    intentResponse = await HandleYesIntent(displaySupported);
                     break;
                 case "AMAZON.NoIntent":
                     await SetStateToOffAndExit();
@@ -107,8 +99,8 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Help intent.");
                     break;
                 case "WordsToReadIntent":
-                    intentResponse = await HandleWordsToReadIntent(intent);
-                    await sqs.Send(GetSessionUpdate());
+                    intentResponse = await HandleWordsToReadIntent(intent, displaySupported);
+                    //await sqs.Send(GetSessionUpdate());
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -121,24 +113,59 @@ namespace FlashCardService
             await TransferDataFromUserProfileToLiveSession();
             liveSession.CurrentState = STATE.Off;
             await UpdateLiveSessionDatabase();
-            await sqs.Send(GetSessionUpdate());
+            //await sqs.Send(GetSessionUpdate());
         }
 
+        private async Task<SkillResponse> HandleLaunchRequest(bool displaySupported)
+        {   
+            await TransferDataFromUserProfileToLiveSession();
+            await UpdateLiveSessionDatabase();
+            //await sqs.Send(GetSessionUpdate());
 
-        private async Task<SkillResponse> HandleYesIntent()
+            if (liveSession.TeachMode == MODE.Teach)
+            {
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
+                return TeachMode.Introduction(liveSession, wordAttributes, displaySupported);
+            }
+            else
+            {
+                return AlexaResponse.Introduction("Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?", "Say yes or no to continue.", displaySupported);
+            }
+            
+        }
+
+        private async Task<SkillResponse> HandleYesIntent(bool displaySupported)
         {
+           
+            await TransferDataFromUserProfileToLiveSession();
+            
+            liveSession.CurrentState = STATE.FirstWord;
+            
+            await UpdateLiveSessionDatabase();
+            
+            //await sqs.Send(GetSessionUpdate());
+
             await liveSession.GetDataFromLiveSession();
 
             string currentWord = liveSession.GetCurrentWord();
 
             string prompt = "Say the word on the flash card";
 
-            return AlexaResponse.GetResponse(currentWord, prompt, prompt);
+            if (liveSession.TeachMode == MODE.Teach)
+            {
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
+                return TeachMode.TeachTheWord(liveSession, wordAttributes, displaySupported);
+            }
+            else
+            {
+                return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
+            }            
         }
+           
 
-        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent)
+        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent, bool displaySupported)
         {
-
+            
             await liveSession.GetDataFromLiveSession();
 
             string currentWord = liveSession.GetCurrentWord();
@@ -148,11 +175,11 @@ namespace FlashCardService
 
             if (ReaderSaidTheWord(intent))
             {
-                //prompt = "Great!";  UNCOMMENT IF NEEDING ALEXA FEEDBACK, OTHERWISE THIS GETS TO BE TOO MUCH
+                prompt = "Great!";  
 
                 if (liveSession.Remove(currentWord))
                 {
-                    prompt = "Congratulations! You finished this session! Another reading assession awaits you. Just say, Alexa, open Moycan Readers!";
+                    prompt = "Congratulations! You finished this session! Another reading assession awaits you. Just say, Alexa, open Moycan Readers!";                    
                     await this.userProfile.RemoveCompletedScheduleFromUserProfile(liveSession.CurrentSchedule);
                     liveSession.CurrentState = STATE.Off;
                     info.LogLine("SESSION COMPLETED.");
@@ -168,24 +195,35 @@ namespace FlashCardService
                 await UpdateLiveSessionDatabase();
             }
 
-            return AlexaResponse.GetResponse(currentWord, prompt, rePrompt);
+            if (liveSession.TeachMode == MODE.Teach)
+            {
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
+                return TeachMode.TeachTheWord(liveSession, wordAttributes, displaySupported);
+            }
+            else
+            {
+                return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
+            }
+            
         }
-        // Creates or updates the queue and sets the queue URL in the user database
-        public async Task InitializeUserQueue()
-        {
-            this.sqs.QueueURL = await sqs.CreateQueue(this.userId);
-            await this.userProfile.SetQueueUrl(this.sqs.QueueURL);
-        }
+        //// Creates or updates the queue and sets the queue URL in the user database
+        //public async Task InitializeUserQueue()
+        //{
+        //    this.sqs.QueueURL = await sqs.CreateQueue(this.userId);
+        //    await this.userProfile.SetQueueUrl(this.sqs.QueueURL);
+        //}
 
         private async Task TransferDataFromUserProfileToLiveSession()
         {
             int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
-            liveSession.wordsToRead = scopeAndSequence.wordsToRead;
-            liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.teachMode));
-            liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.skill));
-            liveSession.CurrentState = STATE.Introduction;
+            liveSession.wordsToRead = scopeAndSequence.WordsToRead;
+            liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.TeachMode));
+            liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.Skill));
+            liveSession.Lesson = scopeAndSequence.Lesson;
             liveSession.CurrentSchedule = currentScheduleNumber;
+            liveSession.CurrentState = STATE.Introduction;
+            
         }
 
         private async Task UpdateLiveSessionDatabase()

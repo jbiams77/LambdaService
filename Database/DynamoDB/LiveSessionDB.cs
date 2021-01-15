@@ -38,6 +38,8 @@ namespace Moyca.Database
         public STATE CurrentState { get; set; }
         /// <summary> The common-core skill Alexa is currently teaching to. </summary>
         public SKILL Skill { get; set; }
+        /// <summary> The lesson that Alexa will teach. </summary>
+        public LESSON Lesson { get; set; }
         /// <summary> Four digit index value that corresponds with scope and sequence database. </summary>
         public int CurrentSchedule { get; set; }
 
