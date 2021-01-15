@@ -77,7 +77,7 @@ namespace FlashCardService
             switch (intent.Intent.Name)
             {
                 case "AMAZON.YesIntent":
-                    intentResponse = await HandleYesIntent();
+                    intentResponse = await HandleYesIntent(displaySupported);
                     break;
                 case "AMAZON.NoIntent":
                     await SetStateToOffAndExit();
@@ -100,7 +100,7 @@ namespace FlashCardService
                     break;
                 case "WordsToReadIntent":
                     intentResponse = await HandleWordsToReadIntent(intent, displaySupported);
-                    await sqs.Send(GetSessionUpdate());
+                    //await sqs.Send(GetSessionUpdate());
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -158,11 +158,10 @@ namespace FlashCardService
             }
             else
             {
-                return AlexaResponse.GetResponse(currentWord, prompt, prompt);
+                return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
             }            
         }
-            return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
-        }
+           
 
         private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent, bool displaySupported)
         {
@@ -203,7 +202,7 @@ namespace FlashCardService
             }
             else
             {
-                return AlexaResponse.GetResponse(currentWord, prompt, prompt);
+                return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
             }
             
         }
