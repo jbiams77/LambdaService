@@ -7,7 +7,6 @@ using Alexa.NET.Response;
 using Alexa.NET.Response.APL;
 using Alexa.NET.Response.Directive;
 using Alexa.NET.Response.Directive.Templates;
-//using FlashCardService.DisplayTemplates;
 
 namespace FlashCardService
 {
