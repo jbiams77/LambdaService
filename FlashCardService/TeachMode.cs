@@ -37,15 +37,15 @@ namespace FlashCardService
             return AlexaResponse.Introduction(teachingPrompts, "You can say yes to continue or no to stop", displaySupported);
         }
 
-        public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes)
+        public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
-            SsmlOutputSpeech teachingPrompts = new SsmlOutputSpeech();
+            string teachingPrompts = "";
 
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
                 teachingPrompts = TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
             }
-            return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
+            return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word, displaySupported);
         }
     }
 
