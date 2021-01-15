@@ -24,7 +24,6 @@ namespace FlashCardService
 
         public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
-            SsmlOutputSpeech teachingPrompts = new SsmlOutputSpeech();
 
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
@@ -34,6 +33,9 @@ namespace FlashCardService
             {
                 return TeachingPrompts.CVCWordIntroduction(wordAttributes, displaySupported);
             }
+            // Default introduction             
+            return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop", displaySupported);
+        }
 
         public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
@@ -62,15 +64,14 @@ namespace FlashCardService
             });
         }
 
-        public static SsmlOutputSpeech WordFamilyTeachTheWord(WordAttributes wordAttributes)
+        public static string WordFamilyTeachTheWord(WordAttributes wordAttributes)
         {
             string[] decodedPhoneme = wordAttributes.DecodedPhoneme.Split('-');
             string[] decodedWord = wordAttributes.Decoded.Split('-');
             string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
 
-            string teachModel = StartTag;
-
-            teachModel += "This word is spelled ";
+            
+            string teachModel = "This word is spelled ";
             foreach (string sound in decodedWord)
             {
                 teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
@@ -84,10 +85,10 @@ namespace FlashCardService
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
             teachModel += EndTag;
-            return new SsmlOutputSpeech(teachModel);
+            return teachModel;
         }
 
-        public static SsmlOutputSpeech SigthWordsIntroduction()
+        public static string SigthWordsIntroduction(bool displaySupported)
         {
             string teachModel = "There are words used over, and over, and over, and over, and ";
             teachModel += PauseFor(.5);
@@ -95,7 +96,7 @@ namespace FlashCardService
             teachModel += " It is helpful to just memorize them by sight. To see them and know what they say.";
             teachModel += " Are you ready to start? ";
 
-            return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop", displaySupported);
+            return teachModel;
         }
 
         public static SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes, bool displaySupported)

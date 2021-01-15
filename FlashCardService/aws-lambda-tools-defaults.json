@@ -8,7 +8,7 @@
     ],
     "profile"     : "jbiams77",
     "region"      : "us-west-2",
-    "configuration" : "Release",
+    "configuration" : "Debug",
     "framework"     : "netcoreapp3.1",
     "function-runtime" : "dotnetcore3.1",
     "function-memory-size" : 512,

@@ -154,7 +154,7 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
-                return TeachMode.TeachTheWord(liveSession, wordAttributes);
+                return TeachMode.TeachTheWord(liveSession, wordAttributes, displaySupported);
             }
             else
             {
@@ -198,7 +198,7 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
-                return TeachMode.TeachTheWord(liveSession, wordAttributes);
+                return TeachMode.TeachTheWord(liveSession, wordAttributes, displaySupported);
             }
             else
             {
