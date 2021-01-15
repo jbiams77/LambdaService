@@ -128,7 +128,6 @@ namespace FlashCardService
 
             teachModel += PauseFor(1.0);
             teachModel += " Are your ready to give it a try?";
-            teachModel += EndTag;
 
             // change this from "Say yes" to something more helpful
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop", displaySupported);
