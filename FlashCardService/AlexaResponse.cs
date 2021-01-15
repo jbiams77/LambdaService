@@ -30,23 +30,11 @@ namespace FlashCardService
             return BuildResponse(speechResponse, false, null, new Reprompt(reprompt), null);
         }
 
-        public static SkillResponse Introduction(IOutputSpeech introduction, string reprompt, bool displaySupported)
+        public static SkillResponse Introduction(string introduction, string reprompt, bool displaySupported)
         {
-            var response = AlexaResponse.SayWithReprompt(introduction, reprompt);
+            string intro = StartTag + introduction + EndTag;
 
-            if (displaySupported)
-            {
-                response.Response.Directives.Add(Create_IntroPresentation_Directive());
-            }
-
-            return response;
-        }
-
-        public static SkillResponse Introduction(bool displaySupported)
-        {
-            string introduction = StartTag + "Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?" + EndTag;
-
-            var response = AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(introduction), "Say yes or no to continue. ");
+            var response = AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(intro), reprompt);
             
             if (displaySupported)
             {
@@ -77,7 +65,6 @@ namespace FlashCardService
 
         public static SkillResponse GetResponse(string slotWord, string output, string reprompt, bool displaySupported)
         {
-
 
             if (displaySupported)
             {
