@@ -46,16 +46,15 @@ namespace FlashCardService
             //this.sqs = new SQS();
             //await InitializeUserQueue();
 
-            info.LogLine("USER ID" + this.userId);
 
             switch (T.Name)
             {
                 case "LaunchRequest":
-                    response = await HandleLaunchRequest();
+                    response = await HandleLaunchRequest(input.APLSupported());
                     break;
 
                 case "IntentRequest":
-                    response = await HandleIntentRequest((IntentRequest)input.Request);
+                    response = await HandleIntentRequest((IntentRequest)input.Request, input.APLSupported());
                     break;
 
                 case "SessionEndedRequest":
@@ -71,7 +70,7 @@ namespace FlashCardService
             return response;
         }
 
-        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent)
+        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent, bool displaySupported)
         {
             SkillResponse intentResponse;
 
@@ -100,8 +99,8 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Help intent.");
                     break;
                 case "WordsToReadIntent":
-                    intentResponse = await HandleWordsToReadIntent(intent);
-                    //await sqs.Send(GetSessionUpdate());
+                    intentResponse = await HandleWordsToReadIntent(intent, displaySupported);
+                    await sqs.Send(GetSessionUpdate());
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -117,7 +116,7 @@ namespace FlashCardService
             //await sqs.Send(GetSessionUpdate());
         }
 
-        private async Task<SkillResponse> HandleLaunchRequest()
+        private async Task<SkillResponse> HandleLaunchRequest(bool displaySupported)
         {   
             await TransferDataFromUserProfileToLiveSession();
             await UpdateLiveSessionDatabase();
@@ -126,16 +125,16 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
-                return TeachMode.Introduction(liveSession, wordAttributes);
+                return TeachMode.Introduction(liveSession, wordAttributes, displaySupported);
             }
             else
             {
-                return AlexaResponse.Introduction();
+                return AlexaResponse.Introduction(displaySupported);
             }
             
         }
 
-        private async Task<SkillResponse> HandleYesIntent()
+        private async Task<SkillResponse> HandleYesIntent(bool displaySupported)
         {
            
             await TransferDataFromUserProfileToLiveSession();
@@ -162,8 +161,10 @@ namespace FlashCardService
                 return AlexaResponse.GetResponse(currentWord, prompt, prompt);
             }            
         }
+            return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
+        }
 
-        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent)
+        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent, bool displaySupported)
         {
             
             await liveSession.GetDataFromLiveSession();

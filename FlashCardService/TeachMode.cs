@@ -22,7 +22,7 @@ namespace FlashCardService
     public class TeachMode
     {
 
-        public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes)
+        public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
             SsmlOutputSpeech teachingPrompts = new SsmlOutputSpeech();
 
@@ -34,7 +34,7 @@ namespace FlashCardService
             {
                 teachingPrompts = TeachingPrompts.CVCWordIntroduction(wordAttributes);
             }
-            return AlexaResponse.SayWithReprompt(teachingPrompts, "You can say yes to continue or no to stop");
+            return AlexaResponse.Introduction(teachingPrompts, "You can say yes to continue or no to stop", displaySupported);
         }
 
         public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes)
