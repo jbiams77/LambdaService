@@ -170,7 +170,8 @@ namespace FlashCardService
 
             string currentWord = liveSession.GetCurrentWord();
 
-            string prompt = "Say the word";
+            string prompt = "";
+            string rePrompt = "Say the word";
 
             if (ReaderSaidTheWord(intent))
             {

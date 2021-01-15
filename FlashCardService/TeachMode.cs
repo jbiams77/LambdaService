@@ -15,6 +15,7 @@ using Amazon.DynamoDBv2.Model;
 using Moyca.Database;
 using Moyca.Database.GlobalConstants;
 
+
 namespace FlashCardService
 {
     
@@ -54,6 +55,7 @@ namespace FlashCardService
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
 
+ 
         public static SkillResponse RichTextResponse()
         {
             return AlexaResponse.Say(new SsmlOutputSpeech
@@ -108,8 +110,8 @@ namespace FlashCardService
             teachModel += PauseFor(0.5);
 
             teachModel +=  "A word family is a group of words that are related " +
-                           "because they have a common spelling or sound. Word families " +
-                           "often rhyme or end the same.";
+                                "because they have a common spelling or sound. Word families " +
+                                "often rhyme or end the same.";
             teachModel += PauseFor(1.5);
             teachModel += " Lets begin with the " + Phoneme(wfPhoneme) + ", word family. ";
             teachModel += " Remember, all of these words will end with " + Phoneme(wfPhoneme) + ".";
@@ -130,6 +132,8 @@ namespace FlashCardService
             teachModel += PauseFor(1.5);
             teachModel += " Listen for " + SayExtraSlow(Phoneme(wordAttributes.WordFamily)) + ", At the end of each word.";
 
+            teachModel += PauseFor(1.0);
+            teachModel += " Are your ready to give it a try?";
             teachModel += EndTag;
 
             // change this from "Say yes" to something more helpful
