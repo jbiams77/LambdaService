@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Moyca.Database;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.GlobalConstants;
+using AWSInfrastructure.Logger;
 
-namespace Moyca.Database
+namespace AWSInfrastructure.DynamoDB
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
@@ -25,7 +25,7 @@ namespace Moyca.Database
         private string userId;
 
         private string timeStamp;
-
+        private MoycaLogger log;
         /// <summary>
         /// Indicates if Unity application is running, is set by Unity 
         /// application and known through live-session database
@@ -47,9 +47,11 @@ namespace Moyca.Database
         /// Initializes live session data base with uniqe userID.
         /// </summary>
         /// <param name="userId"></param>
-        public LiveSessionDB(string userId) : base(LiveSessionDB.TableName, LiveSessionDB.PrimaryPartitionKey)
+        /// <param name="logger"></param>
+        public LiveSessionDB(string userId, MoycaLogger logger) : base(LiveSessionDB.TableName, LiveSessionDB.PrimaryPartitionKey, logger)
         {
             this.userId = userId;
+            this.log = logger;
         }
 
         /// <summary>
@@ -58,6 +60,8 @@ namespace Moyca.Database
         /// </summary>
         public async Task UpdateLiveSession()
         {
+            log.INFO("LiveSessionDB", "UpdateLiveSession", "Updating live-session");
+
             AttributeValue currentSchedule = new AttributeValue();
             currentSchedule.N = this.CurrentSchedule.ToString();
 
@@ -90,6 +94,8 @@ namespace Moyca.Database
         /// <returns></returns>
         public async Task GetDataFromLiveSession()
         {
+            log.INFO("LiveSessionDB", "GetDataFromLiveSession", "Getting data from live-session");
+
             DatabaseItem items = await GetEntryByKey(this.userId);
 
             if (items.TryGetValue("WordsToRead", out AttributeValue words))
@@ -138,6 +144,8 @@ namespace Moyca.Database
         /// successful completion of session.</returns>
         public bool Remove(string currentWord)
         {
+            log.INFO("LiveSessionDB", "Remove", "Removing from local: " + currentWord);
+
             wordsToRead.Remove(currentWord);
             return (wordsToRead.Count == 0) ? true : false;
         }

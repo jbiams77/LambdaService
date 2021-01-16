@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.GlobalConstants;
+using AWSInfrastructure.Logger;
 
-namespace Moyca.Database
+namespace AWSInfrastructure.DynamoDB
 {
     
     using DatabaseItem = Dictionary<string, AttributeValue>;
@@ -54,7 +55,9 @@ namespace Moyca.Database
         // words retrieved from dictionary based on scope and sequence
         private List<string> wordsToRead;
 
-        public DictionaryDB() : base(DictionaryDB.TableName, DictionaryDB.PrimaryPartitionKey)
+        private MoycaLogger log;
+
+        public DictionaryDB(MoycaLogger logger) : base(DictionaryDB.TableName, DictionaryDB.PrimaryPartitionKey, logger)
         {
             cVC_WF_Index = new CVC_WF_index();
             cVC_V_Index = new CVC_V_index();
@@ -63,6 +66,7 @@ namespace Moyca.Database
             cD_CB_Index = new CD_CB_index();
             this.InitializeBoolsToFalse();
             this.wordsToRead = new List<string>();
+            this.log = logger;
         }
 
         /// <summary>If GetWordsToReadWithOrder() is not called, returns null.</summary>

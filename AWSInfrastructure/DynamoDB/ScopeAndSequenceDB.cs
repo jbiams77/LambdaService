@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.GlobalConstants;
+using AWSInfrastructure.Logger;
 
-
-namespace Moyca.Database
+namespace AWSInfrastructure.DynamoDB
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
@@ -20,13 +20,18 @@ namespace Moyca.Database
         public string Skill { get; set; }
         public LESSON Lesson { get; set; }
 
-        public ScopeAndSequenceDB() : base(ScopeAndSequenceDB.TableName, ScopeAndSequenceDB.PrimaryPartitionKey)
+        private MoycaLogger log;
+
+        public ScopeAndSequenceDB(MoycaLogger logger) : base(ScopeAndSequenceDB.TableName, ScopeAndSequenceDB.PrimaryPartitionKey, logger)
         {
             this.WordsToRead = new List<string>();
+            this.log = logger;
         }
 
         public async Task GetSessionDataWithNumber(int orderNumber)
         {
+            log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Order number: " + orderNumber);
+
             DatabaseItem item = await GetEntryByKey(orderNumber);
 
             if (item.TryGetValue("WordsToRead", out AttributeValue words))
@@ -92,10 +97,14 @@ namespace Moyca.Database
                 if (sw.S.Equals("TRUE")) { Lesson = LESSON.SightWords; }
             }
 
+            log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Teach Mode: " + this.TeachMode.ToString());
+            log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Lesson: " + this.Lesson.ToString());
         }       
 
         public async Task<Dictionary<string, string>> GetOrder(int number)
         {
+            log.INFO("ScopeAndSequenceDB", "GetOrder", "Order Number: " + number);
+
             DatabaseItem items = await GetEntryByKey(number);
 
             Dictionary<string, string> wordOrder = new Dictionary<string, string>();
@@ -113,6 +122,8 @@ namespace Moyca.Database
 
         public async Task PutItemBackWithWordsToRead(int index, List<string> wordsToRead)
         {
+            log.INFO("ScopeAndSequenceDB", "PutItemBackWithWordsToRead", "Index: " + index);
+
             AttributeValue pKey = new AttributeValue();
             pKey.N = index.ToString();
             await SetItemsAttribute(pKey, "WordsToRead", new AttributeValue(wordsToRead));

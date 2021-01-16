@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 
-namespace Moyca.Database.GlobalConstants
+namespace AWSInfrastructure.GlobalConstants
 {
 
     /// <summary>

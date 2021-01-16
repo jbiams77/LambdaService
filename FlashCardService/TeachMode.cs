@@ -12,8 +12,8 @@ using Alexa.NET.Response.Directive;
 using Newtonsoft.Json;
 using Alexa.NET;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.DynamoDB;
+using AWSInfrastructure.GlobalConstants;
 
 
 namespace FlashCardService
@@ -21,9 +21,12 @@ namespace FlashCardService
     
     public class TeachMode
     {
-
+        
         public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
+            Function.log.INFO("TeachMode", "Introduction", "Provided for schedule" + liveSession.CurrentSchedule);
+
+            Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + liveSession.Lesson.ToString());
 
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
@@ -33,13 +36,17 @@ namespace FlashCardService
             {
                 return TeachingPrompts.CVCWordIntroduction(wordAttributes, displaySupported);
             }
-            // Default introduction             
+            
             return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop", displaySupported);
         }
 
         public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
+            Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + liveSession.Lesson);
+
             string teachingPrompts = "";
+
+            Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + liveSession.Lesson.ToString());
 
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
@@ -55,7 +62,6 @@ namespace FlashCardService
     {
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
-
  
         public static SkillResponse RichTextResponse()
         {
@@ -85,6 +91,9 @@ namespace FlashCardService
             teachModel += SayExtraSlow(wordAttributes.Word);
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
+
+            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+
             return teachModel;
         }
 
@@ -95,6 +104,8 @@ namespace FlashCardService
             teachModel += " Well " + PauseFor(.5) + " you get the point. These are called sight words. ";
             teachModel += " It is helpful to just memorize them by sight. To see them and know what they say.";
             teachModel += " Are you ready to start? ";
+
+            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
 
             return teachModel;
         }
@@ -114,6 +125,8 @@ namespace FlashCardService
             teachModel += " Remember, all of these words will end with " + Phoneme(wfPhoneme) + ".";
             teachModel += " Are you ready to begin?";
 
+            Function.log.DEBUG("TeachingPrompts", "WordFamilyIntroduction", "Alexa Says: " + teachModel);
+
             return AlexaResponse.GetResponse(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop", displaySupported);
         }
 
@@ -129,106 +142,11 @@ namespace FlashCardService
             teachModel += PauseFor(1.0);
             teachModel += " Are your ready to give it a try?";
 
+            Function.log.DEBUG("TeachingPrompts", "CVCWordIntroduction", "Alexa Says: " + teachModel);
+
             // change this from "Say yes" to something more helpful
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop", displaySupported);
             }
-
-
-        public static SsmlOutputSpeech NextWordFamily(string familyPhoneme, List<string> wordFamilyList)
-        {
-            string teachModel = StartTag;
-            teachModel += " Next is the " + Phoneme(familyPhoneme) + ", word family. ";
-            teachModel += " Remember, all of these words will end with " + Phoneme(familyPhoneme) + ".";
-            teachModel += PauseFor(1.5);
-            teachModel += " Listen for " + SayExtraSlow(Phoneme(familyPhoneme)) + ", At the end of each word.";
-            teachModel += PauseFor(1.5);
-
-            foreach (string word in wordFamilyList)
-            {
-                teachModel += PauseFor(1.0);
-                teachModel += ", ";
-                teachModel += SayExtraSlow(word);
-            }
-
-            teachModel += PauseFor(1.0);
-            teachModel += " Are your ready to give it a try?";
-            teachModel += EndTag;
-
-            return new SsmlOutputSpeech(teachModel);
-        }
-
-        public static SsmlOutputSpeech WordFamilyModel(string currentWord, string wordFamily, string endPhoneme)
-        {
-            string teachModel = StartTag;
-            string reprompt = "Say the word " + currentWord;
-            string beggingSound = currentWord.Remove(currentWord.Length - wordFamily.Length, wordFamily.Length);
-
-            teachModel += @"The word is " + SayExtraSlow(currentWord);
-            teachModel += PauseFor(0.5);
-
-            if (PhonemesConsonants.TryGetValue(beggingSound, out string sound))
-            {
-                teachModel += SayExtraSlow(Phoneme(sound));
-            }
-
-            teachModel += PauseFor(0.5);
-            teachModel += Phoneme(endPhoneme);
-            teachModel += PauseFor(0.5);
-            teachModel += SayExtraSlow(currentWord);
-            teachModel += PauseFor(0.5);
-            teachModel += " Say the word with me. ";
-            teachModel += PauseFor(0.5);
-            teachModel += SayExtraSlow(currentWord);
-            teachModel += PauseFor(0.5);
-            teachModel += " Now its your turn. Say the word ";
-            teachModel += SayExtraSlow(currentWord);
-            teachModel += EndTag;
-            return  new SsmlOutputSpeech(teachModel);
-        }
-
-        public static SsmlOutputSpeech SightWordModel(string currentWord, string phoneme, string example)
-        {
-            string teachModel = StartTag;
-            string reprompt = "Say the word " + currentWord;
-            string[] exampleWords = example.Split(' ');
-
-
-            teachModel += @"This sight word is " + SayExtraSlow(Phoneme(phoneme));
-            teachModel += PauseFor(0.5);
-            teachModel += "As in ";
-            teachModel += PauseFor(1);
-
-            foreach (string word in exampleWords)
-            {
-
-                if (word.Equals(currentWord.ToLower()))
-                {
-                    teachModel += " " + PauseFor(.5) + " ";
-                    teachModel += " " + SayExtraSlow(Phoneme(phoneme));
-                    teachModel += PauseFor(.5) + " ";
-                }
-                else
-                {
-                    teachModel += " " + word + " ";
-                }
-
-            }
-
-            teachModel += PauseFor(0.5);
-            teachModel += Phoneme(phoneme);
-            teachModel += PauseFor(0.5);
-            teachModel += SayExtraSlow(Phoneme(phoneme));
-            teachModel += PauseFor(0.5);
-            teachModel += " Say the word with me. ";
-            teachModel += PauseFor(0.5);
-            teachModel += SayExtraSlow(Phoneme(phoneme));
-            teachModel += PauseFor(0.5);
-            teachModel += " Now its your turn. Say the word ";
-            teachModel += SayExtraSlow(Phoneme(phoneme));
-            teachModel += EndTag;
-
-            return new SsmlOutputSpeech(teachModel);
-        }
 
         public static string PauseFor(double delay)
         {

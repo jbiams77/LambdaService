@@ -10,8 +10,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Text.Json;
+using AWSInfrastructure.S3Policy;
 
-namespace FlashCardService
+namespace AWSInfrastructure.SQS
 {
     class SQS
     {
@@ -69,7 +70,7 @@ namespace FlashCardService
                 }
                 catch (Exception e)
                 {
-                    Function.info.Log("Failed to create queue " + createQueueRequest.QueueName + ": " + e);
+                    //Function.info.Log("Failed to create queue " + createQueueRequest.QueueName + ": " + e);
                 }
             }
 
@@ -86,18 +87,18 @@ namespace FlashCardService
         public async Task Send<MessageType>(MessageType message)
         {
             string messageAsJson = ToJson(message);
-            Function.info.Log("Attempting to send on SQS\n: " + messageAsJson);
+            //Function.info.Log("Attempting to send on SQS\n: " + messageAsJson);
             if (messageAsJson != "")
             {
                 SendMessageRequest smr = new SendMessageRequest(QueueURL, messageAsJson);
                 try
                 {
                     await sqsClient.SendMessageAsync(smr);
-                    Function.info.Log("Sent message to " + QueueURL + ": \n" + messageAsJson);
+                    //Function.info.Log("Sent message to " + QueueURL + ": \n" + messageAsJson);
                 }
                 catch (Exception e)
                 {
-                    Function.info.Log("Failed to send message to " + QueueURL + ": " + e);
+                    //Function.info.Log("Failed to send message to " + QueueURL + ": " + e);
                 }
             }
         }
@@ -116,7 +117,7 @@ namespace FlashCardService
             }
             catch (Exception e)
             {
-                Function.info.Log("Failed to get existing queue url for " + queueName + ": " + e);
+                //Function.info.Log("Failed to get existing queue url for " + queueName + ": " + e);
             }
 
             return Tuple.Create(false, "");
@@ -154,7 +155,7 @@ namespace FlashCardService
             }
             catch (Exception e)
             {
-                Function.info.Log("Failed to set queue attributes: " + e);
+                //Function.info.Log("Failed to set queue attributes: " + e);
             }
         }
 
@@ -167,15 +168,15 @@ namespace FlashCardService
             {
                 // This is bad code. Dont put everything in a single try catch. But it works..
                 // Parse the URL to get account information.
-                var accountId = queueUrl.Split("/")[3];
-                var queueName = queueUrl.Split("/")[4];
-                var region = queueUrl.Split("/")[2].Split(".")[1];
+                string accountId = queueUrl.Split('/')[3];
+                var queueName = queueUrl.Split('/')[4];
+                var region = queueUrl.Split('/')[2].Split('.')[1];
 
                 return policyTemplate.Replace("${AccountId}", accountId).Replace("${QueueName}", queueName).Replace("${Region}", region);
             }
             catch (IndexOutOfRangeException e)
             {
-                Function.info.Log("Unable to create sqs policy: " + e);
+                //Function.info.Log("Unable to create sqs policy: " + e);
             }
 
             return "";
@@ -189,7 +190,7 @@ namespace FlashCardService
             }
             catch (Exception e)
             {
-                Function.info.Log("[SQS] Failed to convert object to json: " + e);
+                //Function.info.Log("[SQS] Failed to convert object to json: " + e);
                 return "";
             }
         }

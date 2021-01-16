@@ -7,14 +7,23 @@ using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Lambda.Core;
 using System.Threading.Tasks;
+using AWSInfrastructure.Logger;
 
-namespace FlashCardService
+namespace AWSInfrastructure.CognitoPool
 {
-    class CognitoUserPool
+    public class CognitoUserPool
     {
+        MoycaLogger log;
+
+        public CognitoUserPool(MoycaLogger logger)
+        {
+            this.log = logger;
+        }
+
         private readonly string DEFAULT_USERNAME = "default";
 
         private AmazonCognitoIdentityProviderClient _provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.USWest2);
+
         /// <summary>
         /// Get Username from Cognito UserPool Account
         /// </summary>
@@ -46,7 +55,7 @@ namespace FlashCardService
             }
             catch (Exception e)
             {
-                Function.info.Log("Cognito get user request failed. " + e.Message);
+                //Function.info.Log("Cognito get user request failed. " + e.Message);
             }
 
             return response;
