@@ -15,7 +15,6 @@ using Amazon.DynamoDBv2.Model;
 using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.GlobalConstants;
 
-
 namespace FlashCardService
 {
     
@@ -40,17 +39,17 @@ namespace FlashCardService
             return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop", displaySupported);
         }
 
-        public static SkillResponse TeachTheWord(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
+        public static SkillResponse TeachTheWord(string beggining, LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
             Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + liveSession.Lesson);
 
-            string teachingPrompts = "";
+            string teachingPrompts = beggining + " ";
 
             Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + liveSession.Lesson.ToString());
 
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
-                teachingPrompts = TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
+                teachingPrompts += TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
             }
 
             return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word, displaySupported);
@@ -78,7 +77,7 @@ namespace FlashCardService
             string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
 
             
-            string teachModel = "This word is spelled ";
+            string teachModel = " This word is spelled ";
             foreach (string sound in decodedWord)
             {
                 teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
@@ -114,7 +113,7 @@ namespace FlashCardService
         {
             string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
 
-            string teachModel = "Hello my Moycan! We are working with word families. ";
+            string teachModel = CommonPhrases.Greeting + " my Moycan! We are working with word families. ";
             teachModel += PauseFor(0.5);
 
             teachModel +=  "A word family is a group of words that are related " +
