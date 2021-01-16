@@ -15,7 +15,7 @@ using Alexa.NET;
 using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.GlobalConstants;
 using AWSInfrastructure.CognitoPool;
-using AWSInfrastructure.S3Policy;
+using AWSInfrastructure.Logger;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -23,29 +23,33 @@ using AWSInfrastructure.S3Policy;
 namespace FlashCardService
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
+    
     public class Function
     {
+        public static MoycaLogger log;
+
         // Make logger static to give all classes access to it
         public static ILambdaLogger info;
         public LiveSessionDB liveSession;
         public UserProfileDB userProfile;
         public ScopeAndSequenceDB scopeAndSequence;
         public SkillResponse response;
-        public string userId;
-        
+        public string userId;        
+        private CognitoUserPool cognitoUserPool;
+
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
         {
 
             Type T = input.GetRequestType();
-            info = context.Logger;
-            CognitoUserPool cognitoUserPool = new CognitoUserPool();
+            log = new MoycaLogger(context, LogLevel.TRACE);
+
+            cognitoUserPool = new CognitoUserPool(log);
+
             this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);
 
             this.liveSession = new LiveSessionDB(userId);
             this.userProfile = new UserProfileDB(userId);
             this.scopeAndSequence = new ScopeAndSequenceDB();
-            //this.sqs = new SQS();
-            //await InitializeUserQueue();
 
 
             switch (T.Name)
