@@ -29,7 +29,7 @@ namespace SchedulerService
         {
             log = new MoycaLogger(context, LogLevel.TRACE);
             scopeAndSequence = new ScopeAndSequenceDB(log);
-            dictionary = new DictionaryDB();
+            dictionary = new DictionaryDB(log);
             int i;
             for(i=1000; i<1056; i++)
             {                

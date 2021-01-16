@@ -44,7 +44,7 @@ namespace FlashCardService
             this.liveSession = new LiveSessionDB(userId, log);
             this.userProfile = new UserProfileDB(userId, log);
             this.scopeAndSequence = new ScopeAndSequenceDB(log);
-
+            log.INFO("BEGIN", "-----------------------------------------------------------------------");
             log.INFO("Function", "USERID: " + this.userId);
             log.INFO("Function", "LaunchRequest: " + T.Name);
 
@@ -131,7 +131,7 @@ namespace FlashCardService
 
             if (liveSession.TeachMode == MODE.Teach)
             {           
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
                 return TeachMode.Introduction(liveSession, wordAttributes, displaySupported);
             }
             else
@@ -162,8 +162,8 @@ namespace FlashCardService
 
             if (liveSession.TeachMode == MODE.Teach)
             {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
-                return TeachMode.TeachTheWord(liveSession, wordAttributes, displaySupported);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
+                return TeachMode.TeachTheWord(" ", liveSession, wordAttributes, displaySupported);
             }
             else
             {
@@ -192,7 +192,7 @@ namespace FlashCardService
 
             if (wordWasSaid)
             {
-                prompt = "Great!";
+                prompt = CommonPhrases.ShortAffirmation;
 
                 bool sessionFinished = liveSession.Remove(currentWord);
 
@@ -200,7 +200,7 @@ namespace FlashCardService
 
                 if (sessionFinished)
                 {
-                    prompt = "Congratulations! You finished this session! Another reading assession awaits you. Just say, Alexa, open Moycan Readers!";                    
+                    prompt = CommonPhrases.LongAffirmation + "You finished this session! Another reading session awaits you. Just say, Alexa, open Moycan Readers!";                    
                     await this.userProfile.RemoveCompletedScheduleFromUserProfile(liveSession.CurrentSchedule);
                     liveSession.CurrentState = STATE.Off;
                     return ResponseBuilder.Tell(prompt);
@@ -218,8 +218,8 @@ namespace FlashCardService
 
             if (liveSession.TeachMode == MODE.Teach)
             {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
-                return TeachMode.TeachTheWord(liveSession, wordAttributes, displaySupported);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
+                return TeachMode.TeachTheWord(prompt, liveSession, wordAttributes, displaySupported);
             }
             else
             {
