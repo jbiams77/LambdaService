@@ -7,8 +7,8 @@
     <ProjectGuid>{D1F3F761-BE05-4825-9B0E-11EF1E769A23}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Database</RootNamespace>
-    <AssemblyName>Database</AssemblyName>
+    <RootNamespace>AWSInfrastructure</RootNamespace>
+    <AssemblyName>AWSInfrastructure</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -23,7 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <DocumentationFile>bin\Debug\Database.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\AWSInfrastructure.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -78,13 +78,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DatabaseClient.cs" />
+    <Compile Include="DynamoDB\DatabaseClient.cs" />
     <Compile Include="DynamoDB\DictionaryDB.cs" />
-    <Compile Include="GlobalConstants.cs" />
     <Compile Include="DynamoDB\LiveSessionDB.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DynamoDB\ScopeAndSequenceDB.cs" />
     <Compile Include="DynamoDB\UserProfileDB.cs" />
+    <Compile Include="GlobalConstants.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -96,12 +96,16 @@
     <Analyzer Include="..\packages\AWSSDK.S3.3.5.7.3\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.SQS.3.5.1.5\analyzers\dotnet\cs\AWSSDK.SQS.CodeAnalysis.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Logger\" />
+    <Folder Include="SQS\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy  /Y "$(ProjectDir)bin\Debug\Database.dll" "$(SolutionDir)FlashCardService\bin\Debug"
-xcopy  /Y "$(ProjectDir)bin\Debug\Database.xml" "$(SolutionDir)FlashCardService\bin\Debug"
+    <PostBuildEvent>xcopy  /Y "$(ProjectDir)bin\Debug\AWSInfrastructure.dll" "$(SolutionDir)FlashCardService\bin\Debug"
+xcopy  /Y "$(ProjectDir)bin\Debug\AWSInfrastructure.xml" "$(SolutionDir)FlashCardService\bin\Debug"
 
-xcopy  /Y "$(ProjectDir)bin\Debug\Database.dll" "$(SolutionDir)SchedulerServices\bin\Debug"
-xcopy  /Y "$(ProjectDir)bin\Debug\Database.xml" "$(SolutionDir)SchedulerServices\bin\Debug"</PostBuildEvent>
+xcopy  /Y "$(ProjectDir)bin\Debug\AWSInfrastructure.dll" "$(SolutionDir)SchedulerServices\bin\Debug"
+xcopy  /Y "$(ProjectDir)bin\Debug\AWSInfrastructure.xml" "$(SolutionDir)SchedulerServices\bin\Debug"</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -12,8 +12,8 @@ using Alexa.NET.Response.Converters;
 using Alexa.NET.Response.Directive;
 using Newtonsoft.Json;
 using Alexa.NET;
-using Moyca.Database;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.DynamoDB;
+using AWSInfrastructure.GlobalConstants;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]

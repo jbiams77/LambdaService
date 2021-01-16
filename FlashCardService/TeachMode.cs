@@ -12,8 +12,8 @@ using Alexa.NET.Response.Directive;
 using Newtonsoft.Json;
 using Alexa.NET;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.DynamoDB;
+using AWSInfrastructure.GlobalConstants;
 
 
 namespace FlashCardService

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.GlobalConstants;
 
-namespace Moyca.Database
+namespace AWSInfrastructure.DynamoDB
 {
     
     using DatabaseItem = Dictionary<string, AttributeValue>;

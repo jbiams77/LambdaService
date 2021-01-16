@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Moyca.Database;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.GlobalConstants;
 
-namespace Moyca.Database
+namespace AWSInfrastructure.DynamoDB
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 

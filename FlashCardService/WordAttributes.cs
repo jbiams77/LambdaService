@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database;
+using AWSInfrastructure.DynamoDB;
 using System.Threading.Tasks;
 
 namespace FlashCardService

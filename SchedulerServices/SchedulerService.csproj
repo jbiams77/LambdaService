@@ -21,6 +21,9 @@
     <PackageReference Include="AWSSDK.SQS" Version="3.5.1.5" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AWSInfrastructure\AWSInfrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Database">
       <HintPath>bin\Debug\Database.dll</HintPath>
     </Reference>
