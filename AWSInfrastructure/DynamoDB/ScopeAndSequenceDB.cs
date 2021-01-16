@@ -4,7 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 using AWSInfrastructure.GlobalConstants;
-
+using AWSInfrastructure.Logger;
 
 namespace AWSInfrastructure.DynamoDB
 {
@@ -20,9 +20,12 @@ namespace AWSInfrastructure.DynamoDB
         public string Skill { get; set; }
         public LESSON Lesson { get; set; }
 
-        public ScopeAndSequenceDB() : base(ScopeAndSequenceDB.TableName, ScopeAndSequenceDB.PrimaryPartitionKey)
+        private MoycaLogger log;
+
+        public ScopeAndSequenceDB(MoycaLogger logger) : base(ScopeAndSequenceDB.TableName, ScopeAndSequenceDB.PrimaryPartitionKey)
         {
             this.WordsToRead = new List<string>();
+            this.log = logger;
         }
 
         public async Task GetSessionDataWithNumber(int orderNumber)

@@ -9,6 +9,7 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.DynamoDBEvents;
 using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.GlobalConstants;
+using AWSInfrastructure.Logger;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -18,6 +19,7 @@ namespace SchedulerService
 
     public class Function
     {
+        public static MoycaLogger log;
         // Make logger static to give all classes access to it
         public static ILambdaLogger info;
         ScopeAndSequenceDB scopeAndSequence;
@@ -25,7 +27,8 @@ namespace SchedulerService
 
         public async Task FunctionHandler(DynamoDBEvent dynamoEvent, ILambdaContext context)
         {
-            scopeAndSequence = new ScopeAndSequenceDB();
+            log = new MoycaLogger(context, LogLevel.TRACE);
+            scopeAndSequence = new ScopeAndSequenceDB(log);
             dictionary = new DictionaryDB();
             int i;
             for(i=1000; i<1056; i++)

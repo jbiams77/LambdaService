@@ -27,9 +27,6 @@ namespace FlashCardService
     public class Function
     {
         public static MoycaLogger log;
-
-        // Make logger static to give all classes access to it
-        public static ILambdaLogger info;
         public LiveSessionDB liveSession;
         public UserProfileDB userProfile;
         public ScopeAndSequenceDB scopeAndSequence;
@@ -42,23 +39,22 @@ namespace FlashCardService
 
             Type T = input.GetRequestType();
             log = new MoycaLogger(context, LogLevel.TRACE);
-
-            cognitoUserPool = new CognitoUserPool(log);
-
+            this.cognitoUserPool = new CognitoUserPool(log);
             this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);
+            this.liveSession = new LiveSessionDB(userId, log);
+            this.userProfile = new UserProfileDB(userId, log);
+            this.scopeAndSequence = new ScopeAndSequenceDB(log);
 
-            this.liveSession = new LiveSessionDB(userId);
-            this.userProfile = new UserProfileDB(userId);
-            this.scopeAndSequence = new ScopeAndSequenceDB();
-
+            log.INFO("Function", "USERID: " + this.userId);
+            log.INFO("Function", "LaunchRequest: " + T.Name);
 
             switch (T.Name)
             {
-                case "LaunchRequest":
+                case "LaunchRequest":                    
                     response = await HandleLaunchRequest(input.APLSupported());
                     break;
 
-                case "IntentRequest":
+                case "IntentRequest":                    
                     response = await HandleIntentRequest((IntentRequest)input.Request, input.APLSupported());
                     break;
 
@@ -78,6 +74,8 @@ namespace FlashCardService
         private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent, bool displaySupported)
         {
             SkillResponse intentResponse;
+
+            log.INFO("Function", "HandleIntentRequest", intent.Intent.Name);
 
             switch (intent.Intent.Name)
             {
@@ -110,27 +108,34 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
                     break;
             }
+
             return intentResponse;
         }
         private async Task SetStateToOffAndExit()
         {
+            log.INFO("Function", "SetStateToOffAndExit", "Schedule: " + liveSession.CurrentSchedule);
+
             await TransferDataFromUserProfileToLiveSession();
             liveSession.CurrentState = STATE.Off;
             await UpdateLiveSessionDatabase();
         }
 
         private async Task<SkillResponse> HandleLaunchRequest(bool displaySupported)
-        {   
+        {
+            log.INFO("Function", "HandleLaunchRequest", "Current Schedule: " + liveSession.CurrentSchedule);
+
             await TransferDataFromUserProfileToLiveSession();
             await UpdateLiveSessionDatabase();
 
+            log.DEBUG("Function", "HandleLaunchRequest", "Teach Mode: " + liveSession.TeachMode.ToString());
+
             if (liveSession.TeachMode == MODE.Teach)
-            {
+            {           
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord());
                 return TeachMode.Introduction(liveSession, wordAttributes, displaySupported);
             }
             else
-            {
+            {                
                 return AlexaResponse.Introduction("Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?", "Say yes or no to continue.", displaySupported);
             }
             
@@ -138,7 +143,8 @@ namespace FlashCardService
 
         private async Task<SkillResponse> HandleYesIntent(bool displaySupported)
         {
-           
+            log.INFO("Function", "HandleYesIntent", "Current Schedule: " + liveSession.CurrentSchedule);
+
             await TransferDataFromUserProfileToLiveSession();
             
             liveSession.CurrentState = STATE.FirstWord;
@@ -151,9 +157,8 @@ namespace FlashCardService
 
             string prompt = "Say the word on the flash card";
 
-            info.LogLine("Lesson: " + liveSession.Lesson.ToString());
-            info.LogLine("TeachMode: " + liveSession.TeachMode.ToString());
-            info.LogLine("Is display supported?" + displaySupported);
+            log.DEBUG("Function", "HandleYesIntent", "Teach Mode: " + liveSession.TeachMode.ToString());
+            log.INFO("Function", "HandleYesIntent", "Current Word: " + liveSession.GetCurrentWord());
 
             if (liveSession.TeachMode == MODE.Teach)
             {
@@ -169,35 +174,47 @@ namespace FlashCardService
 
         private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent, bool displaySupported)
         {
+            log.INFO("Function", "HandleWordsToReadIntent", "Current Schedule: " + liveSession.CurrentSchedule);
             
+
             await liveSession.GetDataFromLiveSession();
 
             string currentWord = liveSession.GetCurrentWord();
 
+            log.INFO("Function", "HandleWordsToReadIntent", "Current Word: " + currentWord);
+
             string prompt = "";
             string rePrompt = "Say the word";
 
-            if (ReaderSaidTheWord(intent))
-            {
-                prompt = "Great!";  
+            bool wordWasSaid = ReaderSaidTheWord(intent);
 
-                if (liveSession.Remove(currentWord))
+            log.DEBUG("Function", "HandleWordsToReadIntent", "Reader said the word? " + wordWasSaid);
+
+            if (wordWasSaid)
+            {
+                prompt = "Great!";
+
+                bool sessionFinished = liveSession.Remove(currentWord);
+
+                log.DEBUG("Function", "HandleWordsToReadIntent", "Session Finished? " + sessionFinished);
+
+                if (sessionFinished)
                 {
                     prompt = "Congratulations! You finished this session! Another reading assession awaits you. Just say, Alexa, open Moycan Readers!";                    
                     await this.userProfile.RemoveCompletedScheduleFromUserProfile(liveSession.CurrentSchedule);
                     liveSession.CurrentState = STATE.Off;
-                    info.LogLine("SESSION COMPLETED.");
                     return ResponseBuilder.Tell(prompt);
                 }
                 else
                 {
                     currentWord = liveSession.GetCurrentWord();
                     liveSession.CurrentState = STATE.Assess;
-                    LogSessionInfo(liveSession, info);
                 }
 
                 await UpdateLiveSessionDatabase();
             }
+
+            log.DEBUG("Function", "HandleWordsToReadIntent", "Teach Mode: " + liveSession.TeachMode.ToString());
 
             if (liveSession.TeachMode == MODE.Teach)
             {
@@ -206,14 +223,19 @@ namespace FlashCardService
             }
             else
             {
-                return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
+                return AlexaResponse.GetResponse(currentWord, prompt, rePrompt, displaySupported);
             }
             
         }
 
         private async Task TransferDataFromUserProfileToLiveSession()
         {
+            log.INFO("Function", "TransferDataFromUserProfileToLiveSession", "Transferring Data");
+
             int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();
+
+            log.DEBUG("Function", "TransferDataFromUserProfileToLiveSession", "Current Schedule: " + currentScheduleNumber);
+
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
             liveSession.wordsToRead = scopeAndSequence.WordsToRead;
             liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.TeachMode));
@@ -226,12 +248,13 @@ namespace FlashCardService
 
         private async Task UpdateLiveSessionDatabase()
         {
+            log.INFO("Function", "UpdateLiveSessionDatabase", "Updating Live Session");
+
             await liveSession.UpdateLiveSession();
         }
 
         private bool ReaderSaidTheWord(IntentRequest input)
-        {
-
+        {            
             foreach (ResolutionAuthority auth in input.Intent.Slots.Last().Value.Resolution.Authorities)
             {
                 if (auth.Status.Code == ResolutionStatusCode.SuccessfulMatch)
@@ -241,14 +264,6 @@ namespace FlashCardService
             }
 
             return false;
-        }
-
-        private void LogSessionInfo(LiveSessionDB session, ILambdaLogger info)
-        {
-            info.LogLine("Teach Mode: " + session.TeachMode);
-            info.LogLine("Current State: " + session.CurrentState);
-            info.LogLine("CLive Session Schedule: " + session.CurrentSchedule);
-
         }
 
     }

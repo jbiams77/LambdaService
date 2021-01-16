@@ -26,12 +26,28 @@ namespace AWSInfrastructure.Logger
             this.context = ct;
             this.level = lvl;
         }
+        public void INFO(string className, string message)
+        {
+            if (level == LogLevel.INFO || level == LogLevel.TRACE)
+            {
+                this.context.Logger.LogLine("INFO: " + className + ": " + message);
+            }
+        }
 
         public void INFO(string className, string function, string message)
         {
             if (level == LogLevel.INFO || level == LogLevel.TRACE)
             {
                 this.context.Logger.LogLine("INFO: " + className + ": " + function + ": " + message);
+            }
+        }
+
+
+        public void DEBUG(string className, string message)
+        {
+            if (level == LogLevel.DEBUG || level == LogLevel.TRACE)
+            {
+                this.context.Logger.LogLine("DEBUG: " + className + ": " + message);
             }
         }
 

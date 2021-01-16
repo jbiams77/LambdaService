@@ -24,21 +24,18 @@ namespace FlashCardService
         
         public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
         {
-            Function.log.INFO("TeachMode", "Introduction", "Provided for " + liveSession.CurrentSchedule);
+            Function.log.INFO("TeachMode", "Introduction", "Provided for schedule" + liveSession.CurrentSchedule);
+
+            Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + liveSession.Lesson.ToString());
 
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
-                Function.log.DEBUG("TeachMode", "Introduction", "WordFamilies");
-
                 return TeachingPrompts.WordFamilyIntroduction(wordAttributes, displaySupported);
             }
             else if (liveSession.Lesson == LESSON.CVC)
             {
-                Function.log.DEBUG("TeachMode", "Introduction", "CVC");
-
                 return TeachingPrompts.CVCWordIntroduction(wordAttributes, displaySupported);
             }
-            Function.log.DEBUG("TeachMode", "Introduction", "Default Selection");
             
             return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop", displaySupported);
         }
@@ -49,14 +46,12 @@ namespace FlashCardService
 
             string teachingPrompts = "";
 
+            Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + liveSession.Lesson.ToString());
+
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
-                Function.log.DEBUG("TeachMode", "TeachTheWord", "WordFamilies");
-
                 teachingPrompts = TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
             }
-
-            Function.log.DEBUG("TeachMode", "TeachTheWord", "Default Selection");
 
             return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word, displaySupported);
         }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 using AWSInfrastructure.GlobalConstants;
+using AWSInfrastructure.Logger;
 
 namespace AWSInfrastructure.DynamoDB
 {
@@ -24,7 +25,7 @@ namespace AWSInfrastructure.DynamoDB
         private string userId;
 
         private string timeStamp;
-
+        private MoycaLogger log;
         /// <summary>
         /// Indicates if Unity application is running, is set by Unity 
         /// application and known through live-session database
@@ -46,9 +47,10 @@ namespace AWSInfrastructure.DynamoDB
         /// Initializes live session data base with uniqe userID.
         /// </summary>
         /// <param name="userId"></param>
-        public LiveSessionDB(string userId) : base(LiveSessionDB.TableName, LiveSessionDB.PrimaryPartitionKey)
+        public LiveSessionDB(string userId, MoycaLogger logger) : base(LiveSessionDB.TableName, LiveSessionDB.PrimaryPartitionKey)
         {
             this.userId = userId;
+            this.log = logger;
         }
 
         /// <summary>

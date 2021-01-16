@@ -23,11 +23,8 @@
     <PackageReference Include="System.Text.Json" Version="5.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AWSInfrastructure\AWSInfrastructure.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Database">
-      <HintPath>bin\Debug\Database.dll</HintPath>
+    <Reference Include="AWSInfrastructure">
+      <HintPath>bin\Debug\AWSInfrastructure.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

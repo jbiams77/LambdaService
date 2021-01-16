@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 using AWSInfrastructure.GlobalConstants;
+using AWSInfrastructure.Logger;
 
 namespace AWSInfrastructure.DynamoDB
 {
@@ -25,10 +26,12 @@ namespace AWSInfrastructure.DynamoDB
         // Keys used to access database elements
         private readonly string DEFAULT_DB_KEY = "default";
         private readonly string SCHEDULE_KEY = "Schedule";
+        private MoycaLogger log;
 
-        public UserProfileDB(string userId) : base (UserProfileDB.TableName, UserProfileDB.PrimaryPartitionKey)
+        public UserProfileDB(string userId, MoycaLogger logger) : base (UserProfileDB.TableName, UserProfileDB.PrimaryPartitionKey)
         {
             this.UserID = userId;
+            this.log = logger;
             schedule = new List<int>();
         }
 
@@ -45,7 +48,7 @@ namespace AWSInfrastructure.DynamoDB
             if (!items.TryGetValue(SCHEDULE_KEY, out dbSchedule))
             {
                 // The user profile didnt contain a schedule, copy the default schedule into this user's profile
-                DatabaseItem defaultDb = await GetEntryByKey(DEFAULT_DB_KEY);
+                DatabaseItem defaultDb = await base.GetEntryByKey(DEFAULT_DB_KEY);
                 defaultDb.TryGetValue(SCHEDULE_KEY, out AttributeValue defaultSchedule);
 
                 AttributeValue key = new AttributeValue{ S = this.UserID };

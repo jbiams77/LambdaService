@@ -23,6 +23,7 @@ namespace AWSInfrastructure.CognitoPool
         private readonly string DEFAULT_USERNAME = "default";
 
         private AmazonCognitoIdentityProviderClient _provider = new AmazonCognitoIdentityProviderClient(new AnonymousAWSCredentials(), RegionEndpoint.USWest2);
+
         /// <summary>
         /// Get Username from Cognito UserPool Account
         /// </summary>
