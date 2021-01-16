@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Moyca.Database;
 using Amazon.DynamoDBv2.Model;
-using Moyca.Database.GlobalConstants;
+using AWSInfrastructure.GlobalConstants;
+using AWSInfrastructure.Logger;
 
-namespace Moyca.Database
+namespace AWSInfrastructure.DynamoDB
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
@@ -26,10 +26,12 @@ namespace Moyca.Database
         // Keys used to access database elements
         private readonly string DEFAULT_DB_KEY = "default";
         private readonly string SCHEDULE_KEY = "Schedule";
+        private MoycaLogger log;
 
-        public UserProfileDB(string userId) : base (UserProfileDB.TableName, UserProfileDB.PrimaryPartitionKey)
+        public UserProfileDB(string userId, MoycaLogger logger) : base (UserProfileDB.TableName, UserProfileDB.PrimaryPartitionKey, logger)
         {
             this.UserID = userId;
+            this.log = logger;
             schedule = new List<int>();
         }
 
@@ -45,8 +47,9 @@ namespace Moyca.Database
             AttributeValue dbSchedule;
             if (!items.TryGetValue(SCHEDULE_KEY, out dbSchedule))
             {
-                // The user profile didnt contain a schedule, copy the default schedule into this user's profile
-                DatabaseItem defaultDb = await GetEntryByKey(DEFAULT_DB_KEY);
+                log.INFO("UserProfileDB", "GetUserSchedule", "The user profile didnt contain a schedule, copy the default schedule into this user's profile");                
+
+                DatabaseItem defaultDb = await base.GetEntryByKey(DEFAULT_DB_KEY);
                 defaultDb.TryGetValue(SCHEDULE_KEY, out AttributeValue defaultSchedule);
 
                 AttributeValue key = new AttributeValue{ S = this.UserID };
@@ -63,6 +66,8 @@ namespace Moyca.Database
 
         public async Task RemoveCompletedScheduleFromUserProfile(int completedSchedule)
         {
+            log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Removing Schedule: " + completedSchedule);
+
             await GetUserSchedule();
 
             schedule.Remove(completedSchedule);
@@ -94,6 +99,8 @@ namespace Moyca.Database
 
         public async Task SetQueueUrl(string queueURL)
         {
+            log.INFO("UserProfileDB", "SetQueueUrl", "Setting QueueURL: " + queueURL);
+
             var updateRequest = new UpdateItemRequest
             {
                 TableName = UserProfileDB.TableName,
