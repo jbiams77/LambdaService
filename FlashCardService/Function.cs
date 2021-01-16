@@ -14,6 +14,8 @@ using Newtonsoft.Json;
 using Alexa.NET;
 using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.GlobalConstants;
+using AWSInfrastructure.CognitoPool;
+using AWSInfrastructure.S3Policy;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -30,7 +32,6 @@ namespace FlashCardService
         public ScopeAndSequenceDB scopeAndSequence;
         public SkillResponse response;
         public string userId;
-        //SQS sqs;
         
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
         {
@@ -100,7 +101,6 @@ namespace FlashCardService
                     break;
                 case "WordsToReadIntent":
                     intentResponse = await HandleWordsToReadIntent(intent, displaySupported);
-                    //await sqs.Send(GetSessionUpdate());
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -113,14 +113,12 @@ namespace FlashCardService
             await TransferDataFromUserProfileToLiveSession();
             liveSession.CurrentState = STATE.Off;
             await UpdateLiveSessionDatabase();
-            //await sqs.Send(GetSessionUpdate());
         }
 
         private async Task<SkillResponse> HandleLaunchRequest(bool displaySupported)
         {   
             await TransferDataFromUserProfileToLiveSession();
             await UpdateLiveSessionDatabase();
-            //await sqs.Send(GetSessionUpdate());
 
             if (liveSession.TeachMode == MODE.Teach)
             {
@@ -143,8 +141,6 @@ namespace FlashCardService
             
             await UpdateLiveSessionDatabase();
             
-            //await sqs.Send(GetSessionUpdate());
-
             await liveSession.GetDataFromLiveSession();
 
             string currentWord = liveSession.GetCurrentWord();
@@ -210,12 +206,6 @@ namespace FlashCardService
             }
             
         }
-        //// Creates or updates the queue and sets the queue URL in the user database
-        //public async Task InitializeUserQueue()
-        //{
-        //    this.sqs.QueueURL = await sqs.CreateQueue(this.userId);
-        //    await this.userProfile.SetQueueUrl(this.sqs.QueueURL);
-        //}
 
         private async Task TransferDataFromUserProfileToLiveSession()
         {
@@ -257,15 +247,5 @@ namespace FlashCardService
 
         }
 
-        private MessageSchema.SessionUpdate GetSessionUpdate()
-        {
-            return new MessageSchema.SessionUpdate
-            {
-                CurrentWord = this.liveSession.GetCurrentWord(),
-                CurrentSchedule = this.liveSession.CurrentSchedule,
-                CurrentState = this.liveSession.CurrentState.ToString(),
-                WordsRemaining = this.liveSession.GetWordsRemaining()
-            };
-        }
     }
 }

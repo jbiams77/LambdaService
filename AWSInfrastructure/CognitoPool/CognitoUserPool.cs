@@ -8,9 +8,9 @@ using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Lambda.Core;
 using System.Threading.Tasks;
 
-namespace FlashCardService
+namespace AWSInfrastructure.CognitoPool
 {
-    class CognitoUserPool
+    public class CognitoUserPool
     {
         private readonly string DEFAULT_USERNAME = "default";
 
@@ -46,7 +46,7 @@ namespace FlashCardService
             }
             catch (Exception e)
             {
-                Function.info.Log("Cognito get user request failed. " + e.Message);
+                //Function.info.Log("Cognito get user request failed. " + e.Message);
             }
 
             return response;
