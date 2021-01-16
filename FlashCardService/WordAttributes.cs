@@ -4,6 +4,7 @@ using System.Text;
 using Amazon.DynamoDBv2.Model;
 using AWSInfrastructure.DynamoDB;
 using System.Threading.Tasks;
+using AWSInfrastructure.Logger;
 
 namespace FlashCardService
 {
@@ -29,15 +30,15 @@ namespace FlashCardService
 
         private WordAttributes() { }
 
-        async public static Task<WordAttributes> GetWordAttributes(string word)
+        async public static Task<WordAttributes> GetWordAttributes(string word, MoycaLogger logger)
         {
             var wordAttributes = new WordAttributes();
-            await wordAttributes.GetAttributes(word);
+            await wordAttributes.GetAttributes(word, logger);
             return wordAttributes;
         }
-        private async Task GetAttributes(string word)
+        private async Task GetAttributes(string word, MoycaLogger logger)
         {
-            dictionaryDB = new DictionaryDB();
+            dictionaryDB = new DictionaryDB(logger);
             DatabaseItem items = await dictionaryDB.GetWordAttributesFromDictionary(word);
 
             if (items.TryGetValue("ConsonantBlend", out AttributeValue cb))
