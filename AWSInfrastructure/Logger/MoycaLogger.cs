@@ -13,7 +13,7 @@ namespace AWSInfrastructure.Logger
         TRACE,   // log everything
         INFO,    // log only info
         DEBUG, 
-        WARNING,
+        WARN,
         ERROR
     }
     public class MoycaLogger
@@ -28,7 +28,7 @@ namespace AWSInfrastructure.Logger
         }
         public void INFO(string className, string message)
         {
-            if (level == LogLevel.INFO || level == LogLevel.TRACE)
+            if (level == LogLevel.INFO || level == LogLevel.TRACE || level == LogLevel.WARN)
             {
                 this.context.Logger.LogLine("INFO: " + className + ": " + message);
             }
@@ -36,7 +36,7 @@ namespace AWSInfrastructure.Logger
 
         public void INFO(string className, string function, string message)
         {
-            if (level == LogLevel.INFO || level == LogLevel.TRACE)
+            if (level == LogLevel.INFO || level == LogLevel.TRACE || level == LogLevel.WARN)
             {
                 this.context.Logger.LogLine("INFO: " + className + ": " + function + ": " + message);
             }
@@ -45,7 +45,7 @@ namespace AWSInfrastructure.Logger
 
         public void DEBUG(string className, string message)
         {
-            if (level == LogLevel.DEBUG || level == LogLevel.TRACE)
+            if (level == LogLevel.DEBUG || level == LogLevel.TRACE || level == LogLevel.WARN)
             {
                 this.context.Logger.LogLine("DEBUG: " + className + ": " + message);
             }
@@ -53,9 +53,17 @@ namespace AWSInfrastructure.Logger
 
         public void DEBUG(string className, string function, string message)
         {
-            if (level == LogLevel.DEBUG || level == LogLevel.TRACE)
+            if (level == LogLevel.DEBUG || level == LogLevel.TRACE || level == LogLevel.WARN)
             {
                 this.context.Logger.LogLine("DEBUG: " + className + ": " + function + ": " + message);
+            }
+        }
+
+        public void WARN(string className, string function, string message)
+        {
+            if (level == LogLevel.WARN || level == LogLevel.TRACE)
+            {
+                this.context.Logger.LogLine("WARNING: " + className + ": " + function + ": " + message);
             }
         }
 

@@ -28,7 +28,7 @@ namespace AWSInfrastructure.DynamoDB
         private readonly string SCHEDULE_KEY = "Schedule";
         private MoycaLogger log;
 
-        public UserProfileDB(string userId, MoycaLogger logger) : base (UserProfileDB.TableName, UserProfileDB.PrimaryPartitionKey)
+        public UserProfileDB(string userId, MoycaLogger logger) : base (UserProfileDB.TableName, UserProfileDB.PrimaryPartitionKey, logger)
         {
             this.UserID = userId;
             this.log = logger;
@@ -47,7 +47,8 @@ namespace AWSInfrastructure.DynamoDB
             AttributeValue dbSchedule;
             if (!items.TryGetValue(SCHEDULE_KEY, out dbSchedule))
             {
-                // The user profile didnt contain a schedule, copy the default schedule into this user's profile
+                log.INFO("UserProfileDB", "GetUserSchedule", "The user profile didnt contain a schedule, copy the default schedule into this user's profile");                
+
                 DatabaseItem defaultDb = await base.GetEntryByKey(DEFAULT_DB_KEY);
                 defaultDb.TryGetValue(SCHEDULE_KEY, out AttributeValue defaultSchedule);
 
@@ -65,6 +66,8 @@ namespace AWSInfrastructure.DynamoDB
 
         public async Task RemoveCompletedScheduleFromUserProfile(int completedSchedule)
         {
+            log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Removing Schedule: " + completedSchedule);
+
             await GetUserSchedule();
 
             schedule.Remove(completedSchedule);
@@ -96,6 +99,8 @@ namespace AWSInfrastructure.DynamoDB
 
         public async Task SetQueueUrl(string queueURL)
         {
+            log.INFO("UserProfileDB", "SetQueueUrl", "Setting QueueURL: " + queueURL);
+
             var updateRequest = new UpdateItemRequest
             {
                 TableName = UserProfileDB.TableName,

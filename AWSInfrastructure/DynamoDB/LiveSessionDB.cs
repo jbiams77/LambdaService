@@ -47,7 +47,8 @@ namespace AWSInfrastructure.DynamoDB
         /// Initializes live session data base with uniqe userID.
         /// </summary>
         /// <param name="userId"></param>
-        public LiveSessionDB(string userId, MoycaLogger logger) : base(LiveSessionDB.TableName, LiveSessionDB.PrimaryPartitionKey)
+        /// <param name="logger"></param>
+        public LiveSessionDB(string userId, MoycaLogger logger) : base(LiveSessionDB.TableName, LiveSessionDB.PrimaryPartitionKey, logger)
         {
             this.userId = userId;
             this.log = logger;
@@ -59,6 +60,8 @@ namespace AWSInfrastructure.DynamoDB
         /// </summary>
         public async Task UpdateLiveSession()
         {
+            log.INFO("LiveSessionDB", "UpdateLiveSession", "Updating live-session");
+
             AttributeValue currentSchedule = new AttributeValue();
             currentSchedule.N = this.CurrentSchedule.ToString();
 
@@ -91,6 +94,8 @@ namespace AWSInfrastructure.DynamoDB
         /// <returns></returns>
         public async Task GetDataFromLiveSession()
         {
+            log.INFO("LiveSessionDB", "GetDataFromLiveSession", "Getting data from live-session");
+
             DatabaseItem items = await GetEntryByKey(this.userId);
 
             if (items.TryGetValue("WordsToRead", out AttributeValue words))
@@ -139,6 +144,8 @@ namespace AWSInfrastructure.DynamoDB
         /// successful completion of session.</returns>
         public bool Remove(string currentWord)
         {
+            log.INFO("LiveSessionDB", "Remove", "Removing from local: " + currentWord);
+
             wordsToRead.Remove(currentWord);
             return (wordsToRead.Count == 0) ? true : false;
         }

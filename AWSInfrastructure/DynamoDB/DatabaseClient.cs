@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using AWSInfrastructure.Logger;
 
 namespace AWSInfrastructure.DynamoDB
 {
@@ -16,14 +17,15 @@ namespace AWSInfrastructure.DynamoDB
         private string tableName;
         private string primaryPartitionKey;
         private AmazonDynamoDBClient client = new AmazonDynamoDBClient();
-
+        private MoycaLogger log;
 
         /// Constructor
         /// @param tableName - The name of the table that will be used to perform all functions of this class </param>
         /// @param primaryKeyName - The name of the primary lookup key for the specified table </param>
-        public DatabaseClient(string tableName, string primaryKeyName)
+        public DatabaseClient(string tableName, string primaryKeyName, MoycaLogger logger)
         {
             this.tableName = tableName;
+            this.log = logger;
             this.primaryPartitionKey = primaryKeyName;
         }
         
@@ -51,7 +53,7 @@ namespace AWSInfrastructure.DynamoDB
             }
             catch (Exception e)
             {
-                //TODO: Log exception thrown.
+                log.WARN("DatabaseClient", "GetEntryByKey(string)", "EXCEPTION: " + e.Message);
             }
 
             return item;
@@ -81,7 +83,7 @@ namespace AWSInfrastructure.DynamoDB
             }
             catch (Exception e)
             {
-                //TODO: Log exception thrown.
+                log.WARN("DatabaseClient", "GetEntryByKey(int)", "EXCEPTION: " + e.Message);
             }
 
             return item;
@@ -114,7 +116,7 @@ namespace AWSInfrastructure.DynamoDB
             }
             catch (Exception e)
             {
-                //TODO: Log exception thrown.
+                log.WARN("DatabaseClient", "GetEntriesBySecondaryIndex", "EXCEPTION: " + e.Message);
             }
 
             return new List<DatabaseItem>();
@@ -134,7 +136,7 @@ namespace AWSInfrastructure.DynamoDB
             }
             catch (Exception e)
             {
-                //TODO: Log exception thrown.
+                log.WARN("DatabaseClient", "GetItemsWithQueryRequest", "EXCEPTION: " + e.Message);
             }
 
             return new List<DatabaseItem>();
@@ -167,7 +169,7 @@ namespace AWSInfrastructure.DynamoDB
             }
             catch (Exception e)
             {
-                //TODO: Log exception thrown.
+                log.WARN("DatabaseClient", "SetItemsAttribute", "EXCEPTION: " + e.Message);
                 return false;
             }
         }
@@ -183,7 +185,7 @@ namespace AWSInfrastructure.DynamoDB
             }
             catch (Exception e)
             {
-                //TODO: Log exception thrown.
+                log.WARN("DatabaseClient", "SetItemsAttributeWithRequest", "EXCEPTION: " + e.Message);
                 return false;
             }
         }
@@ -210,7 +212,7 @@ namespace AWSInfrastructure.DynamoDB
             }
             catch (Exception e)
             {
-                //TODO: Log exception thrown.
+                log.WARN("DatabaseClient", "PutAttributes", "EXCEPTION: " + e.Message);
                 return false;
             }
         }

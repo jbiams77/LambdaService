@@ -22,7 +22,7 @@ namespace AWSInfrastructure.DynamoDB
 
         private MoycaLogger log;
 
-        public ScopeAndSequenceDB(MoycaLogger logger) : base(ScopeAndSequenceDB.TableName, ScopeAndSequenceDB.PrimaryPartitionKey)
+        public ScopeAndSequenceDB(MoycaLogger logger) : base(ScopeAndSequenceDB.TableName, ScopeAndSequenceDB.PrimaryPartitionKey, logger)
         {
             this.WordsToRead = new List<string>();
             this.log = logger;
@@ -30,6 +30,8 @@ namespace AWSInfrastructure.DynamoDB
 
         public async Task GetSessionDataWithNumber(int orderNumber)
         {
+            log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Order number: " + orderNumber);
+
             DatabaseItem item = await GetEntryByKey(orderNumber);
 
             if (item.TryGetValue("WordsToRead", out AttributeValue words))
@@ -95,10 +97,14 @@ namespace AWSInfrastructure.DynamoDB
                 if (sw.S.Equals("TRUE")) { Lesson = LESSON.SightWords; }
             }
 
+            log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Teach Mode: " + this.TeachMode.ToString());
+            log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Lesson: " + this.Lesson.ToString());
         }       
 
         public async Task<Dictionary<string, string>> GetOrder(int number)
         {
+            log.INFO("ScopeAndSequenceDB", "GetOrder", "Order Number: " + number);
+
             DatabaseItem items = await GetEntryByKey(number);
 
             Dictionary<string, string> wordOrder = new Dictionary<string, string>();
@@ -116,6 +122,8 @@ namespace AWSInfrastructure.DynamoDB
 
         public async Task PutItemBackWithWordsToRead(int index, List<string> wordsToRead)
         {
+            log.INFO("ScopeAndSequenceDB", "PutItemBackWithWordsToRead", "Index: " + index);
+
             AttributeValue pKey = new AttributeValue();
             pKey.N = index.ToString();
             await SetItemsAttribute(pKey, "WordsToRead", new AttributeValue(wordsToRead));
