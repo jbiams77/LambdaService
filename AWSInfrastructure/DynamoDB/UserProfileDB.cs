@@ -64,7 +64,7 @@ namespace AWSInfrastructure.DynamoDB
             }
         }
 
-        public async Task RemoveCompletedScheduleFromUserProfile(int completedSchedule)
+        public async Task IncrementUserSchedule(int completedSchedule)
         {
 
             await GetUserSchedule();
@@ -79,7 +79,17 @@ namespace AWSInfrastructure.DynamoDB
             if (await RemoveSchedule(completedSchedule))
             {
                 log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Adding Schedule: " + scheduleToAdd.ToString());
-                await AddSchedule(scheduleToAdd);
+                await AppendSchedule(scheduleToAdd);
+            }
+        }
+
+        public async Task DecrementUserSchedule(int completedSchedule)
+        {
+            var scheduleToAdd = completedSchedule - 1;
+
+            if (scheduleToAdd >= 1000)
+            {
+                await InsertScheduleFront(scheduleToAdd);
             }
         }
 
@@ -108,7 +118,7 @@ namespace AWSInfrastructure.DynamoDB
             }
         }
 
-        private async Task<bool> AddSchedule(int scheduleToAdd)
+        private async Task<bool> AppendSchedule(int scheduleToAdd)
         {
             var newSchedule = new AttributeValue
             {
@@ -124,6 +134,39 @@ namespace AWSInfrastructure.DynamoDB
                     { UserProfileDB.PrimaryPartitionKey, new AttributeValue(this.UserID) }
                 },
                 UpdateExpression = "SET #attrName = list_append(#attrName, :attrValue)",
+                ExpressionAttributeNames = new Dictionary<string, string>
+                {
+                    { "#attrName", SCHEDULE_KEY },
+                },
+                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
+                {
+                    { ":attrValue", new AttributeValue()
+                        {
+                            L = scheduleList
+                        }
+                    }
+                }
+            };
+
+            return await SetItemsAttributeWithRequest(updateRequest);
+        }
+
+        private async Task<bool> InsertScheduleFront(int scheduleToAdd)
+        {
+            var newSchedule = new AttributeValue
+            {
+                N = scheduleToAdd.ToString()
+            };
+            var scheduleList = new List<AttributeValue> { newSchedule };
+
+            var updateRequest = new UpdateItemRequest
+            {
+                TableName = UserProfileDB.TableName,
+                Key = new Dictionary<string, AttributeValue>
+                {
+                    { UserProfileDB.PrimaryPartitionKey, new AttributeValue(this.UserID) }
+                },
+                UpdateExpression = "SET #attrName = list_append(:attrValue, #attrName)",
                 ExpressionAttributeNames = new Dictionary<string, string>
                 {
                     { "#attrName", SCHEDULE_KEY },

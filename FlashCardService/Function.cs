@@ -37,6 +37,9 @@ namespace FlashCardService
         // Most sessions have 6 - 7 words. Reader must miss one or less to advance sessions.
         private static int PERCENT_TO_MOVE_FORWARD = 83;
 
+        // If the reader misses half of the words or more in assess mode, they will move back to teach mode
+        private static int PERCENT_TO_MOVE_BACKWARD = 50;
+
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
         {
 
@@ -219,7 +222,12 @@ namespace FlashCardService
                     if (percentAccuracy >= PERCENT_TO_MOVE_FORWARD)
                     {
                         prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moycan Readers!";
-                        await this.userProfile.RemoveCompletedScheduleFromUserProfile(liveSession.CurrentSchedule);
+                        await this.userProfile.IncrementUserSchedule(liveSession.CurrentSchedule);
+                    }
+                    else if (percentAccuracy <= PERCENT_TO_MOVE_BACKWARD && liveSession.TeachMode == MODE.Assess)
+                    {
+                        prompt = "Let's review this lesson again! Just say, Alexa, open Moycan Readers!";
+                        await this.userProfile.DecrementUserSchedule(liveSession.CurrentSchedule);
                     }
                     else
                     {
