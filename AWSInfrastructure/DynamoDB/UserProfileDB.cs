@@ -66,7 +66,6 @@ namespace AWSInfrastructure.DynamoDB
 
         public async Task RemoveCompletedScheduleFromUserProfile(int completedSchedule)
         {
-            log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Removing Schedule: " + completedSchedule);
 
             await GetUserSchedule();
 
@@ -76,6 +75,7 @@ namespace AWSInfrastructure.DynamoDB
                 scheduleToAdd = schedule[schedule.Count - 1] + 1;
             }
 
+            log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Removing Schedule: " + completedSchedule);
             if (await RemoveSchedule(completedSchedule))
             {
                 log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Adding Schedule: " + scheduleToAdd.ToString());
@@ -140,6 +140,7 @@ namespace AWSInfrastructure.DynamoDB
 
             return await SetItemsAttributeWithRequest(updateRequest);
         }
+
         public async Task SetQueueUrl(string queueURL)
         {
             log.INFO("UserProfileDB", "SetQueueUrl", "Setting QueueURL: " + queueURL);

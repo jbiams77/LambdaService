@@ -94,7 +94,7 @@ namespace FlashCardService
 
         public static SkillResponse IntroductionWithCard(string cardText, string introduction, string reprompt)
         {
-            return HandleFlashCard(cardText, introduction, reprompt);
+            return HandleFlashCard(cardText, 0, introduction, reprompt);
         }
 
         public static SkillResponse Introduction(string introduction, string reprompt)
@@ -111,26 +111,24 @@ namespace FlashCardService
             return response;
         }
 
-        public static SkillResponse PresentFlashCard(string slotWord, string output, string reprompt)
+        public static SkillResponse PresentFlashCard(string flashCardWord, int attemptsMade, string output, string reprompt)
         {
             if (!DisplaySupported)
             {
-                reprompt = Slow(SpellOut(slotWord), "x-slow");
-                output += Slow(SpellOut(slotWord), "x-slow");
+                reprompt = Slow(SpellOut(flashCardWord), "x-slow");
+                output += Slow(SpellOut(flashCardWord), "x-slow");
             }
-            return HandleFlashCard(slotWord, output, reprompt);
+            return HandleFlashCard(flashCardWord, attemptsMade, output, reprompt);
         }
 
-        private static SkillResponse HandleFlashCard(string slotWord, string output, string reprompt)
+        private static SkillResponse HandleFlashCard(string flashCardWord, int attemptsMade, string output, string reprompt)
         {
-            
-
             string reprompSpeech = StartTag + reprompt + EndTag;
             string speech = StartTag + output + EndTag;
 
             SkillResponse response = new SkillResponse { Version = "1.1" };
 
-            var directive = AlexaResponse.Create_DynamicEntityDirective(slotWord);
+            var directive = AlexaResponse.Create_DynamicEntityDirective(flashCardWord);
 
             ResponseBody body = new ResponseBody
             {
@@ -140,14 +138,18 @@ namespace FlashCardService
                 {
                     OutputSpeech = new SsmlOutputSpeech(reprompSpeech)
                 }
-        };
+            };
 
             response.Response = body;
             response.Response.Directives.Add(directive);
+            response.SessionAttributes = new Dictionary<string, object>()
+            {
+                { "TotalFailedAttempts", attemptsMade.ToString() }
+            };
 
             if (DisplaySupported)
             {
-                var displayDirective = AlexaResponse.Create_CurrentWordPresentation_Directive(slotWord);
+                var displayDirective = AlexaResponse.Create_CurrentWordPresentation_Directive(flashCardWord);
                 response.Response.Directives.Add(displayDirective);
             }
 

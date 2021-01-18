@@ -39,7 +39,7 @@ namespace FlashCardService
             return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop");
         }
 
-        public static SkillResponse TeachTheWord(string beggining, LiveSessionDB liveSession, WordAttributes wordAttributes)
+        public static SkillResponse TeachTheWord(string beggining, int attemptsMade, LiveSessionDB liveSession, WordAttributes wordAttributes)
         {
             Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + liveSession.Lesson);
 
@@ -52,7 +52,7 @@ namespace FlashCardService
                 teachingPrompts += TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
             }
 
-            return AlexaResponse.PresentFlashCard(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
+            return AlexaResponse.PresentFlashCard(wordAttributes.Word, attemptsMade, teachingPrompts, "Please say " + wordAttributes.Word);
         }
     }
 
