@@ -34,7 +34,8 @@ namespace FlashCardService
         public string userId;        
         private CognitoUserPool cognitoUserPool;
 
-        private static int PERCENT_TO_MOVE_FORWARD = 90;
+        // Most sessions have 6 - 7 words. Reader must miss one or less to advance sessions.
+        private static int PERCENT_TO_MOVE_FORWARD = 83;
 
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
         {
@@ -217,12 +218,12 @@ namespace FlashCardService
 
                     if (percentAccuracy >= PERCENT_TO_MOVE_FORWARD)
                     {
-                        prompt = CommonPhrases.LongAffirmation + "You finished this session! Another reading session awaits you. Just say, Alexa, open Moycan Readers!";
+                        prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moycan Readers!";
                         await this.userProfile.RemoveCompletedScheduleFromUserProfile(liveSession.CurrentSchedule);
                     }
                     else
                     {
-                        prompt = CommonPhrases.LongAffirmation + "Lets try those again! Just say, Alexa, open Moycan Readers!";
+                        prompt = CommonPhrases.LongAffirmation + "Let's practice that session again! Just say, Alexa, open Moycan Readers!";
                     }
                     liveSession.CurrentState = STATE.Off;
                     return ResponseBuilder.Tell(prompt);

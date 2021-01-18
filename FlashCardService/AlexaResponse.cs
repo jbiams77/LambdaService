@@ -49,6 +49,17 @@ namespace FlashCardService
         }
 
         /// <summary>
+        /// Have Alexa say the word excitedly
+        /// </summary>
+        /// <param name="word">Word to sat</param>
+        /// <param name="intensity">Excitement intencity. One of low, medium, high</param>
+        /// <returns></returns>
+        public static string Excited(string word, string intensity = "medium")
+        {
+            return "<amazon:emotion name=\"excited\" intensity=\""+intensity+"\">" + word + "</amazon:emotion>";
+        }
+
+        /// <summary>
         /// Have Alexa spell the specifed word
         /// </summary>
         /// <param name="word">Word to spell</param>
