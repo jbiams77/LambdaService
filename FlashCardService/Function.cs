@@ -39,6 +39,8 @@ namespace FlashCardService
 
             Type T = input.GetRequestType();
             log = new MoycaLogger(context, LogLevel.TRACE);
+            AlexaResponse.SetLogger(log);
+
             this.cognitoUserPool = new CognitoUserPool(log);
             this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);
             this.liveSession = new LiveSessionDB(userId, log);
@@ -48,14 +50,16 @@ namespace FlashCardService
             log.INFO("Function", "USERID: " + this.userId);
             log.INFO("Function", "LaunchRequest: " + T.Name);
 
+            AlexaResponse.SetDisplaySupported(input.APLSupported());
+
             switch (T.Name)
             {
                 case "LaunchRequest":                    
-                    response = await HandleLaunchRequest(input.APLSupported());
+                    response = await HandleLaunchRequest();
                     break;
 
                 case "IntentRequest":                    
-                    response = await HandleIntentRequest((IntentRequest)input.Request, input.APLSupported());
+                    response = await HandleIntentRequest((IntentRequest)input.Request);
                     break;
 
                 case "SessionEndedRequest":
@@ -71,7 +75,7 @@ namespace FlashCardService
             return response;
         }
 
-        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent, bool displaySupported)
+        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent)
         {
             SkillResponse intentResponse;
 
@@ -80,7 +84,7 @@ namespace FlashCardService
             switch (intent.Intent.Name)
             {
                 case "AMAZON.YesIntent":
-                    intentResponse = await HandleYesIntent(displaySupported);
+                    intentResponse = await HandleYesIntent();
                     break;
                 case "AMAZON.NoIntent":
                     await SetStateToOffAndExit();
@@ -91,8 +95,7 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Cancel intent.");
                     break;
                 case "AMAZON.FallbackIntent":
-                    await SetStateToOffAndExit();
-                    intentResponse = ResponseBuilder.Tell("Fallback intent");
+                    intentResponse = await HandleWordsToReadIntent(intent);
                     break;
                 case "AMAZON.StopIntent":
                     await SetStateToOffAndExit();
@@ -102,7 +105,7 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Help intent.");
                     break;
                 case "WordsToReadIntent":
-                    intentResponse = await HandleWordsToReadIntent(intent, displaySupported);
+                    intentResponse = await HandleWordsToReadIntent(intent);
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -120,7 +123,7 @@ namespace FlashCardService
             await UpdateLiveSessionDatabase();
         }
 
-        private async Task<SkillResponse> HandleLaunchRequest(bool displaySupported)
+        private async Task<SkillResponse> HandleLaunchRequest()
         {
             log.INFO("Function", "HandleLaunchRequest", "Current Schedule: " + liveSession.CurrentSchedule);
 
@@ -132,16 +135,16 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {           
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.Introduction(liveSession, wordAttributes, displaySupported);
+                return TeachMode.Introduction(liveSession, wordAttributes);
             }
             else
             {                
-                return AlexaResponse.Introduction("Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?", "Say yes or no to continue.", displaySupported);
+                return AlexaResponse.Introduction("Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?", "Say yes or no to continue.");
             }
             
         }
 
-        private async Task<SkillResponse> HandleYesIntent(bool displaySupported)
+        private async Task<SkillResponse> HandleYesIntent()
         {
             log.INFO("Function", "HandleYesIntent", "Current Schedule: " + liveSession.CurrentSchedule);
 
@@ -155,7 +158,7 @@ namespace FlashCardService
 
             string currentWord = liveSession.GetCurrentWord();
 
-            string prompt = "Say the word on the flash card";
+            string prompt = "Say the word ";
 
             log.DEBUG("Function", "HandleYesIntent", "Teach Mode: " + liveSession.TeachMode.ToString());
             log.INFO("Function", "HandleYesIntent", "Current Word: " + liveSession.GetCurrentWord());
@@ -163,16 +166,16 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.TeachTheWord(" ", liveSession, wordAttributes, displaySupported);
+                return TeachMode.TeachTheWord(" ", liveSession, wordAttributes);
             }
             else
             {
-                return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
+                return AlexaResponse.PresentFlashCard(currentWord, prompt, prompt);
             }            
         }
            
 
-        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent, bool displaySupported)
+        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent)
         {
             log.INFO("Function", "HandleWordsToReadIntent", "Current Schedule: " + liveSession.CurrentSchedule);
             
@@ -219,11 +222,11 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.TeachTheWord(prompt, liveSession, wordAttributes, displaySupported);
+                return TeachMode.TeachTheWord(prompt, liveSession, wordAttributes);
             }
             else
             {
-                return AlexaResponse.GetResponse(currentWord, prompt, rePrompt, displaySupported);
+                return AlexaResponse.PresentFlashCard(currentWord, prompt, rePrompt);
             }
             
         }
@@ -254,12 +257,15 @@ namespace FlashCardService
         }
 
         private bool ReaderSaidTheWord(IntentRequest input)
-        {            
-            foreach (ResolutionAuthority auth in input.Intent.Slots.Last().Value.Resolution.Authorities)
+        {
+            if (input.Intent.Slots?.Any() ?? false)
             {
-                if (auth.Status.Code == ResolutionStatusCode.SuccessfulMatch)
+                foreach (ResolutionAuthority auth in input.Intent.Slots.Last().Value.Resolution.Authorities)
                 {
-                    return true;
+                    if (auth.Status.Code == ResolutionStatusCode.SuccessfulMatch)
+                    {
+                        return true;
+                    }
                 }
             }
 

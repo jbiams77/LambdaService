@@ -7,13 +7,56 @@ using Alexa.NET.Response;
 using Alexa.NET.Response.APL;
 using Alexa.NET.Response.Directive;
 using Alexa.NET.Response.Directive.Templates;
+using AWSInfrastructure.Logger;
 
 namespace FlashCardService
 {
     public class AlexaResponse
     {
+        public static MoycaLogger log;
+
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
+
+        private static bool DisplaySupported;
+        public static void SetDisplaySupported(bool displaySupported)
+        {
+            DisplaySupported = displaySupported;
+        }
+        public static void SetLogger(MoycaLogger logger)
+        {
+            log = logger;
+        }
+
+        /// <summary>
+        /// Add a pause in Alexa's speech.
+        /// </summary>
+        /// <param name="milliseconds">Length of pause</param>
+        /// <returns></returns>
+        public static string Pause(int milliseconds)
+        {
+            return "<break time=\"" + milliseconds + "\"ms\"/>";
+        }
+
+        /// <summary>
+        /// Speak the specified word slow
+        /// </summary>
+        /// <param name="rate"> The rate to speak. Default is slow. Options: x-slow, slow, medium, fast, x-fast</param>
+        /// <returns></returns>
+        public static string Slow(string word, string rate = "slow")
+        {
+            return "<prosody rate=\"" + rate + "\">" + word + "</prosody>";
+        }
+
+        /// <summary>
+        /// Have Alexa spell the specifed word
+        /// </summary>
+        /// <param name="word">Word to spell</param>
+        /// <returns></returns>
+        public static string SpellOut(string word)
+        {
+            return "<say-as interpret-as=\"spell-out\">" + word + "</say-as>";
+        }
 
         public static SkillResponse Say(string speechResponse)
         {
@@ -28,20 +71,6 @@ namespace FlashCardService
         public static SkillResponse SayWithReprompt(IOutputSpeech speechResponse, string reprompt)
         {
             return BuildResponse(speechResponse, false, null, new Reprompt(reprompt), null);
-        }
-
-        public static SkillResponse Introduction(string introduction, string reprompt, bool displaySupported)
-        {
-            string intro = StartTag + introduction + EndTag;
-
-            var response = AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(intro), reprompt);
-            
-            if (displaySupported)
-            {
-                response.Response.Directives.Add(Create_IntroPresentation_Directive());
-            }
-
-            return response;
         }
 
         private static SkillResponse BuildResponse(IOutputSpeech outputSpeech, bool shouldEndSession, Session sessionAttributes, Reprompt reprompt, ICard card)
@@ -63,38 +92,66 @@ namespace FlashCardService
             return response;
         }
 
-        public static SkillResponse GetResponse(string slotWord, string output, string reprompt, bool displaySupported)
+        public static SkillResponse IntroductionWithCard(string cardText, string introduction, string reprompt)
         {
+            return HandleFlashCard(cardText, introduction, reprompt);
+        }
+
+        public static SkillResponse Introduction(string introduction, string reprompt)
+        {
+            string intro = StartTag + introduction + EndTag;
+
+            var response = AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(intro), reprompt);
+
+            if (DisplaySupported)
+            {
+                response.Response.Directives.Add(Create_IntroPresentation_Directive());
+            }
+
+            return response;
+        }
+
+        public static SkillResponse PresentFlashCard(string slotWord, string output, string reprompt)
+        {
+            if (!DisplaySupported)
+            {
+                reprompt = Slow(SpellOut(slotWord), "x-slow");
+                output += Slow(SpellOut(slotWord), "x-slow");
+            }
+            return HandleFlashCard(slotWord, output, reprompt);
+        }
+
+        private static SkillResponse HandleFlashCard(string slotWord, string output, string reprompt)
+        {
+            
+
+            string reprompSpeech = StartTag + reprompt + EndTag;
             string speech = StartTag + output + EndTag;
 
-            if (displaySupported)
+            SkillResponse response = new SkillResponse { Version = "1.1" };
+
+            var directive = AlexaResponse.Create_DynamicEntityDirective(slotWord);
+
+            ResponseBody body = new ResponseBody
             {
-                SkillResponse response = new SkillResponse { Version = "1.1" };
-
-                var displayDirective = AlexaResponse.Create_CurrentWordPresentation_Directive(slotWord);
-                var directive = AlexaResponse.Create_DynamicEntityDirective(slotWord);
-
-                ResponseBody body = new ResponseBody
+                ShouldEndSession = false,
+                OutputSpeech = new SsmlOutputSpeech(speech),
+                Reprompt = new Reprompt()
                 {
-                    ShouldEndSession = false,
-                    OutputSpeech = new SsmlOutputSpeech(speech),
-                    Reprompt = new Reprompt(reprompt)
-                };
+                    OutputSpeech = new SsmlOutputSpeech(reprompSpeech)
+                }
+        };
 
-                response.Response = body;
-                response.Response.Directives.Add(displayDirective);
-                response.Response.Directives.Add(directive);
+            response.Response = body;
+            response.Response.Directives.Add(directive);
 
-
-                return response;
-            }
-            else
+            if (DisplaySupported)
             {
-                string failedResponse = StartTag + "Oh no! Your current device does not support a display. Please try again on a device with display capabilities." + EndTag;
-                return BuildResponse(new SsmlOutputSpeech(failedResponse), true, null, null, null);
+                var displayDirective = AlexaResponse.Create_CurrentWordPresentation_Directive(slotWord);
+                response.Response.Directives.Add(displayDirective);
             }
 
-            
+            return response;
         }
 
         private static DialogUpdateDynamicEntities Create_DynamicEntityDirective(string slotWord)

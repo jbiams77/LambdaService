@@ -21,7 +21,7 @@ namespace FlashCardService
     public class TeachMode
     {
         
-        public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
+        public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes)
         {
             Function.log.INFO("TeachMode", "Introduction", "Provided for schedule" + liveSession.CurrentSchedule);
 
@@ -29,17 +29,17 @@ namespace FlashCardService
 
             if (liveSession.Lesson == LESSON.WordFamilies)
             {
-                return TeachingPrompts.WordFamilyIntroduction(wordAttributes, displaySupported);
+                return TeachingPrompts.WordFamilyIntroduction(wordAttributes);
             }
             else if (liveSession.Lesson == LESSON.CVC)
             {
-                return TeachingPrompts.CVCWordIntroduction(wordAttributes, displaySupported);
+                return TeachingPrompts.CVCWordIntroduction(wordAttributes);
             }
             
-            return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop", displaySupported);
+            return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop");
         }
 
-        public static SkillResponse TeachTheWord(string beggining, LiveSessionDB liveSession, WordAttributes wordAttributes, bool displaySupported)
+        public static SkillResponse TeachTheWord(string beggining, LiveSessionDB liveSession, WordAttributes wordAttributes)
         {
             Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + liveSession.Lesson);
 
@@ -52,7 +52,7 @@ namespace FlashCardService
                 teachingPrompts += TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
             }
 
-            return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word, displaySupported);
+            return AlexaResponse.PresentFlashCard(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
         }
     }
 
@@ -77,11 +77,7 @@ namespace FlashCardService
             string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
 
             
-            string teachModel = " This word is spelled ";
-            foreach (string sound in decodedWord)
-            {
-                teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
-            }
+            string teachModel = " This word is spelled " + AlexaResponse.Slow(AlexaResponse.SpellOut(wordAttributes.Word), "x-slow");
             teachModel += PauseFor(.5);
             teachModel += "The sounds are ";
             
@@ -96,7 +92,7 @@ namespace FlashCardService
             return teachModel;
         }
 
-        public static string SigthWordsIntroduction(bool displaySupported)
+        public static string SightWordsIntroduction()
         {
             string teachModel = "There are words used over, and over, and over, and over, and ";
             teachModel += PauseFor(.5);
@@ -104,12 +100,12 @@ namespace FlashCardService
             teachModel += " It is helpful to just memorize them by sight. To see them and know what they say.";
             teachModel += " Are you ready to start? ";
 
-            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
+            Function.log.DEBUG("TeachingPrompts", "SightWordsIntroduction", "Alexa Says: " + teachModel);
 
             return teachModel;
         }
 
-        public static SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes, bool displaySupported)
+        public static SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes)
         {
             string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
 
@@ -126,10 +122,10 @@ namespace FlashCardService
 
             Function.log.DEBUG("TeachingPrompts", "WordFamilyIntroduction", "Alexa Says: " + teachModel);
 
-            return AlexaResponse.GetResponse(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop", displaySupported);
+            return AlexaResponse.IntroductionWithCard(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop");
         }
 
-        public static SkillResponse CVCWordIntroduction(WordAttributes wordAttributes, bool displaySupported)
+        public static SkillResponse CVCWordIntroduction(WordAttributes wordAttributes)
         {
             string teachModel = "Lets work on the " + Phoneme("æ") + " sound.";//wordAttributes.VowelPhoneme + " sound.";
             teachModel += PauseFor(1.5);
@@ -144,7 +140,7 @@ namespace FlashCardService
             Function.log.DEBUG("TeachingPrompts", "CVCWordIntroduction", "Alexa Says: " + teachModel);
 
             // change this from "Say yes" to something more helpful
-            return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop", displaySupported);
+            return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
             }
 
         public static string PauseFor(double delay)
