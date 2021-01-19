@@ -70,7 +70,7 @@ namespace FlashCardService
 
                 case "SessionEndedRequest":
                     await SetStateToOffAndExit();
-                    response = AlexaResponse.Say("Session End");
+                    response = AlexaResponse.Say("Goodbye Moycan!");
                     break;
 
                 default:
@@ -95,11 +95,11 @@ namespace FlashCardService
                     break;
                 case "AMAZON.NoIntent":
                     await SetStateToOffAndExit();
-                    intentResponse = ResponseBuilder.Tell("No intent.");
+                    intentResponse = ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moycan Readers'. Goodbye.");
                     break;
                 case "AMAZON.CancelIntent":
                     await SetStateToOffAndExit();
-                    intentResponse = ResponseBuilder.Tell("Cancel intent.");
+                    intentResponse = ResponseBuilder.Tell("Until next time my Moycan!");
                     break;
                 case "AMAZON.FallbackIntent":
                     intentResponse = await HandleWordsToReadIntent(input);
@@ -109,13 +109,13 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Goodbye.");
                     break;
                 case "AMAZON.HelpIntent":
-                    intentResponse = ResponseBuilder.Tell("Help intent.");
+                    intentResponse = ResponseBuilder.Tell("To restart say, 'Alexa, open Moycan Readers'. If you are connected to a display, a flashcard will appear and you will read the word aloud. If there is no display, I will spell the word and you say it.");
                     break;
                 case "WordsToReadIntent":
                     intentResponse = await HandleWordsToReadIntent(input);
                     break;
                 default:
-                    intentResponse = ResponseBuilder.Tell("Unhandled intent.");
+                    intentResponse = ResponseBuilder.Tell("I didn't understand that.");
                     break;
             }
 
