@@ -8,6 +8,16 @@ namespace FlashCardService
     {
         private static Random random = new Random(0);
 
+        public static string Help
+        {
+            get
+            {
+                return "To restart say, 'Alexa, open Moycan Readers'. If you are connected to a display," +
+                        "a flashcard will appear and you will read the word aloud. If there is no display, " + 
+                        "I will spell the word and you say it.";
+            }
+        }
+
         private static string[] greeting =
         {
             "Hello ",

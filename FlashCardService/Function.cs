@@ -55,7 +55,7 @@ namespace FlashCardService
             log.INFO("BEGIN", "-----------------------------------------------------------------------");
             log.INFO("Function", "USERID: " + this.userId);
             log.INFO("Function", "LaunchRequest: " + T.Name);
-
+            log.INFO("Function", "DisplaySupported: " + input.APLSupported());
             AlexaResponse.SetDisplaySupported(input.APLSupported());
 
             switch (T.Name)
@@ -108,8 +108,8 @@ namespace FlashCardService
                     await SetStateToOffAndExit();
                     intentResponse = ResponseBuilder.Tell("Goodbye.");
                     break;
-                case "AMAZON.HelpIntent":
-                    intentResponse = ResponseBuilder.Tell("To restart say, 'Alexa, open Moycan Readers'. If you are connected to a display, a flashcard will appear and you will read the word aloud. If there is no display, I will spell the word and you say it.");
+                case "AMAZON.HelpIntent":                    
+                    intentResponse = await HandleHelpRequest();
                     break;
                 case "WordsToReadIntent":
                     intentResponse = await HandleWordsToReadIntent(input);
@@ -180,7 +180,17 @@ namespace FlashCardService
                 return AlexaResponse.PresentFlashCard(currentWord, 0, prompt, prompt);
             }            
         }
-           
+
+        private async Task<SkillResponse> HandleHelpRequest()
+        {
+            await TransferDataFromUserProfileToLiveSession();
+            await liveSession.GetDataFromLiveSession();
+
+            log.INFO("Function", "HandleHelpRequest", "Current Schedule: " + liveSession.CurrentSchedule);
+            
+            return AlexaResponse.PresentFlashCard(liveSession.GetCurrentWord(), 0, CommonPhrases.Help, "You can say the word now");
+        }
+        
 
         private async Task<SkillResponse> HandleWordsToReadIntent(SkillRequest input)
         {
