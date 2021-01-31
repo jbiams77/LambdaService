@@ -23,6 +23,10 @@ namespace AWSInfrastructure.DynamoDB
 
         public List<int> schedule;
 
+        // This is a temporary fix to prevent user schedule from going out of bounds
+        public readonly int MIN_SCHEDULE_INDEX = 1000;
+        public readonly int MAX_SCHEDULE_INDEX = 1051;
+
         // Keys used to access database elements
         private readonly string DEFAULT_DB_KEY = "default";
         private readonly string SCHEDULE_KEY = "Schedule";
@@ -69,10 +73,16 @@ namespace AWSInfrastructure.DynamoDB
 
             await GetUserSchedule();
 
-            int scheduleToAdd = 1000;
+            int scheduleToAdd = MIN_SCHEDULE_INDEX;
             if (schedule.Any())
             {
                 scheduleToAdd = schedule[schedule.Count - 1] + 1;
+            }
+
+            if (scheduleToAdd > MAX_SCHEDULE_INDEX)
+            {
+                // User reached the end of allowed schedules
+                scheduleToAdd = MIN_SCHEDULE_INDEX;
             }
 
             log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Removing Schedule: " + completedSchedule);

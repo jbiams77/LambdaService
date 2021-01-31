@@ -40,6 +40,7 @@ namespace FlashCardService
         // If the reader misses half of the words or more in assess mode, they will move back to teach mode
         private static int PERCENT_TO_MOVE_BACKWARD = 50;
 
+            
         public async Task<SkillResponse> FunctionHandler(SkillRequest input, ILambdaContext context)
         {
 
@@ -95,7 +96,7 @@ namespace FlashCardService
                     break;
                 case "AMAZON.NoIntent":
                     await SetStateToOffAndExit();
-                    intentResponse = ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moycan Readers'. Goodbye.");
+                    intentResponse = ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moyca Readers'. Goodbye.");
                     break;
                 case "AMAZON.CancelIntent":
                     await SetStateToOffAndExit();
@@ -231,17 +232,17 @@ namespace FlashCardService
 
                     if (percentAccuracy >= PERCENT_TO_MOVE_FORWARD)
                     {
-                        prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moycan Readers!";
+                        prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moyca Readers!";
                         await this.userProfile.IncrementUserSchedule(liveSession.CurrentSchedule);
                     }
                     else if (percentAccuracy <= PERCENT_TO_MOVE_BACKWARD && liveSession.TeachMode == MODE.Assess)
                     {
-                        prompt = "Let's review this lesson again! Just say, Alexa, open Moycan Readers!";
+                        prompt = "Let's review this lesson again! Just say, Alexa, open Moyca Readers!";
                         await this.userProfile.DecrementUserSchedule(liveSession.CurrentSchedule);
                     }
                     else
                     {
-                        prompt = CommonPhrases.LongAffirmation + "Let's practice that session again! Just say, Alexa, open Moycan Readers!";
+                        prompt = CommonPhrases.LongAffirmation + "Let's practice that session again! Just say, Alexa, open Moyca Readers!";
                     }
                     liveSession.CurrentState = STATE.Off;
                     return ResponseBuilder.Tell(prompt);
