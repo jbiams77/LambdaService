@@ -237,7 +237,7 @@ namespace FlashCardService
                     MainTemplate = new Layout(new[]
                     {
                         new Container(
-                            new Image("https://moyca-alexa-display.s3-us-west-2.amazonaws.com/Logo-01.png") { Width = "100%", Height = "100%", Align = "center" }
+                            new Image("https://moyca-alexa-display.s3-us-west-2.amazonaws.com/MoycaLogoSquareWords-01+(1).png") { Width = "100%", Height = "100%", Align = "center" }
                         )
                         {
                             Width = "100%",

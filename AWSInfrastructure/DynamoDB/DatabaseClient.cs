@@ -9,7 +9,7 @@ namespace AWSInfrastructure.DynamoDB
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
     
-    /// <summary>Class <c>DatabaseClient</c>: Provides all Moycan specific DynamoDB
+    /// <summary>Class <c>DatabaseClient</c>: Provides all Moyca specific DynamoDB
     /// databases with a common utility for queries, scan's, and getItems.</summary>
     ///
     public abstract class DatabaseClient
