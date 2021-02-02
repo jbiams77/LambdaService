@@ -28,6 +28,10 @@ namespace AWSInfrastructure.DynamoDB
             this.log = logger;
         }
 
+        /// <summary>
+        /// Uses order (primary key) to retrieve the words to read and lesson type from scope and sequence Database.
+        /// </summary>
+        /// @param orderNumber - Integer number used as primary key for geting list of words from database. </param>        
         public async Task GetSessionDataWithNumber(int orderNumber)
         {
             log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Order number: " + orderNumber);
@@ -50,52 +54,29 @@ namespace AWSInfrastructure.DynamoDB
             }
 
             // Determine lesson plan 
+            if(item.TryGetValue("Lesson", out AttributeValue lesson))
+            {               
 
-            // WORD FAMILY
-            if(item.TryGetValue("WF", out AttributeValue wf))
-            {
-                if (!wf.S.Equals("FALSE")) { Lesson = LESSON.WordFamilies; }
+                switch (lesson.S)
+                {
+                    case "WF": 
+                        this.Lesson = LESSON.WordFamilies; 
+                        break;
+                    case "CVC": 
+                        this.Lesson = LESSON.CVC; 
+                        break;
+                    case "CD": 
+                        this.Lesson = LESSON.ConsonantDigraph; 
+                        break;
+                    case "CB": 
+                        this.Lesson = LESSON.ConsonantBlend; 
+                        break;
+                    defualt: 
+                        this.Lesson = LESSON.None;
+                        break;
+                }
+
             }            
-            // CONSONANT VOWEL CONSONANT
-            else if (item.TryGetValue("CVC", out AttributeValue cvc))
-            {
-                if (cvc.S.Equals("TRUE")) { Lesson = LESSON.CVC; }
-            }
-            // CONSONANT DIGRAPH
-            else if (item.TryGetValue("CD", out AttributeValue cd))
-            {
-                if (!cd.S.Equals("FALSE")) { Lesson = LESSON.ConsonantDigraph; }
-            }
-            // CONSONANT BLEND
-            else if (item.TryGetValue("CB", out AttributeValue cb))
-            {
-                if (!cb.S.Equals("FALSE")) { Lesson = LESSON.ConsonantBlend; }
-            }
-            // E CONTROLLED VOWEL
-            else if (item.TryGetValue("E", out AttributeValue e))
-            {
-                if (!e.S.Equals("FALSE")) { Lesson = LESSON.EControlledVowel; }
-            }
-            // R CONTROLLED VOWEL
-            else if (item.TryGetValue("R", out AttributeValue r))
-            {
-                if (!r.S.Equals("FALSE")) { Lesson = LESSON.RControlledVowel; }
-            }
-            // L CONTROLLED VOWEL
-            else if (item.TryGetValue("L", out AttributeValue l))
-            {
-                if (!l.S.Equals("FALSE")) { Lesson = LESSON.LControlledVowel; }
-            }
-            // VOWEL BLENDS
-            else if (item.TryGetValue("VB", out AttributeValue vb))
-            {
-                if (!vb.S.Equals("FALSE")) { Lesson = LESSON.VowelBlends; }
-            }
-            // SIGHT WORDS
-            else if (item.TryGetValue("SW", out AttributeValue sw))
-            {
-                if (sw.S.Equals("TRUE")) { Lesson = LESSON.SightWords; }
-            }
 
             log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Teach Mode: " + this.TeachMode.ToString());
             log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Lesson: " + this.Lesson.ToString());

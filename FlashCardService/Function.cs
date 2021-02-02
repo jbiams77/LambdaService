@@ -27,6 +27,7 @@ namespace FlashCardService
     public class Function
     {
         public static MoycaLogger log;
+        public static bool displaySupported;
         public LiveSessionDB liveSession;
         public UserProfileDB userProfile;
         public ScopeAndSequenceDB scopeAndSequence;
@@ -44,6 +45,7 @@ namespace FlashCardService
             this.liveSession = new LiveSessionDB(userId, log);
             this.userProfile = new UserProfileDB(userId, log);
             this.scopeAndSequence = new ScopeAndSequenceDB(log);
+            Function.displaySupported = input.APLSupported();
             log.INFO("BEGIN", "-----------------------------------------------------------------------");
             log.INFO("Function", "USERID: " + this.userId);
             log.INFO("Function", "LaunchRequest: " + T.Name);
@@ -55,7 +57,7 @@ namespace FlashCardService
                     break;
 
                 case "IntentRequest":                    
-                    response = await HandleIntentRequest((IntentRequest)input.Request, input.APLSupported());
+                    response = await HandleIntentRequest((IntentRequest)input.Request);
                     break;
 
                 case "SessionEndedRequest":
@@ -71,7 +73,7 @@ namespace FlashCardService
             return response;
         }
 
-        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent, bool displaySupported)
+        private async Task<SkillResponse> HandleIntentRequest(IntentRequest intent)
         {
             SkillResponse intentResponse;
 
@@ -80,7 +82,7 @@ namespace FlashCardService
             switch (intent.Intent.Name)
             {
                 case "AMAZON.YesIntent":
-                    intentResponse = await HandleYesIntent(displaySupported);
+                    intentResponse = await HandleYesIntent();
                     break;
                 case "AMAZON.NoIntent":
                     await SetStateToOffAndExit();
@@ -102,7 +104,7 @@ namespace FlashCardService
                     intentResponse = ResponseBuilder.Tell("Help intent.");
                     break;
                 case "WordsToReadIntent":
-                    intentResponse = await HandleWordsToReadIntent(intent, displaySupported);
+                    intentResponse = await HandleWordsToReadIntent(intent);
                     break;
                 default:
                     intentResponse = ResponseBuilder.Tell("Unhandled intent.");
@@ -132,16 +134,16 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {           
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.Introduction(liveSession, wordAttributes, displaySupported);
+                return TeachMode.Introduction(liveSession, wordAttributes);
             }
             else
             {                
-                return AlexaResponse.Introduction("Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?", "Say yes or no to continue.", displaySupported);
+                return AlexaResponse.Introduction("Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?", "Say yes or no to continue.");
             }
             
         }
 
-        private async Task<SkillResponse> HandleYesIntent(bool displaySupported)
+        private async Task<SkillResponse> HandleYesIntent()
         {
             log.INFO("Function", "HandleYesIntent", "Current Schedule: " + liveSession.CurrentSchedule);
 
@@ -163,16 +165,16 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.TeachTheWord(" ", liveSession, wordAttributes, displaySupported);
+                return TeachMode.TeachTheWord(" ", liveSession, wordAttributes);
             }
             else
             {
-                return AlexaResponse.GetResponse(currentWord, prompt, prompt, displaySupported);
+                return AlexaResponse.GetResponse(currentWord, prompt, prompt);
             }            
         }
            
 
-        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent, bool displaySupported)
+        private async Task<SkillResponse> HandleWordsToReadIntent(IntentRequest intent)
         {
             log.INFO("Function", "HandleWordsToReadIntent", "Current Schedule: " + liveSession.CurrentSchedule);
             
@@ -219,11 +221,11 @@ namespace FlashCardService
             if (liveSession.TeachMode == MODE.Teach)
             {
                 WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.TeachTheWord(prompt, liveSession, wordAttributes, displaySupported);
+                return TeachMode.TeachTheWord(prompt, liveSession, wordAttributes);
             }
             else
             {
-                return AlexaResponse.GetResponse(currentWord, prompt, rePrompt, displaySupported);
+                return AlexaResponse.GetResponse(currentWord, prompt, rePrompt);
             }
             
         }

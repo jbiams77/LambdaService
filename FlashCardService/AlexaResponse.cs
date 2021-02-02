@@ -30,13 +30,13 @@ namespace FlashCardService
             return BuildResponse(speechResponse, false, null, new Reprompt(reprompt), null);
         }
 
-        public static SkillResponse Introduction(string introduction, string reprompt, bool displaySupported)
+        public static SkillResponse Introduction(string introduction, string reprompt)
         {
             string intro = StartTag + introduction + EndTag;
 
             var response = AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(intro), reprompt);
             
-            if (displaySupported)
+            if (Function.displaySupported)
             {
                 response.Response.Directives.Add(Create_IntroPresentation_Directive());
             }
@@ -63,11 +63,11 @@ namespace FlashCardService
             return response;
         }
 
-        public static SkillResponse GetResponse(string slotWord, string output, string reprompt, bool displaySupported)
+        public static SkillResponse GetResponse(string slotWord, string output, string reprompt)
         {
             string speech = StartTag + output + EndTag;
 
-            if (displaySupported)
+            if (Function.displaySupported)
             {
                 SkillResponse response = new SkillResponse { Version = "1.1" };
 
