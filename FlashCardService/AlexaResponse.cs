@@ -7,13 +7,73 @@ using Alexa.NET.Response;
 using Alexa.NET.Response.APL;
 using Alexa.NET.Response.Directive;
 using Alexa.NET.Response.Directive.Templates;
+using AWSInfrastructure.Logger;
 
 namespace FlashCardService
 {
     public class AlexaResponse
     {
+        public static MoycaLogger log;
+        private static SessionAttributes sessionAttributes;
+
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
+
+        private static bool DisplaySupported;
+        public static void SetDisplaySupported(bool displaySupported)
+        {
+            DisplaySupported = displaySupported;
+        }
+        public static void SetLogger(MoycaLogger logger)
+        {
+            log = logger;
+        }
+
+        public static void SetSessionAttributeHandler(SessionAttributes sessionAttributesHandler)
+        {
+            sessionAttributes = sessionAttributesHandler;
+        }
+
+        /// <summary>
+        /// Add a pause in Alexa's speech.
+        /// </summary>
+        /// <param name="milliseconds">Length of pause</param>
+        /// <returns></returns>
+        public static string Pause(int milliseconds)
+        {
+            return "<break time=\"" + milliseconds + "\"ms\"/>";
+        }
+
+        /// <summary>
+        /// Speak the specified word slow
+        /// </summary>
+        /// <param name="rate"> The rate to speak. Default is slow. Options: x-slow, slow, medium, fast, x-fast</param>
+        /// <returns></returns>
+        public static string Slow(string word, string rate = "slow")
+        {
+            return "<prosody rate=\"" + rate + "\">" + word + "</prosody>";
+        }
+
+        /// <summary>
+        /// Have Alexa say the word excitedly
+        /// </summary>
+        /// <param name="word">Word to sat</param>
+        /// <param name="intensity">Excitement intencity. One of low, medium, high</param>
+        /// <returns></returns>
+        public static string Excited(string word, string intensity = "medium")
+        {
+            return "<amazon:emotion name=\"excited\" intensity=\""+intensity+"\">" + word + "</amazon:emotion>";
+        }
+
+        /// <summary>
+        /// Have Alexa spell the specifed word
+        /// </summary>
+        /// <param name="word">Word to spell</param>
+        /// <returns></returns>
+        public static string SpellOut(string word)
+        {
+            return "<say-as interpret-as=\"spell-out\">" + word + "</say-as>";
+        }
 
         public static SkillResponse Say(string speechResponse)
         {
@@ -22,32 +82,17 @@ namespace FlashCardService
 
         public static SkillResponse Say(IOutputSpeech speechResponse)
         {
-            return BuildResponse(speechResponse, true, null, null, null);
+            return BuildResponse(speechResponse, true, null, null);
         }
 
         public static SkillResponse SayWithReprompt(IOutputSpeech speechResponse, string reprompt)
         {
-            return BuildResponse(speechResponse, false, null, new Reprompt(reprompt), null);
+            return BuildResponse(speechResponse, false, new Reprompt(reprompt), null);
         }
 
-        public static SkillResponse Introduction(string introduction, string reprompt)
-        {
-            string intro = StartTag + introduction + EndTag;
-
-            var response = AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(intro), reprompt);
-            
-            if (Function.displaySupported)
-            {
-                response.Response.Directives.Add(Create_IntroPresentation_Directive());
-            }
-
-            return response;
-        }
-
-        private static SkillResponse BuildResponse(IOutputSpeech outputSpeech, bool shouldEndSession, Session sessionAttributes, Reprompt reprompt, ICard card)
+        private static SkillResponse BuildResponse(IOutputSpeech outputSpeech, bool shouldEndSession, Reprompt reprompt, ICard card)
         {
             SkillResponse response = new SkillResponse { Version = "1.0" };
-            if (sessionAttributes != null) response.SessionAttributes = sessionAttributes.Attributes;
 
             ResponseBody body = new ResponseBody
             {
@@ -59,42 +104,71 @@ namespace FlashCardService
             if (card != null) body.Card = card;
 
             response.Response = body;
+            response.SessionAttributes = sessionAttributes.ToDictionary();
 
             return response;
         }
 
-        public static SkillResponse GetResponse(string slotWord, string output, string reprompt)
+        public static SkillResponse IntroductionWithCard(string cardText, string introduction, string reprompt)
         {
+            return HandleFlashCard(cardText, introduction, reprompt);
+        }
+
+        public static SkillResponse Introduction(string introduction, string reprompt)
+        {
+            string intro = StartTag + introduction + EndTag;
+
+            var response = AlexaResponse.SayWithReprompt(new SsmlOutputSpeech(intro), reprompt);
+
+            if (DisplaySupported)
+            {
+                response.Response.Directives.Add(Create_IntroPresentation_Directive());
+            }
+
+            response.SessionAttributes = sessionAttributes.ToDictionary();
+            return response;
+        }
+
+        public static SkillResponse PresentFlashCard(string flashCardWord, string output, string reprompt)
+        {
+            if (!DisplaySupported)
+            {
+                reprompt = Slow(SpellOut(flashCardWord), "x-slow");
+                output += Slow(SpellOut(flashCardWord), "x-slow");
+            }
+            return HandleFlashCard(flashCardWord, output, reprompt);
+        }
+
+        private static SkillResponse HandleFlashCard(string flashCardWord, string output, string reprompt)
+        {
+            string reprompSpeech = StartTag + reprompt + EndTag;
             string speech = StartTag + output + EndTag;
 
-            if (Function.displaySupported)
+            SkillResponse response = new SkillResponse { Version = "1.1" };
+
+            var directive = AlexaResponse.Create_DynamicEntityDirective(flashCardWord);
+
+            ResponseBody body = new ResponseBody
             {
-                SkillResponse response = new SkillResponse { Version = "1.1" };
-
-                var displayDirective = AlexaResponse.Create_CurrentWordPresentation_Directive(slotWord);
-                var directive = AlexaResponse.Create_DynamicEntityDirective(slotWord);
-
-                ResponseBody body = new ResponseBody
+                ShouldEndSession = false,
+                OutputSpeech = new SsmlOutputSpeech(speech),
+                Reprompt = new Reprompt()
                 {
-                    ShouldEndSession = false,
-                    OutputSpeech = new SsmlOutputSpeech(speech),
-                    Reprompt = new Reprompt(reprompt)
-                };
+                    OutputSpeech = new SsmlOutputSpeech(reprompSpeech)
+                }
+            };
 
-                response.Response = body;
-                response.Response.Directives.Add(displayDirective);
-                response.Response.Directives.Add(directive);
+            response.Response = body;
+            response.Response.Directives.Add(directive);
+            response.SessionAttributes = sessionAttributes.ToDictionary();
 
-
-                return response;
-            }
-            else
+            if (DisplaySupported)
             {
-                string failedResponse = StartTag + "Oh no! Your current device does not support a display. Please try again on a device with display capabilities." + EndTag;
-                return BuildResponse(new SsmlOutputSpeech(failedResponse), true, null, null, null);
+                var displayDirective = AlexaResponse.Create_CurrentWordPresentation_Directive(flashCardWord);
+                response.Response.Directives.Add(displayDirective);
             }
 
-            
+            return response;
         }
 
         private static DialogUpdateDynamicEntities Create_DynamicEntityDirective(string slotWord)
@@ -167,7 +241,7 @@ namespace FlashCardService
                     MainTemplate = new Layout(new[]
                     {
                         new Container(
-                            new Image("https://moyca-alexa-display.s3-us-west-2.amazonaws.com/Logo-01.png") { Width = "100%", Height = "100%", Align = "center" }
+                            new Image("https://moyca-alexa-display.s3-us-west-2.amazonaws.com/MoycaLogoSquareWords-01+(1).png") { Width = "100%", Height = "100%", Align = "center" }
                         )
                         {
                             Width = "100%",

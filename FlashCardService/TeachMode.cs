@@ -20,13 +20,24 @@ namespace FlashCardService
     
     public class TeachMode
     {
+        private SessionAttributes sessionAttributes;
+        private TeachingPrompts teachingPrompts;
+
+        public TeachMode(SessionAttributes sessionAttributes)
         
         public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes)
         {
-            Function.log.INFO("TeachMode", "Introduction", "Provided for schedule" + liveSession.CurrentSchedule);
+            teachingPrompts = new TeachingPrompts();
+            this.sessionAttributes = sessionAttributes;
+        }
 
-            Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + liveSession.Lesson.ToString());
+        public SkillResponse Introduction( WordAttributes wordAttributes)
+        {
+            Function.log.INFO("TeachMode", "Introduction", "Provided for schedule" + this.sessionAttributes.Schedule);
 
+            Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + this.sessionAttributes.Lesson.ToString());
+
+            if (this.sessionAttributes.Lesson == LESSON.WordFamilies)
             SkillResponse skillResponse; 
 
             switch (liveSession.Lesson)
@@ -53,11 +64,11 @@ namespace FlashCardService
 
         public static SkillResponse TeachTheWord(string beggining, LiveSessionDB liveSession, WordAttributes wordAttributes)
         {
-            Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + liveSession.Lesson);
+            Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + this.sessionAttributes.Lesson);
 
             string teachingPrompts = beggining + " ";
 
-            Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + liveSession.Lesson.ToString());
+            Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + this.sessionAttributes.Lesson.ToString());
 
             switch (liveSession.Lesson)
             {
@@ -88,7 +99,7 @@ namespace FlashCardService
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
  
-        public static SkillResponse RichTextResponse()
+        public SkillResponse RichTextResponse()
         {
             return AlexaResponse.Say(new SsmlOutputSpeech
             {
@@ -96,7 +107,7 @@ namespace FlashCardService
             });
         }
 
-        public static string WordFamilyTeachTheWord(WordAttributes wordAttributes)
+        public string WordFamilyTeachTheWord(WordAttributes wordAttributes)
         {
             string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
             string wordFamily = wordAttributes.WordFamily;
@@ -171,7 +182,7 @@ namespace FlashCardService
             teachModel += " It is helpful to just memorize them by sight. To see them and know what they say.";
             teachModel += " Are you ready to start? ";
 
-            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
+            Function.log.DEBUG("TeachingPrompts", "SightWordsIntroduction", "Alexa Says: " + teachModel);
 
             return teachModel;
         }
@@ -258,24 +269,24 @@ namespace FlashCardService
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
             }
 
-        public static string PauseFor(double delay)
+        public string PauseFor(double delay)
         {
             return @"<break time=""" + delay.ToString() + @"s""/>";
         }
 
-        public static string Phoneme(string phoneme)
+        public string Phoneme(string phoneme)
         {
             return @"<phoneme alphabet=""ipa"" ph=""" + phoneme + @""">" + phoneme + "</phoneme>";
 
         }
 
-        public static string SayExtraSlow(string word)
+        public string SayExtraSlow(string word)
         {
             return @"<prosody rate=""x-slow"">" + word + @"</prosody>";
         }
 
 
-        public static string SpellOut(string word)
+        public string SpellOut(string word)
         {
             return @"<say-as interpret-as=""spell-out"">" + word + @"</say-as>";
         }

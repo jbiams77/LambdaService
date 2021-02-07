@@ -43,7 +43,8 @@ namespace AWSInfrastructure.GlobalConstants
         Off,
         Introduction,
         FirstWord,
-        Assess        
+        Assess,
+        Help
     }
 
     /// <summary>
