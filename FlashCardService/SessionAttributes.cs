@@ -39,8 +39,6 @@ namespace FlashCardService
             this.logger = logger;
         }
 
-        
-
         /// <summary>
         /// Converts the object to a dictionary of strings to objects
         /// </summary>
