@@ -24,8 +24,6 @@ namespace FlashCardService
         private TeachingPrompts teachingPrompts;
 
         public TeachMode(SessionAttributes sessionAttributes)
-        
-        public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes)
         {
             teachingPrompts = new TeachingPrompts();
             this.sessionAttributes = sessionAttributes;
@@ -37,22 +35,21 @@ namespace FlashCardService
 
             Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + this.sessionAttributes.Lesson.ToString());
 
-            if (this.sessionAttributes.Lesson == LESSON.WordFamilies)
             SkillResponse skillResponse; 
 
-            switch (liveSession.Lesson)
+            switch (this.sessionAttributes.Lesson)
             {
                 case LESSON.WordFamilies:
-                    skillResponse = TeachingPrompts.WordFamilyIntroduction(wordAttributes);
+                    skillResponse = this.teachingPrompts.WordFamilyIntroduction(wordAttributes);
                     break;
                 case LESSON.CVC:
-                    skillResponse = TeachingPrompts.CVCWordIntroduction(wordAttributes);
+                    skillResponse = this.teachingPrompts.CVCWordIntroduction(wordAttributes);
                     break;
                 case LESSON.ConsonantDigraph:
-                    skillResponse = TeachingPrompts.CDIntroduction(wordAttributes);
+                    skillResponse = this.teachingPrompts.CDIntroduction(wordAttributes);
                     break;
                 case LESSON.ConsonantBlend:
-                    skillResponse = TeachingPrompts.CBIntroduction(wordAttributes);
+                    skillResponse = this.teachingPrompts.CBIntroduction(wordAttributes);
                     break;
                 default: 
                     skillResponse = AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop");
@@ -62,7 +59,7 @@ namespace FlashCardService
             return skillResponse;
         }
 
-        public static SkillResponse TeachTheWord(string beggining, LiveSessionDB liveSession, WordAttributes wordAttributes)
+        public SkillResponse TeachTheWord(string beggining, WordAttributes wordAttributes)
         {
             Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + this.sessionAttributes.Lesson);
 
@@ -70,26 +67,26 @@ namespace FlashCardService
 
             Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + this.sessionAttributes.Lesson.ToString());
 
-            switch (liveSession.Lesson)
+            switch (this.sessionAttributes.Lesson)
             {
                 case LESSON.WordFamilies:
-                    teachingPrompts += TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
+                    teachingPrompts += this.teachingPrompts.WordFamilyTeachTheWord(wordAttributes);
                     break;
                 case LESSON.CVC:
-                    teachingPrompts += TeachingPrompts.CVCTeachTheWord(wordAttributes);
+                    teachingPrompts += this.teachingPrompts.CVCTeachTheWord(wordAttributes);
                     break;
                 case LESSON.ConsonantDigraph:
-                    teachingPrompts += TeachingPrompts.CDTeachTheWord(wordAttributes);
+                    teachingPrompts += this.teachingPrompts.CDTeachTheWord(wordAttributes);
                     break;
                 case LESSON.ConsonantBlend:
-                    teachingPrompts += TeachingPrompts.CBTeachTheWord(wordAttributes);
+                    teachingPrompts += this.teachingPrompts.CBTeachTheWord(wordAttributes);
                     break;
                 default:
                     teachingPrompts = " ERROR ";
                     break;
             }
 
-            return AlexaResponse.GetResponse(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
+            return AlexaResponse.PresentFlashCard(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
         }
     }
 
@@ -130,7 +127,7 @@ namespace FlashCardService
             return teachModel;
         }
 
-        public static string CVCTeachTheWord(WordAttributes wordAttributes)
+        public string CVCTeachTheWord(WordAttributes wordAttributes)
         {
             string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
             string vowelSound = wordAttributes.VowelPhoneme;
@@ -152,7 +149,7 @@ namespace FlashCardService
             return teachModel;
         }
 
-        public static string CDTeachTheWord(WordAttributes wordAttributes)
+        public string CDTeachTheWord(WordAttributes wordAttributes)
         {
             string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
             string vowelSound = wordAttributes.VowelPhoneme;
@@ -174,7 +171,7 @@ namespace FlashCardService
             return teachModel;
         }
 
-        public static string SigthWordsIntroduction(WordAttributes wordAttributes)
+        public string SigthWordsIntroduction(WordAttributes wordAttributes)
         {
             string teachModel = "There are words used over, and over, and over, and over, and ";
             teachModel += PauseFor(.5);
@@ -187,7 +184,7 @@ namespace FlashCardService
             return teachModel;
         }
 
-        public static SkillResponse CDIntroduction(WordAttributes wordAttributes)
+        public SkillResponse CDIntroduction(WordAttributes wordAttributes)
         {
             string consonantDigraph = wordAttributes.ConsonantDigraph;
             string[] cdLetters = consonantDigraph.Split("");
@@ -206,7 +203,7 @@ namespace FlashCardService
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
         }
 
-        public static SkillResponse CBIntroduction(WordAttributes wordAttributes)
+        public SkillResponse CBIntroduction(WordAttributes wordAttributes)
         {
             string consonantBlend = wordAttributes.ConsonantDigraph;
             string[] cBLetters = consonantBlend.Split("");
@@ -224,7 +221,7 @@ namespace FlashCardService
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
         }
 
-        public static SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes)
+        public SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes)
         {
             string wf = wordAttributes.WordFamily;
 
@@ -241,10 +238,10 @@ namespace FlashCardService
 
             Function.log.DEBUG("TeachingPrompts", "WordFamilyIntroduction", "Alexa Says: " + teachModel);
 
-            return AlexaResponse.GetResponse(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop");
+            return AlexaResponse.IntroductionWithCard(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop");
         }
 
-        public static SkillResponse CVCWordIntroduction(WordAttributes wordAttributes)
+        public SkillResponse CVCWordIntroduction(WordAttributes wordAttributes)
         {
             string teachModel = "In the alphabet, there are two types of letters.";
             string vowel = wordAttributes.Vowel;

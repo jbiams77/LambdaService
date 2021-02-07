@@ -28,7 +28,6 @@ namespace FlashCardService
     {
         public static MoycaLogger log;
         public static bool displaySupported;
-        public LiveSessionDB liveSession;
         public UserProfileDB userProfile;
         public ScopeAndSequenceDB scopeAndSequence;
         public SkillResponse response;
@@ -301,7 +300,7 @@ namespace FlashCardService
         }
 
 
-        private async Task TransferDataFromUserProfileToLiveSession()
+        private async Task PopulateSessionAttributes()
         {
             log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
 
