@@ -109,7 +109,6 @@
     <Compile Include="CognitoPool\CognitoUserPool.cs" />
     <Compile Include="DynamoDB\DatabaseClient.cs" />
     <Compile Include="DynamoDB\DictionaryDB.cs" />
-    <Compile Include="DynamoDB\LiveSessionDB.cs" />
     <Compile Include="DynamoDB\ScopeAndSequenceDB.cs" />
     <Compile Include="DynamoDB\UserProfileDB.cs" />
     <Compile Include="GlobalConstants.cs" />

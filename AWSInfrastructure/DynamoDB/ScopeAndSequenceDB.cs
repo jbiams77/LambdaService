@@ -99,7 +99,7 @@ namespace AWSInfrastructure.DynamoDB
 
             log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Teach Mode: " + this.TeachMode.ToString());
             log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Lesson: " + this.Lesson.ToString());
-        }       
+        }
 
         public async Task<Dictionary<string, string>> GetOrder(int number)
         {

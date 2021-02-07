@@ -14,6 +14,7 @@ namespace FlashCardService
     public class AlexaResponse
     {
         public static MoycaLogger log;
+        private static SessionAttributes sessionAttributes;
 
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
@@ -26,6 +27,11 @@ namespace FlashCardService
         public static void SetLogger(MoycaLogger logger)
         {
             log = logger;
+        }
+
+        public static void SetSessionAttributeHandler(SessionAttributes sessionAttributesHandler)
+        {
+            sessionAttributes = sessionAttributesHandler;
         }
 
         /// <summary>
@@ -76,18 +82,17 @@ namespace FlashCardService
 
         public static SkillResponse Say(IOutputSpeech speechResponse)
         {
-            return BuildResponse(speechResponse, true, null, null, null);
+            return BuildResponse(speechResponse, true, null, null);
         }
 
         public static SkillResponse SayWithReprompt(IOutputSpeech speechResponse, string reprompt)
         {
-            return BuildResponse(speechResponse, false, null, new Reprompt(reprompt), null);
+            return BuildResponse(speechResponse, false, new Reprompt(reprompt), null);
         }
 
-        private static SkillResponse BuildResponse(IOutputSpeech outputSpeech, bool shouldEndSession, Session sessionAttributes, Reprompt reprompt, ICard card)
+        private static SkillResponse BuildResponse(IOutputSpeech outputSpeech, bool shouldEndSession, Reprompt reprompt, ICard card)
         {
             SkillResponse response = new SkillResponse { Version = "1.0" };
-            if (sessionAttributes != null) response.SessionAttributes = sessionAttributes.Attributes;
 
             ResponseBody body = new ResponseBody
             {
@@ -99,13 +104,14 @@ namespace FlashCardService
             if (card != null) body.Card = card;
 
             response.Response = body;
+            response.SessionAttributes = sessionAttributes.ToDictionary();
 
             return response;
         }
 
         public static SkillResponse IntroductionWithCard(string cardText, string introduction, string reprompt)
         {
-            return HandleFlashCard(cardText, 0, introduction, reprompt);
+            return HandleFlashCard(cardText, introduction, reprompt);
         }
 
         public static SkillResponse Introduction(string introduction, string reprompt)
@@ -119,20 +125,21 @@ namespace FlashCardService
                 response.Response.Directives.Add(Create_IntroPresentation_Directive());
             }
 
+            response.SessionAttributes = sessionAttributes.ToDictionary();
             return response;
         }
 
-        public static SkillResponse PresentFlashCard(string flashCardWord, int attemptsMade, string output, string reprompt)
+        public static SkillResponse PresentFlashCard(string flashCardWord, string output, string reprompt)
         {
             if (!DisplaySupported)
             {
                 reprompt = Slow(SpellOut(flashCardWord), "x-slow");
                 output += Slow(SpellOut(flashCardWord), "x-slow");
             }
-            return HandleFlashCard(flashCardWord, attemptsMade, output, reprompt);
+            return HandleFlashCard(flashCardWord, output, reprompt);
         }
 
-        private static SkillResponse HandleFlashCard(string flashCardWord, int attemptsMade, string output, string reprompt)
+        private static SkillResponse HandleFlashCard(string flashCardWord, string output, string reprompt)
         {
             string reprompSpeech = StartTag + reprompt + EndTag;
             string speech = StartTag + output + EndTag;
@@ -153,10 +160,7 @@ namespace FlashCardService
 
             response.Response = body;
             response.Response.Directives.Add(directive);
-            response.SessionAttributes = new Dictionary<string, object>()
-            {
-                { "TotalFailedAttempts", attemptsMade.ToString() }
-            };
+            response.SessionAttributes = sessionAttributes.ToDictionary();
 
             if (DisplaySupported)
             {

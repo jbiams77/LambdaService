@@ -27,12 +27,13 @@ namespace FlashCardService
     public class Function
     {
         public static MoycaLogger log;
-        public LiveSessionDB liveSession;
         public UserProfileDB userProfile;
         public ScopeAndSequenceDB scopeAndSequence;
         public SkillResponse response;
         public string userId;        
         private CognitoUserPool cognitoUserPool;
+        private SessionAttributes sessionAttributes;
+        private TeachMode teachMode;
 
         // Most sessions have 6 - 7 words. Reader must miss one or less to advance sessions.
         private static int PERCENT_TO_MOVE_FORWARD = 83;
@@ -46,13 +47,18 @@ namespace FlashCardService
 
             Type T = input.GetRequestType();
             log = new MoycaLogger(context, LogLevel.TRACE);
+
+            this.sessionAttributes = new SessionAttributes(log);
+            this.teachMode = new TeachMode(this.sessionAttributes);
+
             AlexaResponse.SetLogger(log);
+            AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
 
             this.cognitoUserPool = new CognitoUserPool(log);
             this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);
-            this.liveSession = new LiveSessionDB(userId, log);
             this.userProfile = new UserProfileDB(userId, log);
             this.scopeAndSequence = new ScopeAndSequenceDB(log);
+
             log.INFO("BEGIN", "-----------------------------------------------------------------------");
             log.INFO("Function", "USERID: " + this.userId);
             log.INFO("Function", "LaunchRequest: " + T.Name);
@@ -86,6 +92,7 @@ namespace FlashCardService
         {
             SkillResponse intentResponse;
             var request = (IntentRequest)input.Request;
+            this.sessionAttributes.UpdateSessionAttributes(input.Session.Attributes);
 
             log.INFO("Function", "HandleIntentRequest", request.Intent.Name);
 
@@ -124,26 +131,23 @@ namespace FlashCardService
         }
         private async Task SetStateToOffAndExit()
         {
-            log.INFO("Function", "SetStateToOffAndExit", "Schedule: " + liveSession.CurrentSchedule);
-
-            await TransferDataFromUserProfileToLiveSession();
-            liveSession.CurrentState = STATE.Off;
-            await UpdateLiveSessionDatabase();
+            log.INFO("Function", "SetStateToOffAndExit", "Schedule: " + this.sessionAttributes.Schedule);
         }
 
         private async Task<SkillResponse> HandleLaunchRequest()
         {
-            log.INFO("Function", "HandleLaunchRequest", "Current Schedule: " + liveSession.CurrentSchedule);
+            await PopulateSessionAttributes();
+            this.sessionAttributes.SessionState = STATE.Introduction;
 
-            await TransferDataFromUserProfileToLiveSession();
-            await UpdateLiveSessionDatabase();
+            log.INFO("Function", "HandleLaunchRequest", "Current Schedule: " + this.sessionAttributes.Schedule);
 
-            log.DEBUG("Function", "HandleLaunchRequest", "Teach Mode: " + liveSession.TeachMode.ToString());
 
-            if (liveSession.TeachMode == MODE.Teach)
+            log.DEBUG("Function", "HandleLaunchRequest", "Teach Mode: " + this.sessionAttributes.LessonMode.ToString());
+
+            if (this.sessionAttributes.LessonMode == MODE.Teach)
             {           
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.Introduction(liveSession, wordAttributes);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, log);
+                return this.teachMode.Introduction(wordAttributes);
             }
             else
             {                
@@ -154,65 +158,54 @@ namespace FlashCardService
 
         private async Task<SkillResponse> HandleYesIntent()
         {
-            log.INFO("Function", "HandleYesIntent", "Current Schedule: " + liveSession.CurrentSchedule);
+            log.INFO("Function", "HandleYesIntent", "Current Schedule: " + this.sessionAttributes.Schedule);
 
-            await TransferDataFromUserProfileToLiveSession();
-            
-            liveSession.CurrentState = STATE.FirstWord;
-            
-            await UpdateLiveSessionDatabase();
-            
-            await liveSession.GetDataFromLiveSession();
+            this.sessionAttributes.SessionState = STATE.Assess;
 
-            string currentWord = liveSession.GetCurrentWord();
+            this.sessionAttributes.SessionState = STATE.FirstWord;
+
+            string currentWord = this.sessionAttributes.CurrentWord;
 
             string prompt = "Say the word ";
 
-            log.DEBUG("Function", "HandleYesIntent", "Teach Mode: " + liveSession.TeachMode.ToString());
-            log.INFO("Function", "HandleYesIntent", "Current Word: " + liveSession.GetCurrentWord());
+            log.DEBUG("Function", "HandleYesIntent", "Teach Mode: " + this.sessionAttributes.LessonMode.ToString());
+            log.INFO("Function", "HandleYesIntent", "Current Word: " + this.sessionAttributes.CurrentWord);
 
-            if (liveSession.TeachMode == MODE.Teach)
+            
+            if (this.sessionAttributes.LessonMode == MODE.Teach)
             {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.TeachTheWord(" ", 0, liveSession, wordAttributes);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, log);
+                return this.teachMode.TeachTheWord(" ", wordAttributes);
             }
             else
             {
-                return AlexaResponse.PresentFlashCard(currentWord, 0, prompt, prompt);
+                return AlexaResponse.PresentFlashCard(currentWord, prompt, prompt);
             }            
         }
 
         private async Task<SkillResponse> HandleHelpRequest()
         {
-            await TransferDataFromUserProfileToLiveSession();
-            await liveSession.GetDataFromLiveSession();
+            log.INFO("Function", "HandleHelpRequest", "Current Schedule: " + this.sessionAttributes.Schedule);
+            this.sessionAttributes.SessionState = STATE.Help;
 
-            log.INFO("Function", "HandleHelpRequest", "Current Schedule: " + liveSession.CurrentSchedule);
-            
-            return AlexaResponse.PresentFlashCard(liveSession.GetCurrentWord(), 0, CommonPhrases.Help, "You can say the word now");
+            return AlexaResponse.PresentFlashCard(this.sessionAttributes.CurrentWord, CommonPhrases.Help, "You can say the word now");
         }
         
 
         private async Task<SkillResponse> HandleWordsToReadIntent(SkillRequest input)
         {
-            log.INFO("Function", "HandleWordsToReadIntent", "Current Schedule: " + liveSession.CurrentSchedule);
-            
+            log.INFO("Function", "HandleWordsToReadIntent", "Current Schedule: " + this.sessionAttributes.Schedule);
+
+            this.sessionAttributes.SessionState = STATE.Assess;
+
             var request = (IntentRequest)input.Request;
 
-            await liveSession.GetDataFromLiveSession();
-
-            string currentWord = liveSession.GetCurrentWord();
+            string currentWord = this.sessionAttributes.CurrentWord;
 
             log.INFO("Function", "HandleWordsToReadIntent", "Current Word: " + currentWord);
 
             string prompt = "";
             string rePrompt = "Say the word";
-
-            int totalFailedAttempts = 0;
-            if (input.Session.Attributes.ContainsKey("TotalFailedAttempts"))
-            {
-                totalFailedAttempts = Int32.Parse((string)input.Session.Attributes["TotalFailedAttempts"]);
-            }
 
             bool wordWasSaid = ReaderSaidTheWord(request);
 
@@ -222,84 +215,78 @@ namespace FlashCardService
             {
                 prompt = CommonPhrases.ShortAffirmation;
 
-                bool sessionFinished = liveSession.Remove(currentWord);
+                this.sessionAttributes.WordsToRead.Remove(currentWord);
+                bool sessionFinished = !this.sessionAttributes.WordsToRead.Any();
 
                 log.DEBUG("Function", "HandleWordsToReadIntent", "Session Finished? " + sessionFinished);
 
                 if (sessionFinished)
                 {
-                    var percentAccuracy = await GetPercentAccuracy(totalFailedAttempts);
+                    var percentAccuracy = await GetPercentAccuracy(this.sessionAttributes.FailedAttempts, this.sessionAttributes.TotalWordsInSession);
 
                     if (percentAccuracy >= PERCENT_TO_MOVE_FORWARD)
                     {
                         prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moyca Readers!";
-                        await this.userProfile.IncrementUserSchedule(liveSession.CurrentSchedule);
+                        await this.userProfile.IncrementUserSchedule(this.sessionAttributes.Schedule);
                     }
-                    else if (percentAccuracy <= PERCENT_TO_MOVE_BACKWARD && liveSession.TeachMode == MODE.Assess)
+                    else if (percentAccuracy <= PERCENT_TO_MOVE_BACKWARD && this.sessionAttributes.LessonMode == MODE.Assess)
                     {
                         prompt = "Let's review this lesson again! Just say, Alexa, open Moyca Readers!";
-                        await this.userProfile.DecrementUserSchedule(liveSession.CurrentSchedule);
+                        await this.userProfile.DecrementUserSchedule(this.sessionAttributes.Schedule);
                     }
                     else
                     {
                         prompt = CommonPhrases.LongAffirmation + "Let's practice that session again! Just say, Alexa, open Moyca Readers!";
                     }
-                    liveSession.CurrentState = STATE.Off;
                     return ResponseBuilder.Tell(prompt);
                 }
                 else
                 {
-                    currentWord = liveSession.GetCurrentWord();
-                    liveSession.CurrentState = STATE.Assess;
+                    currentWord = this.sessionAttributes.CurrentWord;
+                    this.sessionAttributes.SessionState = STATE.Assess;
                 }
-
-                await UpdateLiveSessionDatabase();
             }
             else
             {
                 // Missed a word. Increment the attempts counter
-                totalFailedAttempts++;
+                this.sessionAttributes.FailedAttempts = this.sessionAttributes.FailedAttempts + 1;
             }
 
-            log.DEBUG("Function", "HandleWordsToReadIntent", "Teach Mode: " + liveSession.TeachMode.ToString());
-            log.DEBUG("Function", "HandleWordsToReadIntent", "Attempts Made: " + totalFailedAttempts.ToString());
+            log.DEBUG("Function", "HandleWordsToReadIntent", "Teach Mode: " + this.sessionAttributes.LessonMode.ToString());
+            log.DEBUG("Function", "HandleWordsToReadIntent", "Attempts Made: " + this.sessionAttributes.FailedAttempts.ToString());
 
-            if (liveSession.TeachMode == MODE.Teach)
+            if (this.sessionAttributes.LessonMode == MODE.Teach)
             {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(liveSession.GetCurrentWord(), log);
-                return TeachMode.TeachTheWord(prompt, totalFailedAttempts, liveSession, wordAttributes);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, log);
+                return this.teachMode.TeachTheWord(prompt, wordAttributes);
             }
             else
             {
-                return AlexaResponse.PresentFlashCard(currentWord, totalFailedAttempts, prompt, rePrompt);
+                return AlexaResponse.PresentFlashCard(currentWord, prompt, rePrompt);
             }
-            
         }
 
-        private async Task TransferDataFromUserProfileToLiveSession()
+        private async Task PopulateSessionAttributes()
         {
-            log.INFO("Function", "TransferDataFromUserProfileToLiveSession", "Transferring Data");
+            log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
 
             int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();
 
-            log.DEBUG("Function", "TransferDataFromUserProfileToLiveSession", "Current Schedule: " + currentScheduleNumber);
+            log.DEBUG("Function", "PopulateSessionAttributes", "Current Schedule: " + currentScheduleNumber);
 
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
-            liveSession.wordsToRead = scopeAndSequence.WordsToRead;
-            liveSession.TeachMode = (MODE)(int.Parse(scopeAndSequence.TeachMode));
-            liveSession.Skill = (SKILL)(int.Parse(scopeAndSequence.Skill));
-            liveSession.Lesson = scopeAndSequence.Lesson;
-            liveSession.CurrentSchedule = currentScheduleNumber;
-            liveSession.CurrentState = STATE.Introduction;
-            
+            this.sessionAttributes.WordsToRead = scopeAndSequence.WordsToRead;
+            this.sessionAttributes.LessonMode = (MODE)(int.Parse(scopeAndSequence.TeachMode));
+            this.sessionAttributes.LessonSkill = (SKILL)(int.Parse(scopeAndSequence.Skill));
+            this.sessionAttributes.Lesson = scopeAndSequence.Lesson;
+            this.sessionAttributes.Schedule = currentScheduleNumber;
+            this.sessionAttributes.TotalWordsInSession = scopeAndSequence.WordsToRead.Count();
+            this.sessionAttributes.FailedAttempts = 0;
         }
 
-        private async Task<int> GetPercentAccuracy(int totalFailedAttempts)
+        private async Task<int> GetPercentAccuracy(int totalFailedAttempts, int totalWordsInSession)
         {
             int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();
-            await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
-            var totalWordsInSession = scopeAndSequence.WordsToRead.Count;
-
 
             var percentAccuracy = (int)((1.0 - ((double)totalFailedAttempts / (double)totalWordsInSession)) * 100.0);
 
@@ -308,13 +295,6 @@ namespace FlashCardService
             log.DEBUG("Function", "GetPercentAccuracy", "percentAccuracy " + percentAccuracy);
 
             return percentAccuracy;
-        }
-
-        private async Task UpdateLiveSessionDatabase()
-        {
-            log.INFO("Function", "UpdateLiveSessionDatabase", "Updating Live Session");
-
-            await liveSession.UpdateLiveSession();
         }
 
         private bool ReaderSaidTheWord(IntentRequest input)
