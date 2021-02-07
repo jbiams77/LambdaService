@@ -20,39 +20,47 @@ namespace FlashCardService
     
     public class TeachMode
     {
-        
-        public static SkillResponse Introduction(LiveSessionDB liveSession, WordAttributes wordAttributes)
+        private SessionAttributes sessionAttributes;
+        private TeachingPrompts teachingPrompts;
+
+        public TeachMode(SessionAttributes sessionAttributes)
         {
-            Function.log.INFO("TeachMode", "Introduction", "Provided for schedule" + liveSession.CurrentSchedule);
+            teachingPrompts = new TeachingPrompts();
+            this.sessionAttributes = sessionAttributes;
+        }
 
-            Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + liveSession.Lesson.ToString());
+        public SkillResponse Introduction( WordAttributes wordAttributes)
+        {
+            Function.log.INFO("TeachMode", "Introduction", "Provided for schedule" + this.sessionAttributes.Schedule);
 
-            if (liveSession.Lesson == LESSON.WordFamilies)
+            Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + this.sessionAttributes.Lesson.ToString());
+
+            if (this.sessionAttributes.Lesson == LESSON.WordFamilies)
             {
-                return TeachingPrompts.WordFamilyIntroduction(wordAttributes);
+                return this.teachingPrompts.WordFamilyIntroduction(wordAttributes);
             }
-            else if (liveSession.Lesson == LESSON.CVC)
+            else if (sessionAttributes.Lesson == LESSON.CVC)
             {
-                return TeachingPrompts.CVCWordIntroduction(wordAttributes);
+                return this.teachingPrompts.CVCWordIntroduction(wordAttributes);
             }
             
             return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop");
         }
 
-        public static SkillResponse TeachTheWord(string beggining, int attemptsMade, LiveSessionDB liveSession, WordAttributes wordAttributes)
+        public SkillResponse TeachTheWord(string beggining,  WordAttributes wordAttributes)
         {
-            Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + liveSession.Lesson);
+            Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + this.sessionAttributes.Lesson);
 
             string teachingPrompts = beggining + " ";
 
-            Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + liveSession.Lesson.ToString());
+            Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + this.sessionAttributes.Lesson.ToString());
 
-            if (liveSession.Lesson == LESSON.WordFamilies)
+            if (this.sessionAttributes.Lesson == LESSON.WordFamilies)
             {
-                teachingPrompts += TeachingPrompts.WordFamilyTeachTheWord(wordAttributes);
+                teachingPrompts += this.teachingPrompts.WordFamilyTeachTheWord(wordAttributes);
             }
 
-            return AlexaResponse.PresentFlashCard(wordAttributes.Word, attemptsMade, teachingPrompts, "Please say " + wordAttributes.Word);
+            return AlexaResponse.PresentFlashCard(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
         }
     }
 
@@ -62,7 +70,7 @@ namespace FlashCardService
         private static string StartTag { get { return "<speak>"; } }
         private static string EndTag { get { return "</speak>"; } }
  
-        public static SkillResponse RichTextResponse()
+        public SkillResponse RichTextResponse()
         {
             return AlexaResponse.Say(new SsmlOutputSpeech
             {
@@ -70,7 +78,7 @@ namespace FlashCardService
             });
         }
 
-        public static string WordFamilyTeachTheWord(WordAttributes wordAttributes)
+        public string WordFamilyTeachTheWord(WordAttributes wordAttributes)
         {
             string[] decodedPhoneme = wordAttributes.DecodedPhoneme.Split('-');
             string[] decodedWord = wordAttributes.Decoded.Split('-');
@@ -92,7 +100,7 @@ namespace FlashCardService
             return teachModel;
         }
 
-        public static string SightWordsIntroduction()
+        public string SightWordsIntroduction()
         {
             string teachModel = "There are words used over, and over, and over, and over, and ";
             teachModel += PauseFor(.5);
@@ -105,7 +113,7 @@ namespace FlashCardService
             return teachModel;
         }
 
-        public static SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes)
+        public SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes)
         {
             string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
 
@@ -125,7 +133,7 @@ namespace FlashCardService
             return AlexaResponse.IntroductionWithCard(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop");
         }
 
-        public static SkillResponse CVCWordIntroduction(WordAttributes wordAttributes)
+        public SkillResponse CVCWordIntroduction(WordAttributes wordAttributes)
         {
             string teachModel = "Lets work on the " + Phoneme("æ") + " sound.";//wordAttributes.VowelPhoneme + " sound.";
             teachModel += PauseFor(1.5);
@@ -143,29 +151,29 @@ namespace FlashCardService
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
             }
 
-        public static string PauseFor(double delay)
+        public string PauseFor(double delay)
         {
             return @"<break time=""" + delay.ToString() + @"s""/>";
         }
 
-        public static string Phoneme(string phoneme)
+        public string Phoneme(string phoneme)
         {
             return @"<phoneme alphabet=""ipa"" ph=""" + phoneme + @""">" + phoneme + "</phoneme>";
 
         }
 
-        public static string SayExtraSlow(string word)
+        public string SayExtraSlow(string word)
         {
             return @"<prosody rate=""x-slow"">" + word + @"</prosody>";
         }
 
-        public static string RetrieveWordFamilyPhoneme(WordAttributes wordAttributes)
+        public string RetrieveWordFamilyPhoneme(WordAttributes wordAttributes)
         {
             string[] phoneme = wordAttributes.DecodedPhoneme.Split('-');
             return phoneme[1] + phoneme[2];
         }
 
-        public static string SpellOut(string word)
+        public string SpellOut(string word)
         {
             return @"<say-as interpret-as=""spell-out"">" + word + @"</say-as>";
         }
