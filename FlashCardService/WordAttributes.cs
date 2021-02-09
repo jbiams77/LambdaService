@@ -14,8 +14,7 @@ namespace FlashCardService
     {
         public string ConsonantBlend { get; set;}
         public string ConsonantDigraph { get; set;}
-        public string Decoded { get; set;}
-        public string DecodedPhoneme { get; set;}
+        public string FirstLetter { get; set;}
         public string Phoneme { get; set;}
         public string Sentence { get; set;}
         public string Syllables { get; set;}
@@ -51,14 +50,9 @@ namespace FlashCardService
                 this.ConsonantDigraph = cd.S;
             }
 
-            if (items.TryGetValue("Decoded", out AttributeValue d))
+            if (items.TryGetValue("FirstLetter", out AttributeValue fl))
             {
-                this.Decoded = d.S;
-            }
-
-            if (items.TryGetValue("DecodedPhoneme", out AttributeValue dp))
-            {
-                this.DecodedPhoneme = dp.S;
+                this.FirstLetter = fl.S;
             }
 
             if (items.TryGetValue("Sentence", out AttributeValue se))

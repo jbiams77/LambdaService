@@ -25,7 +25,7 @@ namespace AWSInfrastructure.DynamoDB
 
         // This is a temporary fix to prevent user schedule from going out of bounds
         public readonly int MIN_SCHEDULE_INDEX = 1000;
-        public readonly int MAX_SCHEDULE_INDEX = 1051;
+        public readonly int MAX_SCHEDULE_INDEX = 1060;
 
         // Keys used to access database elements
         private readonly string DEFAULT_DB_KEY = "default";

@@ -35,19 +35,31 @@ namespace FlashCardService
 
             Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + this.sessionAttributes.Lesson.ToString());
 
-            if (this.sessionAttributes.Lesson == LESSON.WordFamilies)
+            SkillResponse skillResponse; 
+
+            switch (this.sessionAttributes.Lesson)
             {
-                return this.teachingPrompts.WordFamilyIntroduction(wordAttributes);
+                case LESSON.WordFamilies:
+                    skillResponse = this.teachingPrompts.WordFamilyIntroduction(wordAttributes);
+                    break;
+                case LESSON.CVC:
+                    skillResponse = this.teachingPrompts.CVCWordIntroduction(wordAttributes);
+                    break;
+                case LESSON.ConsonantDigraph:
+                    skillResponse = this.teachingPrompts.CDIntroduction(wordAttributes);
+                    break;
+                case LESSON.ConsonantBlend:
+                    skillResponse = this.teachingPrompts.CBIntroduction(wordAttributes);
+                    break;
+                default: 
+                    skillResponse = AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop");
+                    break;
             }
-            else if (sessionAttributes.Lesson == LESSON.CVC)
-            {
-                return this.teachingPrompts.CVCWordIntroduction(wordAttributes);
-            }
-            
-            return AlexaResponse.Introduction("Hello Moycan! Are you ready to begin learning?", "You can say yes to continue or no to stop");
+
+            return skillResponse;
         }
 
-        public SkillResponse TeachTheWord(string beggining,  WordAttributes wordAttributes)
+        public SkillResponse TeachTheWord(string beggining, WordAttributes wordAttributes)
         {
             Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + this.sessionAttributes.Lesson);
 
@@ -55,10 +67,26 @@ namespace FlashCardService
 
             Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + this.sessionAttributes.Lesson.ToString());
 
-            if (this.sessionAttributes.Lesson == LESSON.WordFamilies)
+            switch (this.sessionAttributes.Lesson)
             {
-                teachingPrompts += this.teachingPrompts.WordFamilyTeachTheWord(wordAttributes);
+                case LESSON.WordFamilies:
+                    teachingPrompts += this.teachingPrompts.WordFamilyTeachTheWord(wordAttributes);
+                    break;
+                case LESSON.CVC:
+                    teachingPrompts += this.teachingPrompts.CVCTeachTheWord(wordAttributes);
+                    break;
+                case LESSON.ConsonantDigraph:
+                    teachingPrompts += this.teachingPrompts.CDTeachTheWord(wordAttributes);
+                    break;
+                case LESSON.ConsonantBlend:
+                    teachingPrompts += this.teachingPrompts.CBTeachTheWord(wordAttributes);
+                    break;
+                default:
+                    teachingPrompts = " ERROR ";
+                    break;
             }
+
+            Function.log.DEBUG("TeachMode", "TeachTheWord", "Teaching Prompt: " + teachingPrompts);
 
             return AlexaResponse.PresentFlashCard(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
         }
@@ -80,17 +108,40 @@ namespace FlashCardService
 
         public string WordFamilyTeachTheWord(WordAttributes wordAttributes)
         {
-            string[] decodedPhoneme = wordAttributes.DecodedPhoneme.Split('-');
-            string[] decodedWord = wordAttributes.Decoded.Split('-');
-            string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
-
-            
-            string teachModel = " This word is spelled " + AlexaResponse.Slow(AlexaResponse.SpellOut(wordAttributes.Word), "x-slow");
+            string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
+            string wordFamily = wordAttributes.WordFamily;
+            string teachModel = " This word is spelled ";
+            foreach (string sound in decodedWord)
+            {
+                teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
+            }
             teachModel += PauseFor(.5);
             teachModel += "The sounds are ";
-            
-            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(decodedPhoneme[0])) + PauseFor(0.2);
-            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(wfPhoneme)) + PauseFor(0.2);
+            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
+            teachModel += PauseFor(0.2) + SayExtraSlow(wordFamily) + PauseFor(1.0);
+
+            teachModel += SayExtraSlow(wordAttributes.Word);
+            teachModel += PauseFor(0.5);
+            teachModel += "Now you try. Say the word. ";
+
+            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+
+            return teachModel;
+        }
+
+        public string CVCTeachTheWord(WordAttributes wordAttributes)
+        {
+            string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
+            string vowelSound = wordAttributes.VowelPhoneme;
+            string teachModel = "";
+            teachModel += "The word is spelled ";
+            foreach (string sound in decodedWord)
+            {
+                teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
+            }
+            teachModel += PauseFor(1.2) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
+            teachModel += SayExtraSlow(Phoneme(vowelSound)) + PauseFor(0.2) + SayExtraSlow(Phoneme(decodedWord[2]));
+            teachModel += PauseFor(1.0);
             teachModel += SayExtraSlow(wordAttributes.Word);
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
@@ -100,7 +151,51 @@ namespace FlashCardService
             return teachModel;
         }
 
-        public string SightWordsIntroduction()
+        public string CDTeachTheWord(WordAttributes wordAttributes)
+        {
+            string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
+            string vowelSound = wordAttributes.VowelPhoneme;
+            string teachModel = "";
+            teachModel += "The word is spelled ";
+            foreach (string sound in decodedWord)
+            {
+                teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
+            }
+            teachModel += PauseFor(1.0) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
+            teachModel += SayExtraSlow(Phoneme(vowelSound)) + PauseFor(0.2) + SayExtraSlow(Phoneme(decodedWord[2]));
+            teachModel += PauseFor(1.0);
+            teachModel += SayExtraSlow(wordAttributes.Word);
+            teachModel += PauseFor(0.5);
+            teachModel += "Now you try. Say the word ";
+
+            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+
+            return teachModel;
+        }
+
+        public string CBTeachTheWord(WordAttributes wordAttributes)
+        {
+            string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
+            string vowelSound = wordAttributes.VowelPhoneme;
+            string teachModel = "";
+            teachModel += "The word is spelled ";
+            foreach (string sound in decodedWord)
+            {
+                teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
+            }
+            teachModel += PauseFor(1.0) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
+            teachModel += SayExtraSlow(Phoneme(vowelSound)) + PauseFor(0.2) + SayExtraSlow(Phoneme(decodedWord[2]));
+            teachModel += PauseFor(1.0);
+            teachModel += SayExtraSlow(wordAttributes.Word);
+            teachModel += PauseFor(0.5);
+            teachModel += "Now you try. Say the word ";
+
+            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+
+            return teachModel;
+        }
+
+        public string SigthWordsIntroduction(WordAttributes wordAttributes)
         {
             string teachModel = "There are words used over, and over, and over, and over, and ";
             teachModel += PauseFor(.5);
@@ -113,9 +208,46 @@ namespace FlashCardService
             return teachModel;
         }
 
+        public SkillResponse CDIntroduction(WordAttributes wordAttributes)
+        {
+            string consonantDigraph = wordAttributes.ConsonantDigraph;
+            string[] cdLetters = consonantDigraph.Split("");
+            string teachModel = "When two consonants work together to make one sound, this is called a digraph.";
+            teachModel += PauseFor(.5);
+            teachModel += "Can you say digraph?";
+            teachModel += PauseFor(1.5);
+            teachModel += "The digraph is made up of these two letters:";
+            teachModel += cdLetters[0] + " and a " + cdLetters[1] + ".";
+            cdPhoneme.TryGetValue(consonantDigraph, out string cdp);
+            teachModel += " The sound they make is " + SayExtraSlow(Phoneme(cdp));
+            teachModel += " Are you ready to begin?";
+
+            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
+
+            return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
+        }
+
+        public SkillResponse CBIntroduction(WordAttributes wordAttributes)
+        {
+            string consonantBlend = wordAttributes.ConsonantDigraph;
+            string[] cBLetters = consonantBlend.Split("");
+            string teachModel = "When consonants are stuck together, we call that a consonant blend.";
+            teachModel += PauseFor(.5);
+            teachModel += "The letters still make their individual sounds.";
+            teachModel += PauseFor(1.5);
+            teachModel += "This blend is made up of these two letters:";
+            teachModel += cBLetters[0] + " and a " + cBLetters[1] + ".";
+            teachModel += " The sound they make is " + SayExtraSlow(consonantBlend);
+            teachModel += " Are you ready to begin?";
+
+            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
+
+            return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
+        }
+
         public SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes)
         {
-            string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
+            string wf = wordAttributes.WordFamily;
 
             string teachModel = CommonPhrases.Greeting + " my Moycan! We are working with word families. ";
             teachModel += PauseFor(0.5);
@@ -124,8 +256,8 @@ namespace FlashCardService
                                 "because they have a common spelling or sound. Word families " +
                                 "often rhyme or end the same.";
             teachModel += PauseFor(1.5);
-            teachModel += " Lets begin with the " + Phoneme(wfPhoneme) + ", word family. ";
-            teachModel += " Remember, all of these words will end with " + Phoneme(wfPhoneme) + ".";
+            teachModel += " Lets begin with the " + wf + ", word family. ";
+            teachModel += " Remember, all of these words will end with " + wf + ".";
             teachModel += " Are you ready to begin?";
 
             Function.log.DEBUG("TeachingPrompts", "WordFamilyIntroduction", "Alexa Says: " + teachModel);
@@ -135,19 +267,26 @@ namespace FlashCardService
 
         public SkillResponse CVCWordIntroduction(WordAttributes wordAttributes)
         {
-            string teachModel = "Lets work on the " + Phoneme("æ") + " sound.";//wordAttributes.VowelPhoneme + " sound.";
+            string teachModel = "In the alphabet, there are two types of letters.";
+            string vowel = wordAttributes.Vowel;
+            string vowelSound = wordAttributes.VowelPhoneme;
+            teachModel += PauseFor(0.5);
+            teachModel += "Vowels and Consonants.";
+            teachModel += PauseFor(0.5);
+            teachModel += "Can you say Vowels?";
+            teachModel += PauseFor(0.5);
+            teachModel += "Can you say Consonants?";
+            teachModel += PauseFor(0.5);
+            teachModel += "Vowels are " + SayExtraSlow("a") + SayExtraSlow("e") + SayExtraSlow("i") + SayExtraSlow("o") + SayExtraSlow("u");
+            teachModel += " and sometimes y.";
+            teachModel += "Right now we are going to work with the vowel " + vowel;
             teachModel += PauseFor(1.5);
-            teachModel += " Lets begin with the " + Phoneme(wordAttributes.WordFamily) + ", word family. ";
-            teachModel += " Remember, all of these words will end with " + Phoneme(wordAttributes.WordFamily) + ".";
-            teachModel += PauseFor(1.5);
-            teachModel += " Listen for " + SayExtraSlow(Phoneme(wordAttributes.WordFamily)) + ", At the end of each word.";
-
+            teachModel += " A short " + vowel + " makes the sound " + SayExtraSlow(Phoneme(vowelSound)) + ".";
             teachModel += PauseFor(1.0);
-            teachModel += " Are your ready to give it a try?";
+            teachModel += " Are your ready to learn some words with " + vowel;
 
             Function.log.DEBUG("TeachingPrompts", "CVCWordIntroduction", "Alexa Says: " + teachModel);
-
-            // change this from "Say yes" to something more helpful
+            
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
             }
 
@@ -167,42 +306,21 @@ namespace FlashCardService
             return @"<prosody rate=""x-slow"">" + word + @"</prosody>";
         }
 
-        public string RetrieveWordFamilyPhoneme(WordAttributes wordAttributes)
-        {
-            string[] phoneme = wordAttributes.DecodedPhoneme.Split('-');
-            return phoneme[1] + phoneme[2];
-        }
 
         public string SpellOut(string word)
         {
             return @"<say-as interpret-as=""spell-out"">" + word + @"</say-as>";
         }
 
-        private static readonly Dictionary<string, string> PhonemesConsonants = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> cdPhoneme = new Dictionary<string, string>
         {
          // sound | IPA
-            {"b" , "b" },
-            {"d" , "d" },
-            {"j" , "d͡ʒ"},
-            {"f" , "f" },
-            {"g" , "g" },
-            {"h" , "h" },
-            {"y" , "j" },
-            {"c" , "k" },
-            {"l" , "l" },
-            {"m" , "m" },
-            {"n" , "n" },
-            {"ng", "ŋ" },
-            {"p" , "p" },
-            {"r" , "ɹ" },
-            {"s" , "s" },
-            {"sh", "ʃ" },
-            {"t" , "t" },
-            {"ch", "t͡ʃ"},
-            {"th", "θ" },
-            {"v" , "v" },
-            {"w" , "w" },
-            {"z" , "z" }
+            {"ch" , "tʃ" },
+            {"ck" , "k" },
+            {"ll" , "ɫ"},
+            {"sh" , "ʃ" },
+            {"th" , "θ" },
+            {"wh" , "hw" }
         };
     }
 

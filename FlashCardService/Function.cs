@@ -27,6 +27,7 @@ namespace FlashCardService
     public class Function
     {
         public static MoycaLogger log;
+        public static bool displaySupported;
         public UserProfileDB userProfile;
         public ScopeAndSequenceDB scopeAndSequence;
         public SkillResponse response;
@@ -53,13 +54,21 @@ namespace FlashCardService
 
             AlexaResponse.SetLogger(log);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
-
+            log.INFO("BEGIN", "-----------------------------------------------------------------------");
+            log.INFO("skill request", JsonConvert.SerializeObject(input)); 
             this.cognitoUserPool = new CognitoUserPool(log);
+
+            // new user requires account linking
+            if (input.Session.User.AccessToken == null)
+            {
+                return HandleNoExistingAccount();
+            }
+
             this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);
             this.userProfile = new UserProfileDB(userId, log);
             this.scopeAndSequence = new ScopeAndSequenceDB(log);
 
-            log.INFO("BEGIN", "-----------------------------------------------------------------------");
+            Function.displaySupported = input.APLSupported();            
             log.INFO("Function", "USERID: " + this.userId);
             log.INFO("Function", "LaunchRequest: " + T.Name);
             log.INFO("Function", "DisplaySupported: " + input.APLSupported());
@@ -160,8 +169,6 @@ namespace FlashCardService
         {
             log.INFO("Function", "HandleYesIntent", "Current Schedule: " + this.sessionAttributes.Schedule);
 
-            this.sessionAttributes.SessionState = STATE.Assess;
-
             this.sessionAttributes.SessionState = STATE.FirstWord;
 
             string currentWord = this.sessionAttributes.CurrentWord;
@@ -204,7 +211,7 @@ namespace FlashCardService
 
             log.INFO("Function", "HandleWordsToReadIntent", "Current Word: " + currentWord);
 
-            string prompt = "";
+            string prompt = "Say the word";
             string rePrompt = "Say the word";
 
             bool wordWasSaid = ReaderSaidTheWord(request);
@@ -266,6 +273,31 @@ namespace FlashCardService
             }
         }
 
+        private SkillResponse HandleNoExistingAccount()
+        {
+            log.INFO("Function", "HandleNoExistingAccount");
+
+            String prompt = "You must have an account to continue. Please use the Alexa app to link your Amazon " +
+                "account with Moyca Readers. This can be done by going to the skills section, clicking your skills, selecting " +
+                " Moyca readers and Link Account under settings.";
+
+            SkillResponse response = new SkillResponse { Version = "1.0" };
+
+            ResponseBody body = new ResponseBody
+            {
+                ShouldEndSession = true,
+                OutputSpeech = new PlainTextOutputSpeech { Text = prompt }
+            };
+
+            body.Card = new LinkAccountCard();
+
+            response.Response = body;
+            log.INFO("Function", "HandleNoExistingAccount", JsonConvert.SerializeObject(response) );
+
+            return response;
+        }
+
+
         private async Task PopulateSessionAttributes()
         {
             log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
@@ -276,7 +308,8 @@ namespace FlashCardService
 
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
             this.sessionAttributes.WordsToRead = scopeAndSequence.WordsToRead;
-            this.sessionAttributes.LessonMode = (MODE)(int.Parse(scopeAndSequence.TeachMode));
+            // TODO: incorporate teachmode with grade book lambda
+            this.sessionAttributes.LessonMode = MODE.Teach;
             this.sessionAttributes.LessonSkill = (SKILL)(int.Parse(scopeAndSequence.Skill));
             this.sessionAttributes.Lesson = scopeAndSequence.Lesson;
             this.sessionAttributes.Schedule = currentScheduleNumber;

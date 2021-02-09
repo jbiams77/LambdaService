@@ -12,6 +12,7 @@ namespace AWSInfrastructure.GlobalConstants
     /// </summary>
     public enum LESSON
     {
+        None,
         WordFamilies,       
         CVC,
         ConsonantBlend,
