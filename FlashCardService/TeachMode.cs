@@ -86,6 +86,8 @@ namespace FlashCardService
                     break;
             }
 
+            Function.log.DEBUG("TeachMode", "TeachTheWord", "Teaching Prompt: " + teachingPrompts);
+
             return AlexaResponse.PresentFlashCard(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
         }
     }
@@ -159,7 +161,29 @@ namespace FlashCardService
             {
                 teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
             }
-            teachModel += PauseFor(1.2) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
+            teachModel += PauseFor(1.0) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
+            teachModel += SayExtraSlow(Phoneme(vowelSound)) + PauseFor(0.2) + SayExtraSlow(Phoneme(decodedWord[2]));
+            teachModel += PauseFor(1.0);
+            teachModel += SayExtraSlow(wordAttributes.Word);
+            teachModel += PauseFor(0.5);
+            teachModel += "Now you try. Say the word ";
+
+            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+
+            return teachModel;
+        }
+
+        public string CBTeachTheWord(WordAttributes wordAttributes)
+        {
+            string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
+            string vowelSound = wordAttributes.VowelPhoneme;
+            string teachModel = "";
+            teachModel += "The word is spelled ";
+            foreach (string sound in decodedWord)
+            {
+                teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
+            }
+            teachModel += PauseFor(1.0) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
             teachModel += SayExtraSlow(Phoneme(vowelSound)) + PauseFor(0.2) + SayExtraSlow(Phoneme(decodedWord[2]));
             teachModel += PauseFor(1.0);
             teachModel += SayExtraSlow(wordAttributes.Word);

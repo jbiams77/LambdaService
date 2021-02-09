@@ -55,7 +55,7 @@ namespace FlashCardService
             AlexaResponse.SetLogger(log);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
             log.INFO("BEGIN", "-----------------------------------------------------------------------");
-
+            log.INFO("skill request", JsonConvert.SerializeObject(input)); 
             this.cognitoUserPool = new CognitoUserPool(log);
 
             // new user requires account linking
@@ -168,8 +168,6 @@ namespace FlashCardService
         private async Task<SkillResponse> HandleYesIntent()
         {
             log.INFO("Function", "HandleYesIntent", "Current Schedule: " + this.sessionAttributes.Schedule);
-
-            this.sessionAttributes.SessionState = STATE.Assess;
 
             this.sessionAttributes.SessionState = STATE.FirstWord;
 
@@ -310,7 +308,8 @@ namespace FlashCardService
 
             await scopeAndSequence.GetSessionDataWithNumber(currentScheduleNumber);
             this.sessionAttributes.WordsToRead = scopeAndSequence.WordsToRead;
-            this.sessionAttributes.LessonMode = (MODE)(int.Parse(scopeAndSequence.TeachMode));
+            // TODO: incorporate teachmode with grade book lambda
+            this.sessionAttributes.LessonMode = MODE.Teach;
             this.sessionAttributes.LessonSkill = (SKILL)(int.Parse(scopeAndSequence.Skill));
             this.sessionAttributes.Lesson = scopeAndSequence.Lesson;
             this.sessionAttributes.Schedule = currentScheduleNumber;
