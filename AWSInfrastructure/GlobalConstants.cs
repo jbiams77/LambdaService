@@ -83,12 +83,15 @@ namespace AWSInfrastructure.GlobalConstants
         public string VowelType { get; set; }
         public string Vowel { get; set; }
         public string Syllables { get; set; }
+        public string FirstLetter { get; set; }
 
-        public Filter(string vt, string v, string s)
-        {
+        public Filter(string vt, string v, string s, string fl)
+        {           
             this.VowelType = vt;
             this.Vowel = v;
             this.Syllables = s;
+            this.FirstLetter = fl;
         }
+
     }
 }

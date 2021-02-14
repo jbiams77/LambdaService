@@ -95,8 +95,8 @@ namespace AWSInfrastructure.DynamoDB
                 {
                     wordOrder.Add(item.Key, item.Value.S);
                 }
-            }            
-
+            }
+            log.INFO("ScopeAndSequenceDB", "GetOrder", "Word Order: " + wordOrder.ToString());
             return wordOrder;
         }
 

@@ -41,9 +41,13 @@ namespace AWSInfrastructure.DynamoDB
         private bool useVT;  // vowel-type
         private bool useV;   // vowel
         private bool useS;   // syllable
+        private bool useFL;  // First Letter
 
         // for additional filtering due to limitation of dynamo GSI and to avoid costly scan's
         private Filter filter;
+
+        // additional parameters
+        private string wordFamily;
 
         // global secondary indexes specific to dictionary
         private CVC_WF_index cVC_WF_Index; 
@@ -51,6 +55,7 @@ namespace AWSInfrastructure.DynamoDB
         private CVC_V_index  cVC_V_Index;
         private BE_V_index   bE_V_Index;
         private CD_CB_index cD_CB_Index;
+        private WF_CD_index wF_CD_Index;
 
         // words retrieved from dictionary based on scope and sequence
         private List<string> wordsToRead;
@@ -64,6 +69,7 @@ namespace AWSInfrastructure.DynamoDB
             sW_VT_Index = new SW_VT_index();
             bE_V_Index = new BE_V_index();
             cD_CB_Index = new CD_CB_index();
+            wF_CD_Index = new WF_CD_index();
             this.InitializeBoolsToFalse();
             this.wordsToRead = new List<string>();
             this.log = logger;
@@ -142,10 +148,18 @@ namespace AWSInfrastructure.DynamoDB
             List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(cD_CB_Index, consonantDigraph, consonantBlend));
 
             return ExtractWordsFromItem(databaseItem);
-        }       
+        }
+
+        private async Task<List<string>> GetWordFamilyWithConsonantDigraph(string wordFamily, string consonantDigraph)
+        {
+            List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(wF_CD_Index, wordFamily, consonantDigraph));
+
+            return ExtractWordsFromItem(databaseItem);
+        }
+
         private async Task GetWordsWithBestMethod(Dictionary<string, string> order)
         {
-            if (useVT && useV && useS)
+            if (useVT || useV || useS || useFL)
             {
                 SetFilter(order);
             }
@@ -166,19 +180,43 @@ namespace AWSInfrastructure.DynamoDB
                 order.TryGetValue("CB", out string cb);
                 this.wordsToRead = await GetConsonantDigraphWithConsonantBlend(cd, cb);
             }
+            else if (useWF && useCD)
+            {
+                order.TryGetValue("WF", out string wf);
+                order.TryGetValue("CD", out string cd);
+                this.wordsToRead = await GetWordFamilyWithConsonantDigraph(wf, cd);
+            }
             else if (useSW && useVT)
             {
                 order.TryGetValue("VT", out string vt);
                 this.wordsToRead = await GetSightWordWithVowelType(vt);
             }
+            this.filter = null;
         }
 
         private void SetFilter(Dictionary<string, string> order)
         {
-            order.TryGetValue("VT", out string vt);
-            order.TryGetValue("V", out string v);
-            order.TryGetValue("S", out string s);
-            this.filter = new Filter(vt, v, s);
+            if (!order.TryGetValue("VT", out string vt))
+            {
+                vt = "FALSE";
+            }
+            
+            if (!order.TryGetValue("V", out string v))
+            {
+                v = "FALSE";
+            }
+
+            if (!order.TryGetValue("S", out string s))
+            {
+                s = "FALSE";
+            }
+
+            if (!order.TryGetValue("FL", out string fl))
+            {
+                fl = "FALSE";
+            }
+
+            this.filter = new Filter(vt, v, s, fl);
         }
 
         private void InitializeBoolsToFalse()
@@ -195,7 +233,9 @@ namespace AWSInfrastructure.DynamoDB
             this.useVT = false;
             this.useV = false;
             this.useS = false;
+            this.useFL = false;
         }
+
         private void SetBool(string item)
         {
             switch (item)
@@ -212,6 +252,7 @@ namespace AWSInfrastructure.DynamoDB
                 case "VT": useVT = true; break;
                 case "V": useV = true; break;
                 case "S": useS = true; break;
+                case "FL": useFL = true; break;
                 default: break;
             }
         }
@@ -228,7 +269,6 @@ namespace AWSInfrastructure.DynamoDB
                 }
 
             }
-
             return extractedWords;
         }
 
@@ -246,16 +286,18 @@ namespace AWSInfrastructure.DynamoDB
 
             if (this.filter!=null)
             {
+
                 item.TryGetValue("VowelType", out AttributeValue vowelType);
                 item.TryGetValue("Vowel", out AttributeValue vowel);
                 item.TryGetValue("Syllables", out AttributeValue syllables);
-                
-                if (vowelType.S.Equals(this.filter.VowelType) && vowel.S.Equals(this.filter.Vowel) && syllables.S.Equals(this.filter.Syllables))
+                item.TryGetValue("FirstLetter", out AttributeValue firstLetter);
+
+                if (WordMatches(vowel.S, vowelType.S, syllables.S, firstLetter.S))
                 {
                     item.TryGetValue("Word", out wordVal);
-                    word = wordVal.S;
+                    word = wordVal.S;                    
                     return true;
-                }
+                } 
                 else
                 {
                     word = null;
@@ -270,6 +312,37 @@ namespace AWSInfrastructure.DynamoDB
             }
             
         }
+
+        private bool WordMatches(string vowel, string vowelType, string syllables, string firstLetter)
+        {
+            bool matches = false;
+
+            if (this.useVT)
+            {
+                matches = vowelType.Equals(this.filter.VowelType);
+            }
+
+            if (this.useV)
+            {
+                matches = vowel.Equals(this.filter.Vowel);
+            }
+            
+            if (this.useS)
+            {
+                matches = syllables.Equals(this.filter.Syllables);
+            }
+
+            if (this.useFL)
+            {
+                matches = firstLetter.Equals(this.filter.FirstLetter);
+            }
+
+            return matches;
+
+
+        }
+
+
         /// <summary>
         /// Creates the query paylod that is sent to AWS dynamoDB. The query is based
         /// on a Global index which is more effient than database scan. The projected
@@ -294,7 +367,7 @@ namespace AWSInfrastructure.DynamoDB
                         {":partition",  new AttributeValue { S = pKey }},
                         {":sort",       new AttributeValue { S =  sKey }}
                     },
-                ProjectionExpression = "Word, VowelType, Vowel, Syllables",
+                ProjectionExpression = "Word, VowelType, Vowel, Syllables, FirstLetter",
                 ScanIndexForward = true
             };
         }
@@ -307,6 +380,14 @@ namespace AWSInfrastructure.DynamoDB
             public virtual string PartitionKey { get { return "CVC"; } }
             public virtual string SortKey { get { return "WordFamily"; } }
             public CVC_WF_index() { }
+        }
+
+        private class WF_CD_index : GlobalIndex
+        {
+            public virtual string Name { get { return "WF-CD-index"; } }
+            public virtual string PartitionKey { get { return "WordFamily"; } }
+            public virtual string SortKey { get { return "ConsonantDigraph"; } }
+            public WF_CD_index() { }
         }
 
         private class SW_VT_index : GlobalIndex
