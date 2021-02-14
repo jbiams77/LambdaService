@@ -175,6 +175,7 @@ namespace FlashCardService
             string currentWord = liveSession.GetCurrentWord();
 
             string prompt = "Say the word ";
+            string rePrompt = "Say the word";
 
             log.DEBUG("Function", "HandleYesIntent", "Teach Mode: " + liveSession.TeachMode.ToString());
             log.INFO("Function", "HandleYesIntent", "Current Word: " + liveSession.GetCurrentWord());
@@ -186,7 +187,7 @@ namespace FlashCardService
             }
             else
             {
-                return AlexaResponse.PresentFlashCard(currentWord, 0, prompt, prompt);
+                return AlexaResponse.PresentFlashCard(currentWord, 0, prompt, rePrompt);
             }            
         }
 
@@ -305,11 +306,10 @@ namespace FlashCardService
             body.Card = new LinkAccountCard();
 
             response.Response = body;
-            log.INFO("Function", "HandleNoExistingAccount", JsonConvert.SerializeObject(response) );
+            log.INFO("Function", "HandleNoExistingAccount", JsonConvert.SerializeObject(response));
 
             return response;
         }
-
 
         private async Task TransferDataFromUserProfileToLiveSession()
         {

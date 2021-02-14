@@ -72,17 +72,14 @@ namespace FlashCardService
 
         public static string WordFamilyTeachTheWord(WordAttributes wordAttributes)
         {
-            string[] decodedPhoneme = wordAttributes.DecodedPhoneme.Split('-');
-            string[] decodedWord = wordAttributes.Decoded.Split('-');
-            string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
+            string[] decodedWord = wordAttributes.Word.Select(x => new string(x, 1)).ToArray();
 
-            
+            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "decodedWord size: " + decodedWord.Length);
+
             string teachModel = " This word is spelled " + AlexaResponse.Slow(AlexaResponse.SpellOut(wordAttributes.Word), "x-slow");
             teachModel += PauseFor(.5);
-            teachModel += "The sounds are ";
-            
-            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(decodedPhoneme[0])) + PauseFor(0.2);
-            teachModel += PauseFor(0.2) + SayExtraSlow(Phoneme(wfPhoneme)) + PauseFor(0.2);
+            teachModel += "The sounds are ";            
+            teachModel += PauseFor(0.2) + SayExtraSlow(wordAttributes.Word) + PauseFor(1);
             teachModel += SayExtraSlow(wordAttributes.Word);
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
@@ -106,18 +103,19 @@ namespace FlashCardService
         }
 
         public static SkillResponse WordFamilyIntroduction(WordAttributes wordAttributes)
-        {
-            string wfPhoneme = RetrieveWordFamilyPhoneme(wordAttributes);
-
+        {            
+            
             string teachModel = CommonPhrases.Greeting + " my Moycan! We are working with word families. ";
+            string[] decodedWord = wordAttributes.Word.Select(x => new string(x, 1)).ToArray();
+            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "decodedWord size: " + decodedWord.Length);
             teachModel += PauseFor(0.5);
 
             teachModel +=  "A word family is a group of words that are related " +
                                 "because they have a common spelling or sound. Word families " +
                                 "often rhyme or end the same.";
             teachModel += PauseFor(1.5);
-            teachModel += " Lets begin with the " + Phoneme(wfPhoneme) + ", word family. ";
-            teachModel += " Remember, all of these words will end with " + Phoneme(wfPhoneme) + ".";
+            teachModel += " Lets begin with the " + Phoneme(wordAttributes.VowelPhoneme + decodedWord[2]) + ", word family. ";
+            teachModel += " Remember, all of these words will end with " + Phoneme((wordAttributes.VowelPhoneme + decodedWord[2])) + ".";
             teachModel += " Are you ready to begin?";
 
             Function.log.DEBUG("TeachingPrompts", "WordFamilyIntroduction", "Alexa Says: " + teachModel);
