@@ -116,7 +116,7 @@ namespace FlashCardService
                 case "AMAZON.HelpIntent":
                     return await HandleHelpRequest();
             }
-            log.INFO("FUNCTION", "BLAH", "STATE: " + this.sessionAttributes.SessionState.ToString());
+
             // Only accept yes or no intents when in introduction.
             // This prevents Alexa from going into other intents if something other than "Yes" or "No" was said during intro.
             if (this.sessionAttributes.SessionState == STATE.Introduction)
@@ -134,11 +134,9 @@ namespace FlashCardService
             else if (this.sessionAttributes.SessionState == STATE.Assess ||
                      this.sessionAttributes.SessionState == STATE.FirstWord)
             {
-                log.INFO("Function", "HandleIntentRequest", "HERE");
-
+                // Treat any word said as a flash card attempt (including yes or no)
                 switch (request.Intent.Name)
                 {
-                    // Treat any word said as a flash card attempt (including yes or no)
                     case "WordsToReadIntent":
                     case "AMAZON.FallbackIntent":
                     case "AMAZON.YesIntent":
