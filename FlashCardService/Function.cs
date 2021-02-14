@@ -204,7 +204,6 @@ namespace FlashCardService
         private async Task<SkillResponse> HandleHelpRequest()
         {
             log.INFO("Function", "HandleHelpRequest", "Current Schedule: " + this.sessionAttributes.Schedule);
-            this.sessionAttributes.SessionState = STATE.Help;
 
             return AlexaResponse.PresentFlashCard(this.sessionAttributes.CurrentWord, CommonPhrases.Help, "You can say the word now");
         }
