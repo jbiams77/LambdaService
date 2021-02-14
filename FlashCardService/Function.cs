@@ -49,6 +49,12 @@ namespace FlashCardService
             AlexaResponse.SetLogger(log);
 
             this.cognitoUserPool = new CognitoUserPool(log);
+            // new user requires account linking
+            if (input.Session.User.AccessToken == null)
+            {
+                return HandleNoExistingAccount();
+            }
+
             this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);
             this.liveSession = new LiveSessionDB(userId, log);
             this.userProfile = new UserProfileDB(userId, log);
@@ -167,6 +173,7 @@ namespace FlashCardService
             string currentWord = liveSession.GetCurrentWord();
 
             string prompt = "Say the word ";
+            string rePrompt = "Say the word";
 
             log.DEBUG("Function", "HandleYesIntent", "Teach Mode: " + liveSession.TeachMode.ToString());
             log.INFO("Function", "HandleYesIntent", "Current Word: " + liveSession.GetCurrentWord());
@@ -178,7 +185,7 @@ namespace FlashCardService
             }
             else
             {
-                return AlexaResponse.PresentFlashCard(currentWord, 0, prompt, prompt);
+                return AlexaResponse.PresentFlashCard(currentWord, 0, prompt, rePrompt);
             }            
         }
 
@@ -209,10 +216,6 @@ namespace FlashCardService
             string rePrompt = "Say the word";
 
             int totalFailedAttempts = 0;
-            if (input.Session.Attributes.ContainsKey("TotalFailedAttempts"))
-            {
-                totalFailedAttempts = Int32.Parse((string)input.Session.Attributes["TotalFailedAttempts"]);
-            }
 
             bool wordWasSaid = ReaderSaidTheWord(request);
 
@@ -275,6 +278,31 @@ namespace FlashCardService
             }
             
         }
+
+        private SkillResponse HandleNoExistingAccount()
+        {
+            log.INFO("Function", "HandleNoExistingAccount");
+
+            String prompt = "You must have an account to continue. Please use the Alexa app to link your Amazon " +
+                "account with Moyca Readers. This can be done by going to the skills section, clicking your skills, selecting " +
+                " Moyca readers and Link Account under settings.";
+
+            SkillResponse response = new SkillResponse { Version = "1.0" };
+
+            ResponseBody body = new ResponseBody
+            {
+                ShouldEndSession = true,
+                OutputSpeech = new PlainTextOutputSpeech { Text = prompt }
+            };
+
+            body.Card = new LinkAccountCard();
+
+            response.Response = body;
+            log.INFO("Function", "HandleNoExistingAccount", JsonConvert.SerializeObject(response));
+
+            return response;
+        }
+
 
         private async Task TransferDataFromUserProfileToLiveSession()
         {

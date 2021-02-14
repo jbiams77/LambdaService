@@ -97,8 +97,8 @@ namespace AWSInfrastructure.DynamoDB
                 if (sw.S.Equals("TRUE")) { Lesson = LESSON.SightWords; }
             }
 
-            log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Teach Mode: " + this.TeachMode.ToString());
-            log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Lesson: " + this.Lesson.ToString());
+            //log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Teach Mode: " + this.TeachMode.ToString());
+            //log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Lesson: " + this.Lesson.ToString());
         }       
 
         public async Task<Dictionary<string, string>> GetOrder(int number)
