@@ -85,7 +85,7 @@ namespace FlashCardService
                     break;
 
                 case "SessionEndedRequest":
-                    await SetStateToOffAndExit();
+                    SetStateToOffAndExit();
                     response = AlexaResponse.Say("Goodbye Moycan!");
                     break;
 
@@ -99,48 +99,59 @@ namespace FlashCardService
 
         private async Task<SkillResponse> HandleIntentRequest(SkillRequest input)
         {
-            SkillResponse intentResponse;
             var request = (IntentRequest)input.Request;
             this.sessionAttributes.UpdateSessionAttributes(input.Session.Attributes);
 
             log.INFO("Function", "HandleIntentRequest", request.Intent.Name);
 
+            // Allow cancel, stop, and help intents to happen in any state
             switch (request.Intent.Name)
             {
-                case "AMAZON.YesIntent":
-                    intentResponse = await HandleYesIntent();
-                    break;
-                case "AMAZON.NoIntent":
-                    await SetStateToOffAndExit();
-                    intentResponse = ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moyca Readers'. Goodbye.");
-                    break;
                 case "AMAZON.CancelIntent":
-                    await SetStateToOffAndExit();
-                    intentResponse = ResponseBuilder.Tell("Until next time my Moycan!");
-                    break;
-                case "AMAZON.FallbackIntent":
-                    intentResponse = await HandleWordsToReadIntent(input);
-                    break;
+                    SetStateToOffAndExit();
+                    return ResponseBuilder.Tell("Until next time my Moycan!");
                 case "AMAZON.StopIntent":
-                    await SetStateToOffAndExit();
-                    intentResponse = ResponseBuilder.Tell("Goodbye.");
-                    break;
-                case "AMAZON.HelpIntent":                    
-                    intentResponse = await HandleHelpRequest();
-                    break;
-                case "WordsToReadIntent":
-                    intentResponse = await HandleWordsToReadIntent(input);
-                    break;
-                default:
-                    intentResponse = ResponseBuilder.Tell("I didn't understand that.");
-                    break;
+                    SetStateToOffAndExit();
+                    return ResponseBuilder.Tell("Goodbye.");
+                case "AMAZON.HelpIntent":
+                    return await HandleHelpRequest();
             }
 
-            return intentResponse;
+            // Only accept yes or no intents when in introduction.
+            // This prevents Alexa from going into other intents if something other than "Yes" or "No" was said during intro.
+            if (this.sessionAttributes.SessionState == STATE.Introduction)
+            {
+                switch (request.Intent.Name)
+                {
+                    case "AMAZON.YesIntent":
+                        return await HandleYesIntent();
+                    case "AMAZON.NoIntent":
+                    default:
+                        SetStateToOffAndExit();
+                        return ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moyca Readers'. Goodbye.");
+                }
+            }
+            else if (this.sessionAttributes.SessionState == STATE.Assess ||
+                     this.sessionAttributes.SessionState == STATE.FirstWord)
+            {
+                // Treat any word said as a flash card attempt (including yes or no)
+                switch (request.Intent.Name)
+                {
+                    case "WordsToReadIntent":
+                    case "AMAZON.FallbackIntent":
+                    case "AMAZON.YesIntent":
+                    case "AMAZON.NoIntent":
+                        return await HandleWordsToReadIntent(input);
+                }
+            }
+
+            return ResponseBuilder.Tell("I didn't understand that.");
         }
-        private async Task SetStateToOffAndExit()
+
+        private void SetStateToOffAndExit()
         {
             log.INFO("Function", "SetStateToOffAndExit", "Schedule: " + this.sessionAttributes.Schedule);
+            this.sessionAttributes.SessionState = STATE.Off;
         }
 
         private async Task<SkillResponse> HandleLaunchRequest()
@@ -193,7 +204,6 @@ namespace FlashCardService
         private async Task<SkillResponse> HandleHelpRequest()
         {
             log.INFO("Function", "HandleHelpRequest", "Current Schedule: " + this.sessionAttributes.Schedule);
-            this.sessionAttributes.SessionState = STATE.Help;
 
             return AlexaResponse.PresentFlashCard(this.sessionAttributes.CurrentWord, CommonPhrases.Help, "You can say the word now");
         }
