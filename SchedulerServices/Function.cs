@@ -24,23 +24,24 @@ namespace SchedulerService
         public static ILambdaLogger info;
         ScopeAndSequenceDB scopeAndSequence;
         DictionaryDB dictionary;
-
+        int totalWords = 0;
         public async Task FunctionHandler(DynamoDBEvent dynamoEvent, ILambdaContext context)
         {
             log = new MoycaLogger(context, LogLevel.TRACE);
             scopeAndSequence = new ScopeAndSequenceDB(log);
             dictionary = new DictionaryDB(log);
             int i;
-            for(i=1103; i<1140; i++)
+            for(i=1036; i<1096; i++)
             {                
                 await GetAndSetWords(i);
             }
-            
+            log.INFO("Function", "Words in range: " + totalWords);
         }
 
         public async Task GetAndSetWords(int orderNumber)
         {            
             await dictionary.GetWordsToReadWithOrder(await scopeAndSequence.GetOrder(orderNumber));
+            totalWords += dictionary.GetSizeOfWordsToRead();
             await scopeAndSequence.PutItemBackWithWordsToRead(orderNumber, dictionary.GetWordsToRead());            
         }
 

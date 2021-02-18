@@ -89,6 +89,10 @@ namespace AWSInfrastructure.DynamoDB
             return this.wordsToRead;
         }
 
+        public int GetSizeOfWordsToRead()
+        {
+            return this.wordsToRead.Count;
+        }
 
         /// <summary>Retrieves words from dictionary based on order provided by scope-and-sequence.
         /// Must be awaited to ensure dynamoDB response is aquired.
