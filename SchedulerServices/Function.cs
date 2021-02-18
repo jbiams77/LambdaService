@@ -31,7 +31,7 @@ namespace SchedulerService
             scopeAndSequence = new ScopeAndSequenceDB(log);
             dictionary = new DictionaryDB(log);
             int i;
-            for(i=1056; i<1196; i++)
+            for(i=1103; i<1140; i++)
             {                
                 await GetAndSetWords(i);
             }

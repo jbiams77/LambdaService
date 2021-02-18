@@ -56,6 +56,9 @@ namespace AWSInfrastructure.DynamoDB
         private BE_V_index   bE_V_Index;
         private CD_CB_index cD_CB_Index;
         private WF_CD_index wF_CD_Index;
+        private WF_CB_index wF_CB_Index;
+        private CD_VT_index cD_VT_Index;
+        private CB_VT_index cB_VT_Index;
 
         // words retrieved from dictionary based on scope and sequence
         private List<string> wordsToRead;
@@ -70,6 +73,9 @@ namespace AWSInfrastructure.DynamoDB
             bE_V_Index = new BE_V_index();
             cD_CB_Index = new CD_CB_index();
             wF_CD_Index = new WF_CD_index();
+            wF_CB_Index = new WF_CB_index();
+            cD_VT_Index = new CD_VT_index();
+            cB_VT_Index = new CB_VT_index();
             this.InitializeBoolsToFalse();
             this.wordsToRead = new List<string>();
             this.log = logger;
@@ -157,6 +163,27 @@ namespace AWSInfrastructure.DynamoDB
             return ExtractWordsFromItem(databaseItem);
         }
 
+        private async Task<List<string>> GetConsonantBlendWithWordFamily(string wordFamily, string consonantBlend)
+        {
+            List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(wF_CB_Index, wordFamily, consonantBlend));
+
+            return ExtractWordsFromItem(databaseItem);
+        }
+
+        private async Task<List<string>> GetConsonantDigraphWithVowelType(string consonantDigraph, string vowelType)
+        {
+            List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(cD_VT_Index, consonantDigraph, vowelType));
+
+            return ExtractWordsFromItem(databaseItem);
+        }
+
+        private async Task<List<string>> GetConsonantBlendWithVowelType(string consonantBlend, string vowelType)
+        {
+            List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(cB_VT_Index, consonantBlend, vowelType));
+
+            return ExtractWordsFromItem(databaseItem);
+        }
+
         private async Task GetWordsWithBestMethod(Dictionary<string, string> order)
         {
             if (useVT || useV || useS || useFL)
@@ -169,6 +196,12 @@ namespace AWSInfrastructure.DynamoDB
                 order.TryGetValue("WF", out string wf);
                 this.wordsToRead = await GetCVCwithWordFamily(wf);
             }
+            else if (useWF && useCB)
+            {
+                order.TryGetValue("WF", out string wf);
+                order.TryGetValue("CB", out string cb);
+                this.wordsToRead = await GetConsonantBlendWithWordFamily(wf, cb);
+            }
             else if (useCVC && useV)
             {
                 order.TryGetValue("V", out string v);
@@ -179,6 +212,18 @@ namespace AWSInfrastructure.DynamoDB
                 order.TryGetValue("CD", out string cd);
                 order.TryGetValue("CB", out string cb);
                 this.wordsToRead = await GetConsonantDigraphWithConsonantBlend(cd, cb);
+            }
+            else if (useCD && useVT)
+            {
+                order.TryGetValue("CD", out string cd);
+                order.TryGetValue("VT", out string vt);
+                this.wordsToRead = await GetConsonantDigraphWithVowelType(cd, vt);
+            }
+            else if (useCB && useVT)
+            {
+                order.TryGetValue("CB", out string cb);
+                order.TryGetValue("VT", out string vt);
+                this.wordsToRead = await GetConsonantBlendWithVowelType(cb, vt);
             }
             else if (useWF && useCD)
             {
@@ -389,6 +434,13 @@ namespace AWSInfrastructure.DynamoDB
             public virtual string SortKey { get { return "ConsonantDigraph"; } }
             public WF_CD_index() { }
         }
+        private class WF_CB_index : GlobalIndex
+        {
+            public virtual string Name { get { return "WF-CB-index"; } }
+            public virtual string PartitionKey { get { return "WordFamily"; } }
+            public virtual string SortKey { get { return "ConsonantBlend"; } }
+            public WF_CB_index() { }
+        }
 
         private class SW_VT_index : GlobalIndex
         {
@@ -421,6 +473,23 @@ namespace AWSInfrastructure.DynamoDB
             public virtual string SortKey { get { return "ConsonantBlend"; } }
             public CD_CB_index() { }
         }
+
+        private class CD_VT_index : GlobalIndex
+        {
+            public virtual string Name { get { return "CD-VT-index"; } }
+            public virtual string PartitionKey { get { return "ConsonantDigraph"; } }
+            public virtual string SortKey { get { return "VowelType"; } }
+            public CD_VT_index() { }
+        }
+
+        private class CB_VT_index : GlobalIndex
+        {
+            public virtual string Name { get { return "CB-VT-index"; } }
+            public virtual string PartitionKey { get { return "ConsonantBlend"; } }
+            public virtual string SortKey { get { return "VowelType"; } }
+            public CB_VT_index() { }
+        }
+
     }
 
 }
