@@ -13,8 +13,7 @@ namespace AWSInfrastructure.DynamoDB
     public class ScopeAndSequenceDB : DatabaseClient
     {
         public static string TableName { get { return "scope-and-sequence"; } }
-        public static string PrimaryPartitionKey { get { return "Index"; } }
-
+        public static string PrimaryPartitionKey { get { return "Index"; } }        
         public List<string> WordsToRead { get; set; }
         public string TeachMode { get; set; }
         public string Skill { get; set; }

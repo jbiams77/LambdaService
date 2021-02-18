@@ -160,9 +160,7 @@ namespace FlashCardService
             foreach (string sound in decodedWord)
             {
                 teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
-            }
-            teachModel += PauseFor(1.0) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
-            teachModel += SayExtraSlow(Phoneme(vowelSound)) + PauseFor(0.2) + SayExtraSlow(Phoneme(decodedWord[2]));
+            }            
             teachModel += PauseFor(1.0);
             teachModel += SayExtraSlow(wordAttributes.Word);
             teachModel += PauseFor(0.5);
@@ -183,8 +181,6 @@ namespace FlashCardService
             {
                 teachModel += PauseFor(0.2) + SayExtraSlow(sound) + PauseFor(0.2);
             }
-            teachModel += PauseFor(1.0) + SayExtraSlow(Phoneme(decodedWord[0])) + PauseFor(0.2);
-            teachModel += SayExtraSlow(Phoneme(vowelSound)) + PauseFor(0.2) + SayExtraSlow(Phoneme(decodedWord[2]));
             teachModel += PauseFor(1.0);
             teachModel += SayExtraSlow(wordAttributes.Word);
             teachModel += PauseFor(0.5);
@@ -209,17 +205,21 @@ namespace FlashCardService
         }
 
         public SkillResponse CDIntroduction(WordAttributes wordAttributes)
-        {
-            string consonantDigraph = wordAttributes.ConsonantDigraph;
-            string[] cdLetters = consonantDigraph.Split("");
+        {            
+            string[] cdLetters = wordAttributes.ConsonantDigraph.Select(x => x.ToString()).ToArray();
             string teachModel = "When two consonants work together to make one sound, this is called a digraph.";
             teachModel += PauseFor(.5);
             teachModel += "Can you say digraph?";
             teachModel += PauseFor(1.5);
-            teachModel += "The digraph is made up of these two letters:";
-            teachModel += cdLetters[0] + " and a " + cdLetters[1] + ".";
-            cdPhoneme.TryGetValue(consonantDigraph, out string cdp);
-            teachModel += " The sound they make is " + SayExtraSlow(Phoneme(cdp));
+            teachModel += "The digraph we are learning now is made up of these two letters:";
+            teachModel += PauseFor(1);
+            teachModel += SayExtraSlow(cdLetters[0]) + " and a " + SayExtraSlow(cdLetters[1]) + ".";
+            teachModel += PauseFor(1.5);
+            if (cdPhoneme.TryGetValue(wordAttributes.ConsonantDigraph, out string cdp))
+            {
+                teachModel += " The sound they make is " + PauseFor(.5) + SayExtraSlow(Phoneme(cdp));
+            }
+            teachModel += PauseFor(1.5);
             teachModel += " Are you ready to begin?";
 
             Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
@@ -229,15 +229,20 @@ namespace FlashCardService
 
         public SkillResponse CBIntroduction(WordAttributes wordAttributes)
         {
-            string consonantBlend = wordAttributes.ConsonantDigraph;
-            string[] cBLetters = consonantBlend.Split("");
+            string[] cBLetters = wordAttributes.ConsonantBlend.Select(x => x.ToString()).ToArray();
+            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Consonant Blend Letters " + wordAttributes.ConsonantBlend);
             string teachModel = "When consonants are stuck together, we call that a consonant blend.";
             teachModel += PauseFor(.5);
             teachModel += "The letters still make their individual sounds.";
             teachModel += PauseFor(1.5);
             teachModel += "This blend is made up of these two letters:";
-            teachModel += cBLetters[0] + " and a " + cBLetters[1] + ".";
-            teachModel += " The sound they make is " + SayExtraSlow(consonantBlend);
+            teachModel += SayExtraSlow(cBLetters[0]) + " and a " + SayExtraSlow(cBLetters[1]) + ".";
+            teachModel += PauseFor(1.5);
+            if (cbPhoneme.TryGetValue(wordAttributes.ConsonantBlend, out string cbp))
+            {
+                teachModel += " The sound they make is " + PauseFor(.5) + SayExtraSlow(Phoneme(cbp));
+            }
+            teachModel += PauseFor(1.5);
             teachModel += " Are you ready to begin?";
 
             Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
@@ -322,6 +327,51 @@ namespace FlashCardService
             {"th" , "θ" },
             {"wh" , "hw" }
         };
+
+        private static readonly Dictionary<string, string> cbPhoneme = new Dictionary<string, string>
+        {
+         // sound | IPA
+            {"bl" , "bɫ" },
+            {"br" , "bɹ" },
+            {"cl" , "kɫ"},
+            {"cr" , "kɹ" },
+            {"dr" , "dɹ" },
+            {"fl" , "fɫ" },
+            {"fr" , "fɹ" },
+            {"ft" , "ft" },
+            {"gl" , "ɡɫ" },
+            {"gr" , "ɡɹ" },
+            {"lt" , "ɫt" },
+            {"nd" , "nd" },
+            {"ng" , "ŋ" },
+            {"ngr", "ŋɡɹ" },
+            {"nt" , "nt" },
+            {"pl" , "pɫ" },
+            {"pr" , "pɹ" },
+            {"qu" , "kw" },
+            {"rk" , "ɹk" },
+            {"rm" , "ɹm" },
+            {"rt" , "ɹt" },
+            {"sc" , "sk" },
+            {"sch", "sk" },
+            {"scr", "skɹ" },
+            {"shr" , "ʃɹ" },
+            {"sk" , "sk" },
+            {"sl" , "sɫ" },
+            {"sm" , "sm" },
+            {"sn" , "sn" },
+            {"sp" , "sp" },
+            {"spl", "spɫ" },
+            {"spr", "spɹ" },
+            {"st" , "st" },
+            {"str" , "str" },
+            {"sw" , "sw" },
+            {"thr" , "θɹ" },
+            {"tr" , "tɹ" },
+            {"tw" , "tw" },
+            {"wr" , "ɹ" }
+        };
+
     }
 
 }

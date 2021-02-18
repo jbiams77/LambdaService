@@ -43,18 +43,6 @@ namespace AWSInfrastructure.DynamoDB
             };
 
             DatabaseItem item = new DatabaseItem();
-            try
-            {
-                var response = await client.GetItemAsync(getRequest);
-                if (response.IsItemSet)
-                {
-                    item = response.Item;
-                }
-            }
-            catch (Exception e)
-            {
-                log.WARN("DatabaseClient", "GetEntryByKey(string)", "EXCEPTION: " + e.Message);
-            }
 
             return item;
         }
@@ -194,17 +182,8 @@ namespace AWSInfrastructure.DynamoDB
         /// NOTE: This function deletes all existing attributes for the specified key and inserts the new attributes
         /// @param primaryKey - key of entry to edit
         /// @param attributes - a dictionary containing all of the attributes to set for the specified entry
-        protected async Task<bool> PutAttributes(string primaryKey, Dictionary<string, AttributeValue> attributes)
+        protected async Task<bool> PutAttributes(PutItemRequest putRequest)
         {
-            // The primary key is required to determine which database entry to update
-            attributes.Add(primaryPartitionKey, new AttributeValue { S = primaryKey });
-
-            var putRequest = new PutItemRequest
-            {
-                TableName = tableName,
-                Item = attributes
-            };
-
             try
             {
                 await client.PutItemAsync(putRequest);
