@@ -55,18 +55,14 @@ namespace FlashCardService
             AlexaResponse.SetLogger(log);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
             log.INFO("BEGIN", "-----------------------------------------------------------------------");
-            log.INFO("skill request", JsonConvert.SerializeObject(input)); 
+            string skilLRequest = JsonConvert.SerializeObject(input, Formatting.Indented);
+            log.INFO("skill request: ", skilLRequest);
+            
             this.cognitoUserPool = new CognitoUserPool(log);
 
-            // new user requires account linking
-            if (input.Session.User.AccessToken == null)
-            {
-                return HandleNoExistingAccount();
-            }
-
-            this.userId = await cognitoUserPool.GetUsername(input.Session.User.AccessToken);
+            this.userId = input.Session.User.UserId;
             this.userProfile = new UserProfileDB(userId, log);
-            this.scopeAndSequence = new ScopeAndSequenceDB(log);
+            this.scopeAndSequence = new ScopeAndSequenceDB(log);           
 
             Function.displaySupported = input.APLSupported();            
             log.INFO("Function", "USERID: " + this.userId);
@@ -241,20 +237,20 @@ namespace FlashCardService
                 {
                     var percentAccuracy = await GetPercentAccuracy(this.sessionAttributes.FailedAttempts, this.sessionAttributes.TotalWordsInSession);
 
-                    if (percentAccuracy >= PERCENT_TO_MOVE_FORWARD)
-                    {
-                        prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moyca Readers!";
-                        await this.userProfile.IncrementUserSchedule(this.sessionAttributes.Schedule);
-                    }
-                    else if (percentAccuracy <= PERCENT_TO_MOVE_BACKWARD && this.sessionAttributes.LessonMode == MODE.Assess)
-                    {
-                        prompt = "Let's review this lesson again! Just say, Alexa, open Moyca Readers!";
-                        await this.userProfile.DecrementUserSchedule(this.sessionAttributes.Schedule);
-                    }
-                    else
-                    {
-                        prompt = CommonPhrases.LongAffirmation + "Let's practice that session again! Just say, Alexa, open Moyca Readers!";
-                    }
+                    //if (percentAccuracy >= PERCENT_TO_MOVE_FORWARD)
+                    //{
+                    //    prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moyca Readers!";
+                    //    await this.userProfile.IncrementUserSchedule(this.sessionAttributes.Schedule);
+                    //}
+                    //else if (percentAccuracy <= PERCENT_TO_MOVE_BACKWARD && this.sessionAttributes.LessonMode == MODE.Assess)
+                    //{
+                    //    prompt = "Let's review this lesson again! Just say, Alexa, open Moyca Readers!";
+                    //    await this.userProfile.DecrementUserSchedule(this.sessionAttributes.Schedule);
+                    //}
+                    //else
+                    //{
+                    //    prompt = CommonPhrases.LongAffirmation + "Let's practice that session again! Just say, Alexa, open Moyca Readers!";
+                    //}
                     return ResponseBuilder.Tell(prompt);
                 }
                 else
@@ -312,7 +308,7 @@ namespace FlashCardService
         {
             log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
 
-            int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();
+            int currentScheduleNumber = await userProfile.GetUserSchedule();
 
             log.DEBUG("Function", "PopulateSessionAttributes", "Current Schedule: " + currentScheduleNumber);
 
@@ -329,7 +325,7 @@ namespace FlashCardService
 
         private async Task<int> GetPercentAccuracy(int totalFailedAttempts, int totalWordsInSession)
         {
-            int currentScheduleNumber = await userProfile.GetFirstScheduleNumber();
+            int currentScheduleNumber = await userProfile.GetUserSchedule();
 
             var percentAccuracy = (int)((1.0 - ((double)totalFailedAttempts / (double)totalWordsInSession)) * 100.0);
 
