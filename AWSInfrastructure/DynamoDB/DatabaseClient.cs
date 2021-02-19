@@ -43,6 +43,18 @@ namespace AWSInfrastructure.DynamoDB
             };
 
             DatabaseItem item = new DatabaseItem();
+            try
+            {
+                var response = await client.GetItemAsync(getRequest);
+                if (response.IsItemSet)
+                {
+                    item = response.Item;
+                }
+            }
+            catch (Exception e)
+            {
+                log.WARN("DatabaseClient", "GetEntryByKey(string)", "EXCEPTION: " + e.Message);
+            }
 
             return item;
         }

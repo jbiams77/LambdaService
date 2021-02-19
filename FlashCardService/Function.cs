@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
-using Amazon.Runtime;
+using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Amazon.DynamoDBv2.Model;
-using Alexa.NET.Response.Converters;
-using Alexa.NET.Response.Directive;
 using Newtonsoft.Json;
-using Alexa.NET;
 using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.GlobalConstants;
 using AWSInfrastructure.CognitoPool;
@@ -35,6 +32,7 @@ namespace FlashCardService
         private CognitoUserPool cognitoUserPool;
         private SessionAttributes sessionAttributes;
         private TeachMode teachMode;
+        private InSkillPurchase purchase;
 
         // Most sessions have 6 - 7 words. Reader must miss one or less to advance sessions.
         private static int PERCENT_TO_MOVE_FORWARD = 83;
@@ -51,18 +49,19 @@ namespace FlashCardService
 
             this.sessionAttributes = new SessionAttributes(log);
             this.teachMode = new TeachMode(this.sessionAttributes);
+            this.purchase = new InSkillPurchase(input);
+            this.userId = input.Session.User.UserId;
+            this.userProfile = new UserProfileDB(userId, log);
+            this.scopeAndSequence = new ScopeAndSequenceDB(log);
+
 
             AlexaResponse.SetLogger(log);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
+            await this.purchase.GetAvailableProducts();
+
             log.INFO("BEGIN", "-----------------------------------------------------------------------");
             string skilLRequest = JsonConvert.SerializeObject(input, Formatting.Indented);
             log.INFO("skill request: ", skilLRequest);
-            
-            this.cognitoUserPool = new CognitoUserPool(log);
-
-            this.userId = input.Session.User.UserId;
-            this.userProfile = new UserProfileDB(userId, log);
-            this.scopeAndSequence = new ScopeAndSequenceDB(log);           
 
             Function.displaySupported = input.APLSupported();            
             log.INFO("Function", "USERID: " + this.userId);
@@ -73,7 +72,8 @@ namespace FlashCardService
             switch (T.Name)
             {
                 case "LaunchRequest":                    
-                    response = await HandleLaunchRequest();
+                    //response = await HandleLaunchRequest();
+                    response = AlexaResponse.PurchaseContent(this.purchase.GetProductId("short_vowel"), " Buy This ");
                     break;
 
                 case "IntentRequest":

@@ -8,7 +8,8 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Alexa.NET" Version="1.14.0" />
+    <PackageReference Include="Alexa.NET" Version="1.15.0" />
+    <PackageReference Include="Alexa.NET.InSkillPricing" Version="3.0.0" />
     <PackageReference Include="Amazon.Lambda.Core" Version="1.2.0" />
     <PackageReference Include="Amazon.Lambda.DynamoDBEvents" Version="1.2.0" />
     <PackageReference Include="Amazon.Lambda.S3Events" Version="1.2.0" />

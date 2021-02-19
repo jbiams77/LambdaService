@@ -6,6 +6,8 @@ using Alexa.NET.Request;
 using Alexa.NET.Response;
 using Alexa.NET.Response.APL;
 using Alexa.NET.Response.Directive;
+using Alexa.NET.InSkillPricing;
+using Alexa.NET.InSkillPricing.Directives;
 using Alexa.NET.Response.Directive.Templates;
 using AWSInfrastructure.Logger;
 
@@ -167,6 +169,30 @@ namespace FlashCardService
                 var displayDirective = AlexaResponse.Create_CurrentWordPresentation_Directive(flashCardWord);
                 response.Response.Directives.Add(displayDirective);
             }
+
+            return response;
+        }
+
+        public static SkillResponse PurchaseContent(string productId, string upsellPrompt)
+        {
+            var buyDirective = new BuyDirective(productId, "correlationToken");
+            string speech = StartTag + upsellPrompt + EndTag;
+
+            SkillResponse response = new SkillResponse { Version = "1.0" };
+            ResponseBody body = new ResponseBody
+            {
+                ShouldEndSession = false,
+                OutputSpeech = new SsmlOutputSpeech(speech),
+                Card = new SimpleCard { Title = "Purchase", Content = "Whort Vowels"}
+            };
+
+            response.Response = body;
+
+            if (DisplaySupported)
+            {
+                response.Response.Directives.Add(Create_IntroPresentation_Directive());
+            }            
+            response.Response.Directives.Add(buyDirective);
 
             return response;
         }

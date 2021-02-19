@@ -35,11 +35,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Alexa.NET, Version=1.14.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Alexa.NET.1.14.0\lib\netstandard2.0\Alexa.NET.dll</HintPath>
+    <Reference Include="Alexa.NET, Version=1.15.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Alexa.NET.1.15.0\lib\netstandard2.0\Alexa.NET.dll</HintPath>
     </Reference>
     <Reference Include="Alexa.NET.APL, Version=7.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Alexa.NET.APL.7.0.0\lib\netstandard2.0\Alexa.NET.APL.dll</HintPath>
+    </Reference>
+    <Reference Include="Alexa.NET.InSkillPricing, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Alexa.NET.InSkillPricing.3.0.0\lib\netstandard2.0\Alexa.NET.InSkillPricing.dll</HintPath>
     </Reference>
     <Reference Include="Amazon.Lambda.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\Amazon.Lambda.Core.1.2.0\lib\netstandard2.0\Amazon.Lambda.Core.dll</HintPath>
