@@ -17,9 +17,10 @@ namespace AWSInfrastructure.DynamoDB
         public static string TableName { get { return "user-profile"; } }
         public static string PrimaryPartitionKey { get { return "UserID"; } }
         public string UserID { get; set; }
+        public static int LastFreeIndex { get { return 1004; } }
 
         public int schedule;
-        public MODE TeachMode;
+        public MODE teachMode;
 
         // This is a temporary fix to prevent user schedule from going out of bounds
         public readonly int MIN_SCHEDULE_INDEX = 1000;
@@ -35,25 +36,42 @@ namespace AWSInfrastructure.DynamoDB
             this.UserID = userId;
             this.log = logger;
             this.schedule = MIN_SCHEDULE_INDEX;
-            this.TeachMode = MODE.Assess;
+            this.teachMode = MODE.Assess;
         }
 
-        public async Task<int> GetUserSchedule()
+        /// <summary>
+        /// Retrieves user profile data from DynamoDB 'user-profile'
+        /// </summary>
+        public async Task GetUserProfileData()
         {
             DatabaseItem items = await GetEntryByKey(this.UserID);
-            AttributeValue dbSchedule;
-            if (items.TryGetValue(SCHEDULE_KEY, out dbSchedule))
-            {
-                log.INFO("UserProfileDB", "GetUserSchedule", "The user profile does not exist, start the user at schedule 1000");
 
-                this.schedule = MIN_SCHEDULE_INDEX;
+            if (items.TryGetValue(SCHEDULE_KEY, out AttributeValue dbSchedule) && items.TryGetValue(TEACH_MODE_KEY, out AttributeValue tM))
+            {   
+                this.schedule = int.Parse(dbSchedule.N);
+                this.teachMode = (MODE)Enum.Parse(typeof(MODE), tM.S);
+                log.INFO("UserProfileDB", "GetUserSchedule", "User profile exist, start the user at: " + this.schedule);
             }
             else
-            {
+            {   
                 await CreateNewUser();
+                log.INFO("UserProfileDB", "GetUserSchedule", "User profile does not exist, start the user at: " + this.schedule);
             }
+        }
 
-            return schedule;
+        public bool RequiresPurchase()
+        {
+            return (this.schedule > LastFreeIndex);
+        }
+
+        public int GetUserSchedule()
+        {
+            return this.schedule;
+        }
+
+        public MODE GetMode()
+        {
+            return this.teachMode;
         }
 
         //public async Task IncrementUserSchedule(int completedSchedule)
@@ -90,13 +108,14 @@ namespace AWSInfrastructure.DynamoDB
                 await InsertScheduleFront(scheduleToAdd);
             }
         }
+
         private async Task<bool> CreateNewUser()
         {
             Dictionary<string, AttributeValue> attributes = new Dictionary<string, AttributeValue>();
             // The primary key is required to determine which database entry to update
             attributes[PrimaryPartitionKey] = new AttributeValue { S = this.UserID };
             attributes[this.SCHEDULE_KEY] = new AttributeValue { N = this.schedule.ToString() };
-            attributes[this.TEACH_MODE_KEY] = new AttributeValue { S = Enum.GetName(typeof(MODE), this.TeachMode) };
+            attributes[this.TEACH_MODE_KEY] = new AttributeValue { S = Enum.GetName(typeof(MODE), this.teachMode) };
 
             var putRequest = new PutItemRequest
             {

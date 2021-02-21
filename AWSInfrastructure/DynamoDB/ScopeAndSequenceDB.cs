@@ -17,6 +17,7 @@ namespace AWSInfrastructure.DynamoDB
         public List<string> WordsToRead { get; set; }
         public string TeachMode { get; set; }
         public string Skill { get; set; }
+        public string InSkillPurchase { get; set; }
         public LESSON Lesson { get; set; }
 
         private MoycaLogger log;
@@ -52,8 +53,13 @@ namespace AWSInfrastructure.DynamoDB
                 this.Skill = Skill.S;
             }
 
+            if (item.TryGetValue("InSkillPurchase", out AttributeValue inSkillPurchase))
+            {
+                this.InSkillPurchase = inSkillPurchase.S;
+            }
+
             // Determine lesson plan 
-            if(item.TryGetValue("Lesson", out AttributeValue lesson))
+            if (item.TryGetValue("Lesson", out AttributeValue lesson))
             {               
 
                 switch (lesson.S)

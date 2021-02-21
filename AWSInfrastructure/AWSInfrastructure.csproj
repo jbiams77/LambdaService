@@ -53,6 +53,9 @@
     <Reference Include="Amazon.Lambda.S3Events, Version=1.0.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\Amazon.Lambda.S3Events.1.2.0\lib\netstandard2.0\Amazon.Lambda.S3Events.dll</HintPath>
     </Reference>
+    <Reference Include="Amazon.Lambda.Serialization.Json, Version=1.0.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\Amazon.Lambda.Serialization.Json.1.8.0\lib\netstandard2.0\Amazon.Lambda.Serialization.Json.dll</HintPath>
+    </Reference>
     <Reference Include="AWSSDK.CognitoIdentityProvider, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.CognitoIdentityProvider.3.5.1.14\lib\net45\AWSSDK.CognitoIdentityProvider.dll</HintPath>
     </Reference>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Alexa.NET;
 using Alexa.NET.APL.Components;
 using Alexa.NET.Request;
 using Alexa.NET.Response;
@@ -173,27 +174,24 @@ namespace FlashCardService
             return response;
         }
 
-        public static SkillResponse PurchaseContent(string productId, string upsellPrompt)
+        public static SkillResponse PurchaseContentUpsell(string productId, string upsellPrompt, string productName)
         {
-            var buyDirective = new BuyDirective(productId, "correlationToken");
-            string speech = StartTag + upsellPrompt + EndTag;
-
-            SkillResponse response = new SkillResponse { Version = "1.0" };
+            UpsellDirective upsellDirective = new UpsellDirective(productId, "correlationToken", upsellPrompt);            
+            var response = ResponseBuilder.Empty();
             ResponseBody body = new ResponseBody
-            {
-                ShouldEndSession = false,
-                OutputSpeech = new SsmlOutputSpeech(speech),
-                Card = new SimpleCard { Title = "Purchase", Content = "Whort Vowels"}
+            {                
+                // replace with fancy card
+                Card = new SimpleCard { Title = "Purchase", Content = productName }
+                
             };
-
             response.Response = body;
+            response.Response.Directives.Add(upsellDirective);
+            
 
-            if (DisplaySupported)
-            {
-                response.Response.Directives.Add(Create_IntroPresentation_Directive());
-            }            
-            response.Response.Directives.Add(buyDirective);
-
+            //if (DisplaySupported)
+            //{
+            //    response.Response.Directives.Add(Create_IntroPresentation_Directive());
+            //}            
             return response;
         }
 
