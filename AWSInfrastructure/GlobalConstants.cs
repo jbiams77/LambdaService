@@ -44,6 +44,7 @@ namespace AWSInfrastructure.GlobalConstants
         Introduction,
         FirstWord,
         Assess,
+        MakingPurchase,
         Help
     }
 

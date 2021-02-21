@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using AWSInfrastructure.GlobalConstants;
 using System.Linq;
 using AWSInfrastructure.Logger;
 using System.ComponentModel;
-using System.Collections;
 using Newtonsoft.Json;
 using FlashCardService;
+using AWSInfrastructure.DynamoDB;
+using Alexa.NET.Request;
 
 namespace FlashCardService
 {
@@ -19,9 +19,9 @@ namespace FlashCardService
         public SKILL LessonSkill { get; set; }
         public int Schedule { get; set; }
         public List<string> WordsToRead { get; set; }
-        public string CurrentWord { get => GetCurrentWord(); set { } }
+        public string CurrentWord { get; set; }
         public int TotalWordsInSession { get; set; }
-        public int FailedAttempts { get; set; }
+        public int FailedAttempts { get; set; }        
 
         private MoycaLogger logger;
 
@@ -50,6 +50,26 @@ namespace FlashCardService
         }
 
         /// <summary>
+        /// Updates this session attributes with scopeAndSequenceData
+        /// </summary>
+        /// <param name="scopeAndSequence">Schedule data from dynamoDb</param>
+        /// <param name="schedule">Schedule number</param>
+        /// <param name="mode">Teach or assess modes determined by user profile</param>
+        public void UpdateSessionAttributes(ScopeAndSequenceDB scopeAndSequence, int schedule, MODE mode)
+        {
+            Function.log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
+            this.WordsToRead = scopeAndSequence.WordsToRead;
+            this.CurrentWord = GetCurrentWord();
+            this.LessonMode = mode;
+            this.LessonSkill = (SKILL)(int.Parse(scopeAndSequence.Skill));
+            this.Lesson = scopeAndSequence.Lesson;
+            this.Schedule = schedule;
+            this.TotalWordsInSession = scopeAndSequence.WordsToRead.Count();
+            this.FailedAttempts = 0;
+        }
+
+
+        /// <summary>
         /// Updates this object with the values in the sessionAttributeDict
         /// </summary>
         /// <param name="sessionAttributeDict">Dictionary whose keys match the public members of this class</param>
@@ -66,6 +86,7 @@ namespace FlashCardService
                 return;
             }
 
+            CurrentWord = updatedSessionAttributes.CurrentWord;
             SessionState = updatedSessionAttributes.SessionState;
             Lesson = updatedSessionAttributes.Lesson;
             LessonMode = updatedSessionAttributes.LessonMode;
@@ -74,6 +95,12 @@ namespace FlashCardService
             WordsToRead = updatedSessionAttributes.WordsToRead;
             TotalWordsInSession = updatedSessionAttributes.TotalWordsInSession;
             FailedAttempts = updatedSessionAttributes.FailedAttempts;
+        }
+
+        public void RemoveCurrentWord()
+        {
+            WordsToRead.Remove(GetCurrentWord());
+            this.CurrentWord = GetCurrentWord();
         }
 
         private string GetCurrentWord()

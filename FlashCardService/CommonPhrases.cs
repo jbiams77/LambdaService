@@ -8,6 +8,7 @@ namespace FlashCardService
     {
         private static Random random = new Random(0);
 
+        
         public static string Help
         {
             get
@@ -73,6 +74,11 @@ namespace FlashCardService
             {
                 return longAffirmation[random.Next(longAffirmation.Length)];
             }
+        }
+
+        public static string Upsell(string productName)
+        {
+            return "You currently do not have access to the " + productName + " flash cards. Would you like to hear how to get it?";
         }
 
     }
