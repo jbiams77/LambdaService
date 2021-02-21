@@ -35,13 +35,14 @@ namespace FlashCardService.Requests.Intents
             {
                 prompt = CommonPhrases.ShortAffirmation;
 
-                this.sessionAttributes.WordsToRead.Remove(currentWord);
+                this.sessionAttributes.RemoveCurrentWord();
                 bool sessionFinished = !this.sessionAttributes.WordsToRead.Any();
 
                 Function.log.DEBUG("Function", "HandleWordsToReadIntent", "Session Finished? " + sessionFinished);
 
                 if (sessionFinished)
                 {
+                    this.sessionAttributes.SessionState = STATE.Off;
                     return ResponseBuilder.Tell(prompt);
                 }
                 else

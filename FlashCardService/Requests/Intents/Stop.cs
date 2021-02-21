@@ -12,17 +12,11 @@ namespace FlashCardService.Requests.Intents
 
         public async Task<SkillResponse> HandleIntent()
         {
-            Function.log.INFO("Function", "HandleYesIntent", "Current Schedule: " + this.sessionAttributes.Schedule);
-
-            if (this.sessionAttributes.SessionState != STATE.Introduction)
-            {
-                WordsToRead wordsToRead = new WordsToRead(base.skillRequest);
-                return await wordsToRead.HandleIntent();
-            }
+            Function.log.INFO("Stop", "HandleIntent", "State before stopped: " + this.sessionAttributes.SessionState);
 
             this.sessionAttributes.SessionState = STATE.Off;
 
-            return ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moyca Readers'. Goodbye.");
+            return ResponseBuilder.Tell("If you would like to play again, 'Alexa, open Moyca Readers'. Goodbye.");
         }
 
     }

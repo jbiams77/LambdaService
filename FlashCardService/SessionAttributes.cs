@@ -97,6 +97,12 @@ namespace FlashCardService
             FailedAttempts = updatedSessionAttributes.FailedAttempts;
         }
 
+        public void RemoveCurrentWord()
+        {
+            WordsToRead.Remove(GetCurrentWord());
+            this.CurrentWord = GetCurrentWord();
+        }
+
         private string GetCurrentWord()
         {
             if (WordsToRead.Any())
