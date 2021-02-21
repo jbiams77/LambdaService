@@ -7,9 +7,12 @@ using Alexa.NET.Request;
 using Amazon.DynamoDBv2.Model;
 using AWSInfrastructure.Logger;
 using Newtonsoft.Json;
+using Alexa.NET.InSkillPricing.Responses;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+//[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+[assembly: LambdaSerializer(typeof(MySerializer.JsonSerializer))]
+//[assembly: Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace FlashCardService
 {
@@ -19,19 +22,26 @@ namespace FlashCardService
     {
         public static MoycaLogger log;
         public SkillResponse response;
+        
+        public Function()
+        {
+            ConnectionRequestHandler.AddToRequestConverter();
+        }
 
         public async Task<SkillResponse> FunctionHandler(SkillRequest request, ILambdaContext context)
-        {            
-            string requestType = request.Request.Type;     
+        {
+            
+            string requestType = request.Request.Type;
             log = new MoycaLogger(context, LogLevel.TRACE);                       
             AlexaResponse.SetDisplaySupported(request.APLSupported());            
             LogSessionStart(request);
-                        
+            
+
             switch (requestType)
             {
                 case "LaunchRequest":
                     log.DEBUG("Function", "Launch Request");
-                    Requests.Launch launch = new Requests.Launch(request);
+                    Requests.LaunchRequest launch = new Requests.LaunchRequest(request);
                     response = await launch.HandleRequest();
                     break;
 

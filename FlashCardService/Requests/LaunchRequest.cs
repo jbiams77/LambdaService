@@ -7,7 +7,7 @@ using AWSInfrastructure.GlobalConstants;
 
 namespace FlashCardService.Requests
 {
-    public class Launch : Request
+    public class LaunchRequest : Request
     {
         private UserProfileDB userProfile;
         private ScopeAndSequenceDB scopeAndSequence;
@@ -16,7 +16,7 @@ namespace FlashCardService.Requests
         private ProductInventory productInventory;
 
 
-        public Launch(SkillRequest request)
+        public LaunchRequest(SkillRequest request)
         {
             this.userProfile = new UserProfileDB(request.Session.User.UserId, Function.log);
             this.sessionAttributes = new SessionAttributes(Function.log);                     
@@ -38,11 +38,11 @@ namespace FlashCardService.Requests
                 if (productInventory.IsUnpaid(productName))
                 {
                     string properName = productName.Replace('_', ' ');
-                    return AlexaResponse.PurchaseContentUpsell(productInventory.GetProductId(productName), 
+                    return AlexaResponse.PurchaseContentUpsell(productInventory.GetProductId(productName),
                         CommonPhrases.Upsell(properName), properName);
                 }
             }
-            
+
             this.sessionAttributes.UpdateSessionAttributes(scopeAndSequence, userProfile.GetUserSchedule(), userProfile.GetMode());
             this.sessionAttributes.SessionState = STATE.Introduction;
 
