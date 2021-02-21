@@ -10,9 +10,7 @@ using Newtonsoft.Json;
 using Alexa.NET.InSkillPricing.Responses;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-//[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-[assembly: LambdaSerializer(typeof(MySerializer.JsonSerializer))]
-//[assembly: Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+[assembly: Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace FlashCardService
 {
@@ -23,6 +21,7 @@ namespace FlashCardService
         public static MoycaLogger log;
         public SkillResponse response;
         
+        // REQUIRED FOR IN-SKILL PURHCASES TO WORK
         public Function()
         {
             ConnectionRequestHandler.AddToRequestConverter();
