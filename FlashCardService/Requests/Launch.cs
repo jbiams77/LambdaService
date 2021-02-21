@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
-using Alexa.NET.Request.Type;
-using Alexa.NET.InSkillPricing.Responses;
 using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.GlobalConstants;
-using AWSInfrastructure.CognitoPool;
-using AWSInfrastructure.Logger;
 
 namespace FlashCardService.Requests
 {
@@ -18,16 +11,13 @@ namespace FlashCardService.Requests
     {
         private UserProfileDB userProfile;
         private ScopeAndSequenceDB scopeAndSequence;
-        private SkillResponse response;
         private SessionAttributes sessionAttributes;
         private TeachMode teachMode;
         private ProductInventory productInventory;
-        private SkillRequest skillRequest;
 
 
         public Launch(SkillRequest request)
         {
-            this.skillRequest = request;
             this.userProfile = new UserProfileDB(request.Session.User.UserId, Function.log);
             this.sessionAttributes = new SessionAttributes(Function.log);                     
             this.productInventory = new ProductInventory(request);            

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using AWSInfrastructure.GlobalConstants;
 using System.Linq;
 using AWSInfrastructure.Logger;
 using System.ComponentModel;
-using System.Collections;
 using Newtonsoft.Json;
 using FlashCardService;
 using AWSInfrastructure.DynamoDB;

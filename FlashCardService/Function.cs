@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
-using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
-using Alexa.NET.Request.Type;
-using Alexa.NET.InSkillPricing.Responses;
 using Amazon.DynamoDBv2.Model;
-using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.Logger;
 using Newtonsoft.Json;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-//[assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace FlashCardService
 {
