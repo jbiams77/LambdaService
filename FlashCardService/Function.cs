@@ -37,7 +37,7 @@ namespace FlashCardService
 
                 case "IntentRequest":
                     log.DEBUG("Function", "Intent Request");
-                    Requests.Intent intent = new Requests.Intent(request);
+                    Requests.IntentRequest intent = new Requests.IntentRequest(request);
                     response = await intent.HandleRequest();
                     break;
 

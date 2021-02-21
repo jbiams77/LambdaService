@@ -10,7 +10,7 @@ namespace FlashCardService.Requests.Intents
 {
     public class WordsToRead : Intent
     {
-        public WordsToRead() { }
+        public WordsToRead(SkillRequest request) : base(request) { }
 
         public async Task<SkillResponse> HandleIntent()
         {
@@ -18,7 +18,7 @@ namespace FlashCardService.Requests.Intents
 
             this.sessionAttributes.SessionState = STATE.Assess;
 
-            var request = (IntentRequest)skillRequest.Request;
+            var request = (Alexa.NET.Request.Type.IntentRequest)skillRequest.Request;
 
             string currentWord = this.sessionAttributes.CurrentWord;
 
@@ -70,7 +70,7 @@ namespace FlashCardService.Requests.Intents
             }
         }
 
-        private bool ReaderSaidTheWord(IntentRequest input)
+        private bool ReaderSaidTheWord(Alexa.NET.Request.Type.IntentRequest input)
         {
             if (input.Intent.Slots?.Any() ?? false)
             {

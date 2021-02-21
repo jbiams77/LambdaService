@@ -7,6 +7,7 @@ using System.ComponentModel;
 using Newtonsoft.Json;
 using FlashCardService;
 using AWSInfrastructure.DynamoDB;
+using Alexa.NET.Request;
 
 namespace FlashCardService
 {
@@ -18,7 +19,7 @@ namespace FlashCardService
         public SKILL LessonSkill { get; set; }
         public int Schedule { get; set; }
         public List<string> WordsToRead { get; set; }
-        public string CurrentWord { get => GetCurrentWord(); set { } }
+        public string CurrentWord { get; set; }
         public int TotalWordsInSession { get; set; }
         public int FailedAttempts { get; set; }        
 
@@ -58,6 +59,7 @@ namespace FlashCardService
         {
             Function.log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
             this.WordsToRead = scopeAndSequence.WordsToRead;
+            this.CurrentWord = GetCurrentWord();
             this.LessonMode = mode;
             this.LessonSkill = (SKILL)(int.Parse(scopeAndSequence.Skill));
             this.Lesson = scopeAndSequence.Lesson;
@@ -65,6 +67,7 @@ namespace FlashCardService
             this.TotalWordsInSession = scopeAndSequence.WordsToRead.Count();
             this.FailedAttempts = 0;
         }
+
 
         /// <summary>
         /// Updates this object with the values in the sessionAttributeDict
@@ -83,6 +86,7 @@ namespace FlashCardService
                 return;
             }
 
+            CurrentWord = updatedSessionAttributes.CurrentWord;
             SessionState = updatedSessionAttributes.SessionState;
             Lesson = updatedSessionAttributes.Lesson;
             LessonMode = updatedSessionAttributes.LessonMode;

@@ -1,13 +1,14 @@
 ﻿using System.Threading.Tasks;
 using Alexa.NET;
 using Alexa.NET.Response;
+using Alexa.NET.Request;
 using AWSInfrastructure.GlobalConstants;
 
 namespace FlashCardService.Requests.Intents
 {
     public class Cancel : Intent
     {
-        public Cancel() { }
+        public Cancel(SkillRequest request) : base(request) { }
 
         public async Task<SkillResponse> HandleIntent()
         {
@@ -15,7 +16,7 @@ namespace FlashCardService.Requests.Intents
 
             if (this.sessionAttributes.SessionState != STATE.Introduction)
             {
-                WordsToRead wordsToRead = new WordsToRead();
+                WordsToRead wordsToRead = new WordsToRead(base.skillRequest);
                 return await wordsToRead.HandleIntent();
             }
 
