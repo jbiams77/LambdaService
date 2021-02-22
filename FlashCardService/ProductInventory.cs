@@ -23,7 +23,6 @@ namespace FlashCardService
         private SkillRequest input;
         private InSkillProductsClient client;
         private InSkillProductsResponse productsResponse;
-        private List<Products> availableProducts;
 
         // Purchasable Content Reference Name
         public static string WordFamily { get { return "word_family"; } }
@@ -34,7 +33,7 @@ namespace FlashCardService
             this.input = input;
         }
 
-        public async Task UpdateProductInformation()
+        public async Task GetAvailableProducts()
         {
             Function.log.INFO("ProductInventory", "UpdateProductInformation");
             this.client = new InSkillProductsClient(this.input);

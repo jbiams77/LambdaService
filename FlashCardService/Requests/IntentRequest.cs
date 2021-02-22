@@ -5,11 +5,12 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using AWSInfrastructure.DynamoDB;
 using FlashCardService.Requests.Intents;
+using FlashCardService.Interfaces;
 
 namespace FlashCardService.Requests
 {
 
-    public class IntentRequest : Request
+    public class IntentRequest : IRequest
     {
         private SkillRequest skillRequest;
 
@@ -19,7 +20,7 @@ namespace FlashCardService.Requests
         }
 
 
-        public override async Task<SkillResponse> HandleRequest()
+        public async Task<SkillResponse> HandleRequest()
         {
             string intentName = ((Alexa.NET.Request.Type.IntentRequest)skillRequest.Request).Intent.Name;            
 
@@ -28,32 +29,25 @@ namespace FlashCardService.Requests
             switch (intentName)
             {
                 case "AMAZON.YesIntent":
-                    Yes yes = new Yes(this.skillRequest);
-                    return await yes.HandleIntent();
+                    return await new Yes(this.skillRequest).HandleIntent();
                     
                 case "AMAZON.NoIntent":
-                    No no = new No(this.skillRequest);
-                    return await no.HandleIntent();
+                    return await new No(this.skillRequest).HandleIntent();
                     
                 case "AMAZON.CancelIntent":
-                    Cancel cancel = new Cancel(this.skillRequest);
-                    return await cancel.HandleIntent();
+                    return new Cancel(this.skillRequest).HandleIntent();
 
                 case "AMAZON.StopIntent":
-                    Stop stop = new Stop(this.skillRequest);
-                    return await stop.HandleIntent();
+                    return new Stop(this.skillRequest).HandleIntent();
 
                 case "AMAZON.HelpIntent":
-                    Help help = new Help(this.skillRequest);
-                    return await help.HandleIntent();
+                    return await new Help(this.skillRequest).HandleIntent();
 
                 case "WordsToReadIntent":
-                    WordsToRead wordsToRead = new WordsToRead(this.skillRequest);
-                    return await wordsToRead.HandleIntent();
+                    return await new WordsToRead(this.skillRequest).HandleIntent();
 
                 case "AMAZON.FallbackIntent":
-                    Fallback fallback = new Fallback(this.skillRequest);
-                    return await fallback.HandleIntent();
+                    return await new Fallback(this.skillRequest).HandleIntent();
                     
                 default:                    
                     return ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moyca Readers'. Goodbye.");

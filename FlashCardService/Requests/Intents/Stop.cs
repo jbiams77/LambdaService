@@ -10,7 +10,7 @@ namespace FlashCardService.Requests.Intents
     {
         public Stop(SkillRequest request) : base(request) { }
 
-        public async Task<SkillResponse> HandleIntent()
+        public SkillResponse HandleIntent()
         {
             Function.log.INFO("Stop", "HandleIntent", "State before stopped: " + this.sessionAttributes.SessionState);
 

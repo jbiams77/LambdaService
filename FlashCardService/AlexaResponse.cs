@@ -176,23 +176,13 @@ namespace FlashCardService
 
         public static SkillResponse PurchaseContentUpsell(string productId, string upsellPrompt, string productName)
         {
-            UpsellDirective upsellDirective = new UpsellDirective(productId, "correlationToken", upsellPrompt);            
-            var response = ResponseBuilder.Empty();
-            ResponseBody body = new ResponseBody
-            {                
-                // replace with fancy card
-                Card = new SimpleCard { Title = "Purchase", Content = productName }
-                
-            };
-            response.Response = body;
-            response.Response.Directives.Add(upsellDirective);
-            
-
-            //if (DisplaySupported)
-            //{
-            //    response.Response.Directives.Add(Create_IntroPresentation_Directive());
-            //}            
-            return response;
+            var skillResponse = ResponseBuilder.Empty();
+            skillResponse.Response.ShouldEndSession = false;
+            skillResponse.Response.Directives.Add(
+                            new UpsellDirective(productId, "correlationToken", upsellPrompt)
+                        );
+            skillResponse.SessionAttributes = sessionAttributes.ToDictionary();
+            return skillResponse;
         }
 
         private static DialogUpdateDynamicEntities Create_DynamicEntityDirective(string slotWord)

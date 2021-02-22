@@ -7,9 +7,12 @@ using Alexa.NET.Request;
 using Amazon.DynamoDBv2.Model;
 using AWSInfrastructure.Logger;
 using Newtonsoft.Json;
+using Alexa.NET.InSkillPricing.Responses;
+using FlashCardService.Responses;
+using FlashCardService.Requests;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+[assembly: Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace FlashCardService
 {
@@ -19,37 +22,46 @@ namespace FlashCardService
     {
         public static MoycaLogger log;
         public SkillResponse response;
+        
+        // REQUIRED FOR IN-SKILL PURHCASES TO WORK
+        public Function()
+        {            
+            ConnectionRequestHandler.AddToRequestConverter();
+        }
 
         public async Task<SkillResponse> FunctionHandler(SkillRequest request, ILambdaContext context)
-        {            
-            string requestType = request.Request.Type;     
+        {
+            
+            string requestType = request.Request.Type;
             log = new MoycaLogger(context, LogLevel.TRACE);                       
             AlexaResponse.SetDisplaySupported(request.APLSupported());            
             LogSessionStart(request);
-                        
+            
+
             switch (requestType)
             {
                 case "LaunchRequest":
                     log.DEBUG("Function", "Launch Request");
-                    Requests.Launch launch = new Requests.Launch(request);
+                    LaunchRequest launch = new LaunchRequest(request);
                     response = await launch.HandleRequest();
                     break;
 
                 case "IntentRequest":
                     log.DEBUG("Function", "Intent Request");
-                    Requests.IntentRequest intent = new Requests.IntentRequest(request);
+                    IntentRequest intent = new IntentRequest(request);
                     response = await intent.HandleRequest();
                     break;
 
                 case "SessionEndedRequest":
                     log.DEBUG("Function", "Session Ended Request");
-                    Requests.SessionEnded sessionEnded = new Requests.SessionEnded(request);
+                    SessionEnded sessionEnded = new SessionEnded(request);
                     response = await sessionEnded.HandleRequest();
                     break;
 
                 case "Connections.Response":
                     log.DEBUG("Function", "Connection Response ");
-                    response = AlexaResponse.Say("Goodbye Moycan!");
+                    Connection connection = new Connection(request);
+                    response = await connection.HandleRequest();
                     break;                    
 
                 default:

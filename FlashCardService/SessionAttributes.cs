@@ -21,7 +21,8 @@ namespace FlashCardService
         public List<string> WordsToRead { get; set; }
         public string CurrentWord { get; set; }
         public int TotalWordsInSession { get; set; }
-        public int FailedAttempts { get; set; }        
+        public int FailedAttempts { get; set; }
+        public string ProductName { get; set; }
 
         private MoycaLogger logger;
 
@@ -66,6 +67,7 @@ namespace FlashCardService
             this.Schedule = schedule;
             this.TotalWordsInSession = scopeAndSequence.WordsToRead.Count();
             this.FailedAttempts = 0;
+            this.ProductName = "NOT PROVIDED";
         }
 
 
@@ -95,6 +97,11 @@ namespace FlashCardService
             WordsToRead = updatedSessionAttributes.WordsToRead;
             TotalWordsInSession = updatedSessionAttributes.TotalWordsInSession;
             FailedAttempts = updatedSessionAttributes.FailedAttempts;
+        }
+
+        public void UpdateProductName(string name)
+        {
+            this.ProductName = name;
         }
 
         public void RemoveCurrentWord()

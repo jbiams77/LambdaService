@@ -4,10 +4,11 @@ using Alexa.NET.Response;
 using Alexa.NET.Request;
 using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.GlobalConstants;
+using FlashCardService.Interfaces;
 
 namespace FlashCardService.Requests
 {
-    public class Launch : Request
+    public class LaunchRequest : IRequest
     {
         private UserProfileDB userProfile;
         private ScopeAndSequenceDB scopeAndSequence;
@@ -16,33 +17,34 @@ namespace FlashCardService.Requests
         private ProductInventory productInventory;
 
 
-        public Launch(SkillRequest request)
+        public LaunchRequest(SkillRequest skillRequest)
         {
-            this.userProfile = new UserProfileDB(request.Session.User.UserId, Function.log);
+            this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, Function.log);
             this.sessionAttributes = new SessionAttributes(Function.log);                     
-            this.productInventory = new ProductInventory(request);            
+            this.productInventory = new ProductInventory(skillRequest);            
             this.scopeAndSequence = new ScopeAndSequenceDB(Function.log);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
         }
 
-        public override async Task<SkillResponse> HandleRequest()
+        public async Task<SkillResponse> HandleRequest()
         {
             await this.userProfile.GetUserProfileData();
             await scopeAndSequence.GetSessionDataWithNumber(userProfile.GetUserSchedule());
 
             if (userProfile.RequiresPurchase())
             {
-                await productInventory.UpdateProductInformation();
+                await productInventory.GetAvailableProducts();
                 string productName = scopeAndSequence.InSkillPurchase;
 
                 if (productInventory.IsUnpaid(productName))
                 {
                     string properName = productName.Replace('_', ' ');
-                    return AlexaResponse.PurchaseContentUpsell(productInventory.GetProductId(productName), 
+                    this.sessionAttributes.UpdateProductName(properName);
+                    return AlexaResponse.PurchaseContentUpsell(productInventory.GetProductId(productName),
                         CommonPhrases.Upsell(properName), properName);
                 }
             }
-            
+
             this.sessionAttributes.UpdateSessionAttributes(scopeAndSequence, userProfile.GetUserSchedule(), userProfile.GetMode());
             this.sessionAttributes.SessionState = STATE.Introduction;
 
