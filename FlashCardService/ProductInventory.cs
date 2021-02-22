@@ -23,7 +23,6 @@ namespace FlashCardService
         private SkillRequest input;
         private InSkillProductsClient client;
         private InSkillProductsResponse productsResponse;
-        private List<Products> availableProducts;
 
         // Purchasable Content Reference Name
         public static string WordFamily { get { return "word_family"; } }
