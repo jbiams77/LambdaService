@@ -177,7 +177,7 @@ namespace FlashCardService
         public static SkillResponse PurchaseContentUpsell(string productId, string upsellPrompt, string productName)
         {
             var skillResponse = ResponseBuilder.Empty();
-            skillResponse.Response.ShouldEndSession = true;
+            skillResponse.Response.ShouldEndSession = false;
             skillResponse.Response.Directives.Add(
                             new UpsellDirective(productId, "correlationToken", upsellPrompt)
                         );

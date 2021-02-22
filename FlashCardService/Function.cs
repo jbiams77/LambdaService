@@ -61,7 +61,7 @@ namespace FlashCardService
                 case "Connections.Response":
                     log.DEBUG("Function", "Connection Response ");
                     Connection connection = new Connection(request);
-                    response = connection.HandleRequest();
+                    response = await connection.HandleRequest();
                     break;                    
 
                 default:

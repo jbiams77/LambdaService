@@ -81,5 +81,17 @@ namespace FlashCardService
             return "You currently do not have access to the " + productName + " flash cards. Would you like to hear how to get it?";
         }
 
+        public static string UpSellDeclined(string productName)
+        {
+                return "If you change your mind, at any time just say, Alexa I would like to buy the " + 
+                        productName + " expansion. Meanwhile, you can continue using the free flash cards.";
+            
+        }
+
+        public static string UpSellAccepted(string productName)
+        {   
+            return "Great. You now have the " + productName + " flash cards. Opening the next session will continue with the purchased content.";       
+        }
+
     }
 }

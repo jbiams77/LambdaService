@@ -8,10 +8,10 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.InSkillPricing.Responses;
 
-namespace FlashCardService.Requests
+namespace FlashCardService.Interfaces
 {
-    public abstract class  Request
+    public interface IRequest
     {
-        public abstract Task<SkillResponse> HandleRequest();
+        public Task<SkillResponse> HandleRequest();
     }
 }

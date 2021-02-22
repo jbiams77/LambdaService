@@ -8,54 +8,53 @@ using Alexa.NET.InSkillPricing.Responses;
 using Alexa.NET.InSkillPricing;
 using Alexa.NET;
 using Alexa.NET.Request.Type;
+using FlashCardService.Responses.Purchase;
+using FlashCardService.Requests.Intents;
+using AWSInfrastructure.DynamoDB;
 
 namespace FlashCardService.Responses
 {
     public class Connection 
     {
         private SkillRequest skillRequest;
+        private SessionAttributes sessionAttributes;
+        private UserProfileDB userProfile;
+        private ProductInventory productInventory;
+        private ScopeAndSequenceDB scopeAndSequence;
+
         public Connection(SkillRequest skillRequest)
         {
-            this.skillRequest = skillRequest;            
+            this.skillRequest = skillRequest;
+            this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, Function.log);
+            this.sessionAttributes = new SessionAttributes(Function.log);            
+            this.productInventory = new ProductInventory(skillRequest);
+            this.scopeAndSequence = new ScopeAndSequenceDB(Function.log);
+            AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
         }
 
-        public SkillResponse HandleRequest()
+        public async Task<SkillResponse> HandleRequest()
         {
+            await this.userProfile.GetUserProfileData();
+            await scopeAndSequence.GetSessionDataWithNumber(userProfile.GetUserSchedule());
+            string paymentType = ((ConnectionResponseRequest<ConnectionResponsePayload>)skillRequest.Request).Name;
+            string purchaseResult = ((ConnectionResponseRequest<ConnectionResponsePayload>)skillRequest.Request).Payload.PurchaseResult;
+            await productInventory.GetAvailableProducts();
+            string productName = scopeAndSequence.InSkillPurchase.Replace('_', ' ');
 
-            string name = ((ConnectionResponseRequest<ConnectionResponsePayload>)skillRequest.Request).Name;
-            
-            switch (name)
+            switch (paymentType)
             {
                 case PaymentType.Buy:
-                    return HandleBuy();
+                    return new Buy().Handle(purchaseResult, productName);
 
                 case PaymentType.Upsell:
-                    return HandleUpsell();
+                    return new Upsell().Handle(purchaseResult, productName);
 
                 case PaymentType.Cancel:
-                    return HandleCancel();
-
+                    return new Cancel(this.skillRequest).HandleIntent();
             }
 
             return AlexaResponse.Say("Goodbye Moycan!"); ;
         }
-
-
-        public SkillResponse HandleBuy()
-        {
-            return AlexaResponse.Say(" You want to buy Something.");
-        }
-
-        public SkillResponse HandleUpsell()
-        {
-            return AlexaResponse.Say(" You want to Upsell Something.");
-        }
-
-        public SkillResponse HandleCancel()
-        {
-            return AlexaResponse.Say(" You want to Upsell Something.");
-        }
-
 
     }
 

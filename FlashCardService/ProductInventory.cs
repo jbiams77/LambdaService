@@ -33,7 +33,7 @@ namespace FlashCardService
             this.input = input;
         }
 
-        public async Task UpdateProductInformation()
+        public async Task GetAvailableProducts()
         {
             Function.log.INFO("ProductInventory", "UpdateProductInformation");
             this.client = new InSkillProductsClient(this.input);

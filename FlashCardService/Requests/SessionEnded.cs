@@ -1,18 +1,13 @@
 ﻿using System.Threading.Tasks;
-using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
-using Alexa.NET.Request.Type;
-using Alexa.NET.InSkillPricing.Responses;
 using AWSInfrastructure.DynamoDB;
 using AWSInfrastructure.GlobalConstants;
-using AWSInfrastructure.CognitoPool;
-using AWSInfrastructure.Logger;
-using System.Linq;
+using FlashCardService.Interfaces;
 
 namespace FlashCardService.Requests
 {
-    public class SessionEnded : Request
+    public class SessionEnded : IRequest
     {
         public UserProfileDB userProfile;
         public ScopeAndSequenceDB scopeAndSequence;
@@ -33,7 +28,7 @@ namespace FlashCardService.Requests
             this.scopeAndSequence = new ScopeAndSequenceDB(Function.log);
         }
 
-        public override async Task<SkillResponse> HandleRequest()
+        public async Task<SkillResponse> HandleRequest()
         {
             this.sessionAttributes.SessionState = STATE.Off;
             return AlexaResponse.Say("Goodbye Moycan!");
