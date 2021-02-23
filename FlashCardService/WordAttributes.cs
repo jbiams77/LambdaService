@@ -29,15 +29,15 @@ namespace FlashCardService
 
         private WordAttributes() { }
 
-        async public static Task<WordAttributes> GetWordAttributes(string word, MoycaLogger logger)
+        async public static Task<WordAttributes> GetWordAttributes(string word)
         {
             var wordAttributes = new WordAttributes();
-            await wordAttributes.GetAttributes(word, logger);
+            await wordAttributes.GetAttributes(word);
             return wordAttributes;
         }
-        private async Task GetAttributes(string word, MoycaLogger logger)
+        private async Task GetAttributes(string word)
         {
-            dictionaryDB = new DictionaryDB(logger);
+            dictionaryDB = new DictionaryDB(LOGGER.log);
             DatabaseItem items = await dictionaryDB.GetWordAttributesFromDictionary(word);
 
             if (items.TryGetValue("ConsonantBlend", out AttributeValue cb))

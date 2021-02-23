@@ -24,7 +24,7 @@ namespace FlashCardService.Requests
         {
             string intentName = ((Alexa.NET.Request.Type.IntentRequest)skillRequest.Request).Intent.Name;            
 
-            Function.log.INFO("Intent", "HandleRequest", intentName);
+            LOGGER.log.INFO("IntentRequest", "HandleRequest", intentName);
             
             switch (intentName)
             {

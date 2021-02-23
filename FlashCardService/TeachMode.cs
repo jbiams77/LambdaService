@@ -31,9 +31,9 @@ namespace FlashCardService
 
         public SkillResponse Introduction( WordAttributes wordAttributes)
         {
-            Function.log.INFO("TeachMode", "Introduction", "Provided for schedule" + this.sessionAttributes.Schedule);
+            LOGGER.log.INFO("TeachMode", "Introduction", "Provided for schedule" + this.sessionAttributes.Schedule);
 
-            Function.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + this.sessionAttributes.Lesson.ToString());
+            LOGGER.log.DEBUG("TeachMode", "Introduction", "Lesson Introduction: " + this.sessionAttributes.Lesson.ToString());
 
             SkillResponse skillResponse; 
 
@@ -61,11 +61,11 @@ namespace FlashCardService
 
         public SkillResponse TeachTheWord(string beggining, WordAttributes wordAttributes)
         {
-            Function.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + this.sessionAttributes.Lesson);
+            LOGGER.log.INFO("TeachMode", "TeachTheWord", "WORD: " + wordAttributes.Word + " LESSON: " + this.sessionAttributes.Lesson);
 
             string teachingPrompts = beggining + " ";
 
-            Function.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + this.sessionAttributes.Lesson.ToString());
+            LOGGER.log.DEBUG("TeachMode", "TeachTheWord", "Lesson to Teach: " + this.sessionAttributes.Lesson.ToString());
 
             switch (this.sessionAttributes.Lesson)
             {
@@ -86,7 +86,7 @@ namespace FlashCardService
                     break;
             }
 
-            Function.log.DEBUG("TeachMode", "TeachTheWord", "Teaching Prompt: " + teachingPrompts);
+            LOGGER.log.DEBUG("TeachMode", "TeachTheWord", "Teaching Prompt: " + teachingPrompts);
 
             return AlexaResponse.PresentFlashCard(wordAttributes.Word, teachingPrompts, "Please say " + wordAttributes.Word);
         }
@@ -124,7 +124,7 @@ namespace FlashCardService
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word. ";
 
-            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
 
             return teachModel;
         }
@@ -146,7 +146,7 @@ namespace FlashCardService
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
 
-            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
 
             return teachModel;
         }
@@ -166,7 +166,7 @@ namespace FlashCardService
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
 
-            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
 
             return teachModel;
         }
@@ -186,7 +186,7 @@ namespace FlashCardService
             teachModel += PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
 
-            Function.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "WordFamilyTeachTheWord", "Alexa Says: " + teachModel);
 
             return teachModel;
         }
@@ -199,7 +199,7 @@ namespace FlashCardService
             teachModel += " It is helpful to just memorize them by sight. To see them and know what they say.";
             teachModel += " Are you ready to start? ";
 
-            Function.log.DEBUG("TeachingPrompts", "SightWordsIntroduction", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "SightWordsIntroduction", "Alexa Says: " + teachModel);
 
             return teachModel;
         }
@@ -222,7 +222,7 @@ namespace FlashCardService
             teachModel += PauseFor(1.5);
             teachModel += " Are you ready to begin?";
 
-            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
 
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
         }
@@ -230,7 +230,7 @@ namespace FlashCardService
         public SkillResponse CBIntroduction(WordAttributes wordAttributes)
         {
             string[] cBLetters = wordAttributes.ConsonantBlend.Select(x => x.ToString()).ToArray();
-            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Consonant Blend Letters " + wordAttributes.ConsonantBlend);
+            LOGGER.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Consonant Blend Letters " + wordAttributes.ConsonantBlend);
             string teachModel = "When consonants are stuck together, we call that a consonant blend.";
             teachModel += PauseFor(.5);
             teachModel += "The letters still make their individual sounds.";
@@ -245,7 +245,7 @@ namespace FlashCardService
             teachModel += PauseFor(1.5);
             teachModel += " Are you ready to begin?";
 
-            Function.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "SigthWordsIntroduction", "Alexa Says: " + teachModel);
 
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
         }
@@ -265,7 +265,7 @@ namespace FlashCardService
             teachModel += " Remember, all of these words will end with " + wf + ".";
             teachModel += " Are you ready to begin?";
 
-            Function.log.DEBUG("TeachingPrompts", "WordFamilyIntroduction", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "WordFamilyIntroduction", "Alexa Says: " + teachModel);
 
             return AlexaResponse.IntroductionWithCard(wordAttributes.WordFamily, teachModel, "You can say yes to continue or no to stop");
         }
@@ -290,7 +290,7 @@ namespace FlashCardService
             teachModel += PauseFor(1.0);
             teachModel += " Are your ready to learn some words with " + vowel;
 
-            Function.log.DEBUG("TeachingPrompts", "CVCWordIntroduction", "Alexa Says: " + teachModel);
+            LOGGER.log.DEBUG("TeachingPrompts", "CVCWordIntroduction", "Alexa Says: " + teachModel);
             
             return AlexaResponse.Introduction(teachModel, "You can say yes to continue or no to stop");
             }

@@ -21,11 +21,16 @@ namespace AWSInfrastructure.Logger
         private ILambdaContext context;
         private LogLevel level;
 
-        public MoycaLogger(ILambdaContext ct, LogLevel lvl)
+        private MoycaLogger() { }
+
+        public static MoycaLogger GetLogger(ILambdaContext ct, LogLevel lvl)
         {
-            this.context = ct;
-            this.level = lvl;
+            var logger = new MoycaLogger();
+            logger.context = ct;
+            logger.level = lvl;
+            return logger;
         }
+
         public void INFO(string className, string message)
         {
             if (level == LogLevel.INFO || level == LogLevel.TRACE || level == LogLevel.WARN)

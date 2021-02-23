@@ -11,7 +11,7 @@ namespace FlashCardService.Requests.Intents
         public Help(SkillRequest request) : base(request) { }
         public async Task<SkillResponse> HandleIntent()
         {
-            Function.log.DEBUG("Help", "HandleIntent", "CURRENT STATE: " + this.sessionAttributes.Schedule);
+            LOGGER.log.DEBUG("Help", "HandleIntent", "CURRENT STATE: " + this.sessionAttributes.Schedule);
 
             if (this.sessionAttributes.SessionState != STATE.Introduction)
             {

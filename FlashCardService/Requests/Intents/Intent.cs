@@ -23,7 +23,7 @@ namespace FlashCardService.Requests.Intents
         public Intent(SkillRequest request)
         {
             this.skillRequest = request;
-            this.sessionAttributes = new SessionAttributes(Function.log);
+            this.sessionAttributes = new SessionAttributes(LOGGER.log);
             this.sessionAttributes.UpdateSessionAttributes(skillRequest.Session.Attributes);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
             this.teachMode = new TeachMode(this.sessionAttributes);

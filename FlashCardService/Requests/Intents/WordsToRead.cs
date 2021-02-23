@@ -14,7 +14,7 @@ namespace FlashCardService.Requests.Intents
 
         public async Task<SkillResponse> HandleIntent()
         {
-            Function.log.INFO("Function", "HandleWordsToReadIntent", "Current Schedule: " + this.sessionAttributes.Schedule);
+            LOGGER.log.INFO("WordsToRead", "HandleIntent", "Current Schedule: " + this.sessionAttributes.Schedule);
 
             this.sessionAttributes.SessionState = STATE.Assess;
 
@@ -22,14 +22,14 @@ namespace FlashCardService.Requests.Intents
 
             string currentWord = this.sessionAttributes.CurrentWord;
 
-            Function.log.INFO("Function", "HandleWordsToReadIntent", "Current Word: " + currentWord);
+            LOGGER.log.INFO("WordsToRead", "HandleIntent", "Current Word: " + currentWord);
 
             string prompt = "Say the word";
             string rePrompt = "Say the word";
 
             bool wordWasSaid = ReaderSaidTheWord(request);
 
-            Function.log.DEBUG("Function", "HandleWordsToReadIntent", "Reader said the word? " + wordWasSaid);
+            LOGGER.log.DEBUG("WordsToRead", "HandleIntent", "Reader said the word? " + wordWasSaid);
 
             if (wordWasSaid)
             {
@@ -38,7 +38,7 @@ namespace FlashCardService.Requests.Intents
                 this.sessionAttributes.RemoveCurrentWord();
                 bool sessionFinished = !this.sessionAttributes.WordsToRead.Any();
 
-                Function.log.DEBUG("Function", "HandleWordsToReadIntent", "Session Finished? " + sessionFinished);
+                LOGGER.log.DEBUG("WordsToRead", "HandleIntent", "Session Finished? " + sessionFinished);
 
                 if (sessionFinished)
                 {
@@ -57,12 +57,12 @@ namespace FlashCardService.Requests.Intents
                 this.sessionAttributes.FailedAttempts = this.sessionAttributes.FailedAttempts + 1;
             }
 
-            Function.log.DEBUG("Function", "HandleWordsToReadIntent", "Teach Mode: " + this.sessionAttributes.LessonMode.ToString());
-            Function.log.DEBUG("Function", "HandleWordsToReadIntent", "Attempts Made: " + this.sessionAttributes.FailedAttempts.ToString());
+            LOGGER.log.DEBUG("Function", "HandleWordsToReadIntent", "Teach Mode: " + this.sessionAttributes.LessonMode.ToString());
+            LOGGER.log.DEBUG("Function", "HandleWordsToReadIntent", "Attempts Made: " + this.sessionAttributes.FailedAttempts.ToString());
 
             if (this.sessionAttributes.LessonMode == MODE.Teach)
             {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, Function.log);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord);
                 return this.teachMode.TeachTheWord(prompt, wordAttributes);
             }
             else

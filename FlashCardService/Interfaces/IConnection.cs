@@ -7,6 +7,6 @@ namespace FlashCardService.Interfaces
 {
     public interface IConnection
     {
-        public SkillResponse Handle(string purchaseResult, string productName);
+        public SkillResponse Handle(string purchaseResult);
     }
 }

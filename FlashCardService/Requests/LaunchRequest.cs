@@ -19,42 +19,48 @@ namespace FlashCardService.Requests
 
         public LaunchRequest(SkillRequest skillRequest)
         {
-            this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, Function.log);
-            this.sessionAttributes = new SessionAttributes(Function.log);                     
+            this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, LOGGER.log);
+            this.sessionAttributes = new SessionAttributes(LOGGER.log);                     
             this.productInventory = new ProductInventory(skillRequest);            
-            this.scopeAndSequence = new ScopeAndSequenceDB(Function.log);
+            this.scopeAndSequence = new ScopeAndSequenceDB(LOGGER.log);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
         }
 
         public async Task<SkillResponse> HandleRequest()
         {
+            LOGGER.log.INFO("LaunchRequest", "HandleRequest");
+
             await this.userProfile.GetUserProfileData();
             await scopeAndSequence.GetSessionDataWithNumber(userProfile.GetUserSchedule());
 
             if (userProfile.RequiresPurchase())
             {
+                LOGGER.log.DEBUG("LaunchRequest", "HandleRequest", "Schedule is premium content");
+
                 await productInventory.GetAvailableProducts();
                 string productName = scopeAndSequence.InSkillPurchase;
 
                 if (productInventory.IsUnpaid(productName))
                 {
+                    LOGGER.log.DEBUG("LaunchRequest", "HandleRequest", "Premium content requires purchase");
+
                     string properName = productName.Replace('_', ' ');
                     this.sessionAttributes.UpdateProductName(properName);
                     return AlexaResponse.PurchaseContentUpsell(productInventory.GetProductId(productName),
-                        CommonPhrases.Upsell(properName), properName);
+                        CommonPhrases.Upsell(), properName);
                 }
             }
 
             this.sessionAttributes.UpdateSessionAttributes(scopeAndSequence, userProfile.GetUserSchedule(), userProfile.GetMode());
             this.sessionAttributes.SessionState = STATE.Introduction;
 
-            Function.log.INFO("Launch", "HandleRequest", "Current Schedule: " + userProfile.GetUserSchedule());
-            Function.log.DEBUG("Function", "HandleLaunchRequest", "Teach Mode: " + userProfile.GetMode());
+            LOGGER.log.DEBUG("Launch", "HandleRequest", "Next word: " + sessionAttributes.CurrentWord);
+            LOGGER.log.DEBUG("Function", "HandleLaunchRequest", "Lesson: " + sessionAttributes.Lesson);
 
             if (this.sessionAttributes.LessonMode == MODE.Teach)
             {
                 this.teachMode = new TeachMode(this.sessionAttributes);
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, Function.log);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord);
                 return this.teachMode.Introduction(wordAttributes);
             }
             else

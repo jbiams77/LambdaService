@@ -76,21 +76,21 @@ namespace FlashCardService
             }
         }
 
-        public static string Upsell(string productName)
+        public static string Upsell()
         {
-            return "You currently do not have access to the " + productName + " flash cards. Would you like to hear how to get it?";
+            return "You currently do not have access to these flash cards. Would you like to hear how to get it?";
         }
 
-        public static string UpSellDeclined(string productName)
+        public static string UpSellDeclined()
         {
-                return "If you change your mind, at any time just say, Alexa I would like to buy the " + 
-                        productName + " expansion. Meanwhile, you can continue using the free flash cards.";
+                return "If you change your mind, at any time just say, Alexa I would like to buy " + 
+                         "an expansion. Meanwhile, you can continue using the free flash cards.";
             
         }
 
-        public static string UpSellAccepted(string productName)
+        public static string UpSellAccepted()
         {   
-            return "Great. You now have the " + productName + " flash cards. Opening the next session will continue with the purchased content.";       
+            return "Great. You now have the more flash cards. Opening the next session will continue with the purchased content.";       
         }
 
     }
