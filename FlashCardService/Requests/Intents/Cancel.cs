@@ -12,7 +12,7 @@ namespace FlashCardService.Requests.Intents
 
         public SkillResponse HandleIntent()
         {
-            Function.log.INFO("Cancel", "HandleIntent", "State before stopped: " + this.sessionAttributes.SessionState);
+            LOGGER.log.INFO("Cancel", "HandleIntent", "State before stopped: " + this.sessionAttributes.SessionState);
 
             this.sessionAttributes.SessionState = STATE.Off;
 

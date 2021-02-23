@@ -16,6 +16,13 @@ using AWSInfrastructure.Logger;
 
 namespace SchedulerService
 {
+    /// <summary>
+    /// Outputs logs to labmda function
+    /// </summary>
+    public class LOGGER
+    {
+        public static MoycaLogger log;
+    }
 
     public class Function
     {
@@ -27,7 +34,7 @@ namespace SchedulerService
         int totalWords = 0;
         public async Task FunctionHandler(DynamoDBEvent dynamoEvent, ILambdaContext context)
         {
-            log = new MoycaLogger(context, LogLevel.TRACE);
+            LOGGER.log = MoycaLogger.GetLogger(context, LogLevel.TRACE);
             scopeAndSequence = new ScopeAndSequenceDB(log);
             dictionary = new DictionaryDB(log);
             int i;
@@ -35,7 +42,7 @@ namespace SchedulerService
             {                
                 await GetAndSetWords(i);
             }
-            log.INFO("Function", "Words in range: " + totalWords);
+            LOGGER.log.INFO("Function", "Words in range: " + totalWords);
         }
 
         public async Task GetAndSetWords(int orderNumber)

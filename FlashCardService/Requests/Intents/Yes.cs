@@ -15,10 +15,11 @@ namespace FlashCardService.Requests.Intents
 
         public async Task<SkillResponse> HandleIntent()
         {
-            Function.log.INFO("Function", "HandleYesIntent", "Current Schedule: " + base.sessionAttributes.Schedule);
+            LOGGER.log.INFO("Yes", "HandleIntent");
                         
             if(base.sessionAttributes.SessionState != STATE.Introduction)
             {
+                LOGGER.log.DEBUG("Yes", "HandleIntent", "Yes was said, but not in introduction");
                 WordsToRead wordsToRead = new WordsToRead(this.skillRequest);
                 return await wordsToRead.HandleIntent();
             }
@@ -29,13 +30,12 @@ namespace FlashCardService.Requests.Intents
 
             string prompt = "Say the word ";
 
-            Function.log.DEBUG("Function", "HandleYesIntent", "Teach Mode: " + base.sessionAttributes.LessonMode.ToString());
-            Function.log.INFO("Function", "HandleYesIntent", "Current Word: " + base.sessionAttributes.CurrentWord);
+            LOGGER.log.DEBUG("Yes", "HandleIntent", "Current Word: " + base.sessionAttributes.CurrentWord);
 
 
             if (this.sessionAttributes.LessonMode == MODE.Teach)
             {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(base.sessionAttributes.CurrentWord, Function.log);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(base.sessionAttributes.CurrentWord);
                 return base.teachMode.TeachTheWord(" ", wordAttributes);
             }
             else

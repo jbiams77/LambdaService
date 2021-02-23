@@ -35,7 +35,7 @@ namespace FlashCardService
 
         public async Task GetAvailableProducts()
         {
-            Function.log.INFO("ProductInventory", "UpdateProductInformation");
+            LOGGER.log.INFO("ProductInventory", "UpdateProductInformation");
             this.client = new InSkillProductsClient(this.input);
 
             try
@@ -44,7 +44,7 @@ namespace FlashCardService
             }
             catch (Exception e)
             {
-                Function.log.WARN("ProductInventory", "UpdateProductInformation", "EXCEPTION: " + e.Message);
+                LOGGER.log.WARN("ProductInventory", "UpdateProductInformation", "EXCEPTION: " + e.Message);
             }
             
         }

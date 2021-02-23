@@ -16,11 +16,16 @@ using FlashCardService.Requests;
 
 namespace FlashCardService
 {
-    using DatabaseItem = Dictionary<string, AttributeValue>;
-    
-    public class Function
+    /// <summary>
+    /// Outputs logs to labmda function
+    /// </summary>
+    public static class LOGGER
     {
         public static MoycaLogger log;
+    }
+
+    public class Function
+    {        
         public SkillResponse response;
         
         // REQUIRED FOR IN-SKILL PURHCASES TO WORK
@@ -33,56 +38,52 @@ namespace FlashCardService
         {
             
             string requestType = request.Request.Type;
-            log = new MoycaLogger(context, LogLevel.TRACE);                       
+            LOGGER.log = MoycaLogger.GetLogger(context, LogLevel.TRACE);                       
             AlexaResponse.SetDisplaySupported(request.APLSupported());            
-            LogSessionStart(request);
+            LogSessionStart(request);                     
             
 
             switch (requestType)
             {
                 case "LaunchRequest":
-                    log.DEBUG("Function", "Launch Request");
-                    LaunchRequest launch = new LaunchRequest(request);
-                    response = await launch.HandleRequest();
+                    LOGGER.log.DEBUG("Function", "Launch Request");
+                    response = await new LaunchRequest(request).HandleRequest();
                     break;
 
                 case "IntentRequest":
-                    log.DEBUG("Function", "Intent Request");
-                    IntentRequest intent = new IntentRequest(request);
-                    response = await intent.HandleRequest();
+                    LOGGER.log.DEBUG("Function", "Intent Request");
+                    response = await new IntentRequest(request).HandleRequest();
                     break;
 
                 case "SessionEndedRequest":
-                    log.DEBUG("Function", "Session Ended Request");
-                    SessionEnded sessionEnded = new SessionEnded(request);
-                    response = await sessionEnded.HandleRequest();
+                    LOGGER.log.DEBUG("Function", "Session Ended Request");
+                    response = await new SessionEnded().HandleRequest();
                     break;
 
                 case "Connections.Response":
-                    log.DEBUG("Function", "Connection Response ");
-                    Connection connection = new Connection(request);
-                    response = await connection.HandleRequest();
+                    LOGGER.log.DEBUG("Function", "Connection Response ");
+                    response = await new Connection(request).HandleRequest();
                     break;                    
 
                 default:
-                    log.DEBUG("Function", "Default Error Request");
+                    LOGGER.log.DEBUG("Function", "Default Error Request");
                     response = AlexaResponse.Say("Error");
                     break;
             }
 
             string skillResponse = JsonConvert.SerializeObject(response, Formatting.Indented);
-            log.DEBUG("output response: ", skillResponse);
+            LOGGER.log.DEBUG("output response: ", skillResponse);
             return response;
         }
 
         private void LogSessionStart(SkillRequest request)
-        {            
-            log.INFO("BEGIN", "-----------------------------------------------------------------------");
+        {
+            LOGGER.log.INFO("BEGIN", "-----------------------------------------------------------------------");
             string skillRequest = JsonConvert.SerializeObject(request, Formatting.Indented);
-            log.DEBUG("INPUT RECEIVED: ", skillRequest);
-            log.INFO("Function", "USERID: " + request.Session.User.UserId);
-            log.INFO("Function", "REQUEST TYPE: " + request.Request.Type);
-            log.INFO("Function", "DisplaySupported: " + request.APLSupported());
+            LOGGER.log.DEBUG("INPUT RECEIVED: ", skillRequest);
+            LOGGER.log.INFO("Function", "USERID: " + request.Session.User.UserId);
+            LOGGER.log.DEBUG("Function", "REQUEST TYPE: " + request.Request.Type);
+            LOGGER.log.DEBUG("Function", "DisplaySupported: " + request.APLSupported());
         }
 
     }

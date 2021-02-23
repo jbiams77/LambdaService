@@ -27,10 +27,6 @@ namespace FlashCardService
         {
             DisplaySupported = displaySupported;
         }
-        public static void SetLogger(MoycaLogger logger)
-        {
-            log = logger;
-        }
 
         public static void SetSessionAttributeHandler(SessionAttributes sessionAttributesHandler)
         {
@@ -182,6 +178,7 @@ namespace FlashCardService
                             new UpsellDirective(productId, "correlationToken", upsellPrompt)
                         );
             skillResponse.SessionAttributes = sessionAttributes.ToDictionary();
+            // add display for purchase
             return skillResponse;
         }
 

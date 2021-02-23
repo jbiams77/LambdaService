@@ -58,7 +58,7 @@ namespace FlashCardService
         /// <param name="mode">Teach or assess modes determined by user profile</param>
         public void UpdateSessionAttributes(ScopeAndSequenceDB scopeAndSequence, int schedule, MODE mode)
         {
-            Function.log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
+            LOGGER.log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
             this.WordsToRead = scopeAndSequence.WordsToRead;
             this.CurrentWord = GetCurrentWord();
             this.LessonMode = mode;
@@ -150,7 +150,7 @@ public static class DictionaryUtility
             }
             catch (Exception e)
             {
-                Function.log.WARN("SessionAttributes", "ToDictionary", "Failed to convert SessionAttributes to dictionary. " + e.Message);
+                LOGGER.log.WARN("SessionAttributes", "ToDictionary", "Failed to convert SessionAttributes to dictionary. " + e.Message);
             }
         }
         return dictionary;

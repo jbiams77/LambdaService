@@ -12,7 +12,7 @@ namespace FlashCardService.Requests.Intents
 
         public async Task<SkillResponse> HandleIntent()
         {
-            Function.log.INFO("Fallback", "HandleIntent", "CURRENT STATE: " + this.sessionAttributes.Schedule);
+            LOGGER.log.INFO("Fallback", "HandleIntent", "CURRENT STATE: " + this.sessionAttributes.Schedule);
 
             if (this.sessionAttributes.SessionState != STATE.Introduction)
             {

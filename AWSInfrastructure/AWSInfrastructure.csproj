@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Alexa.NET, Version=1.15.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Alexa.NET.1.15.0\lib\netstandard2.0\Alexa.NET.dll</HintPath>
@@ -60,10 +63,10 @@
       <HintPath>..\packages\AWSSDK.CognitoIdentityProvider.3.5.1.14\lib\net45\AWSSDK.CognitoIdentityProvider.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.Core.3.5.1.56\lib\net45\AWSSDK.Core.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.Core.3.5.3.1\lib\net45\AWSSDK.Core.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.DynamoDBv2, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.DynamoDBv2.3.5.4.15\lib\net45\AWSSDK.DynamoDBv2.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.DynamoDBv2.3.5.4.30\lib\net45\AWSSDK.DynamoDBv2.dll</HintPath>
     </Reference>
     <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
       <HintPath>..\packages\AWSSDK.S3.3.5.7.3\lib\net45\AWSSDK.S3.dll</HintPath>
@@ -253,7 +256,7 @@
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.CognitoIdentityProvider.3.5.1.14\analyzers\dotnet\cs\AWSSDK.CognitoIdentityProvider.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\AWSSDK.DynamoDBv2.3.5.4.15\analyzers\dotnet\cs\AWSSDK.DynamoDBv2.CodeAnalysis.dll" />
+    <Analyzer Include="..\packages\AWSSDK.DynamoDBv2.3.5.4.30\analyzers\dotnet\cs\AWSSDK.DynamoDBv2.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.S3.3.5.7.3\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
     <Analyzer Include="..\packages\AWSSDK.SQS.3.5.1.5\analyzers\dotnet\cs\AWSSDK.SQS.CodeAnalysis.dll" />
   </ItemGroup>
