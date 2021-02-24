@@ -44,10 +44,9 @@ namespace FlashCardService.Requests
                 {
                     LOGGER.log.DEBUG("LaunchRequest", "HandleRequest", "Premium content requires purchase");
 
-                    string properName = productName.Replace('_', ' ');
-                    this.sessionAttributes.UpdateProductName(properName);
+                    this.sessionAttributes.ProductName = productName;
                     return AlexaResponse.PurchaseContentUpsell(productInventory.GetProductId(productName),
-                        CommonPhrases.Upsell(), properName);
+                        CommonPhrases.Upsell(), productName);
                 }
             }
 

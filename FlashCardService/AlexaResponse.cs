@@ -23,6 +23,8 @@ namespace FlashCardService
         private static string EndTag { get { return "</speak>"; } }
 
         private static bool DisplaySupported;
+
+        private static AlexaDisplay _alexaDisplay = new AlexaDisplay();
         public static void SetDisplaySupported(bool displaySupported)
         {
             DisplaySupported = displaySupported;
@@ -121,7 +123,7 @@ namespace FlashCardService
 
             if (DisplaySupported)
             {
-                response.Response.Directives.Add(Create_IntroPresentation_Directive());
+                response.Response.Directives.Add(_alexaDisplay.GetIntroDirective());
             }
 
             response.SessionAttributes = sessionAttributes.ToDictionary();
@@ -163,7 +165,7 @@ namespace FlashCardService
 
             if (DisplaySupported)
             {
-                var displayDirective = AlexaResponse.Create_CurrentWordPresentation_Directive(flashCardWord);
+                var displayDirective = _alexaDisplay.GetCurrentWordDirective(flashCardWord);
                 response.Response.Directives.Add(displayDirective);
             }
 
@@ -178,7 +180,13 @@ namespace FlashCardService
                             new UpsellDirective(productId, "correlationToken", upsellPrompt)
                         );
             skillResponse.SessionAttributes = sessionAttributes.ToDictionary();
-            // add display for purchase
+
+            if (DisplaySupported)
+            {
+                var displayDirective = _alexaDisplay.GetUpsellDirective(productName);
+                skillResponse.Response.Directives.Add(displayDirective);
+            }
+
             return skillResponse;
         }
 
@@ -203,69 +211,6 @@ namespace FlashCardService
             };
             actual.Types.Add(wordsToReadType);
             return actual;
-        }
-
-        private static RenderDocumentDirective Create_CurrentWordPresentation_Directive(string currentWord)
-        {
-            var directive = new RenderDocumentDirective
-            {
-                Token = "randomToken",
-                Document = new APLDocument(APLDocumentVersion.V1_2)
-                {
-                    Imports = new List<Import>{ new Import("alexa-layouts", "1.2.0") },
-                    MainTemplate = new Layout(new[]
-                    {
-                        new Container(new APLComponent[]{
-                            new AlexaBackground(){ BackgroundImageSource="https://moyca-alexa-display.s3-us-west-2.amazonaws.com/AlexaFlashCard.png"},
-                            new Text(currentWord)
-                            {
-                                Width="100%",
-                                Height="100%",
-                                FontSize="160dp",
-                                TextAlign="center",
-                                TextAlignVertical="center",
-                                Color="black"
-                            },
-                        })
-                        {
-                            Width="100%",
-                            Height="100%",
-                            AlignItems="center",
-                            Direction="column",
-                            JustifyContent="center",
-                        }
-                    })
-                }
-            };
-
-            return directive;
-        }
-
-        private static RenderDocumentDirective Create_IntroPresentation_Directive()
-        {
-
-            var directive = new RenderDocumentDirective
-            {
-                Token = "randomToken",
-                Document = new APLDocument
-                {
-                    MainTemplate = new Layout(new[]
-                    {
-                        new Container(
-                            new Image("https://moyca-alexa-display.s3-us-west-2.amazonaws.com/MoycaLogoSquareWords-01+(1).png") { Width = "100%", Height = "100%", Align = "center" }
-                        )
-                        {
-                            Width = "100%",
-                            Height = "100%",
-                            AlignItems = "center",
-                            JustifyContent = "center",
-                            Direction = "column",
-                        }
-                    })
-                }
-            };
-
-            return directive;
         }
 
     }
