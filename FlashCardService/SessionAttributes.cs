@@ -99,11 +99,6 @@ namespace FlashCardService
             FailedAttempts = updatedSessionAttributes.FailedAttempts;
         }
 
-        public void UpdateProductName(string name)
-        {
-            this.ProductName = name;
-        }
-
         public void RemoveCurrentWord()
         {
             WordsToRead.Remove(GetCurrentWord());
