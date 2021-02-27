@@ -46,16 +46,50 @@ namespace AWSInfrastructure.DynamoDB
         {
             DatabaseItem items = await GetEntryByKey(this.UserID);
 
-            if (items.TryGetValue(SCHEDULE_KEY, out AttributeValue dbSchedule) && items.TryGetValue(TEACH_MODE_KEY, out AttributeValue tM))
+            if (items.TryGetValue(SCHEDULE_KEY, out AttributeValue dbSchedule))
             {   
-                this.schedule = int.Parse(dbSchedule.N);
-                this.teachMode = (MODE)Enum.Parse(typeof(MODE), tM.S);
+                if (items.TryGetValue(TEACH_MODE_KEY, out AttributeValue tM))
+                {
+                    this.teachMode = (MODE)Enum.Parse(typeof(MODE), tM.S);
+                }
+                else
+                {
+                    this.teachMode = MODE.Assess;
+                }
+
+                this.schedule = int.Parse(dbSchedule.N);                
                 log.INFO("UserProfileDB", "GetUserSchedule", "User profile exist, start the user at: " + this.schedule);
             }
             else
             {   
                 await CreateNewUser();
                 log.INFO("UserProfileDB", "GetUserSchedule", "User profile does not exist, start the user at: " + this.schedule);
+            }
+        }       
+
+        public async Task DecrementUserProfileSchedule()
+        {
+            DatabaseItem items = await GetEntryByKey(this.UserID);
+
+            if (items.TryGetValue(SCHEDULE_KEY, out AttributeValue dbSchedule))
+            {
+                this.schedule = int.Parse(dbSchedule.N);
+                this.schedule -= 1;
+                await UpdateSchedule();
+            }
+        }
+
+        public async Task IncrementUserProfileSchedule()
+        {
+            DatabaseItem items = await GetEntryByKey(this.UserID);
+            log.DEBUG("UserProfileDB", "IncrementUserProfileSchedule");
+
+            if (items.TryGetValue(SCHEDULE_KEY, out AttributeValue dbSchedule))
+            {
+                this.schedule = int.Parse(dbSchedule.N);
+                this.schedule += 1;
+                log.DEBUG("UserProfileDB", "IncrementUserProfileSchedule", "Incremented Schedule to " + this.schedule);
+                await UpdateSchedule();
             }
         }
 
@@ -74,40 +108,6 @@ namespace AWSInfrastructure.DynamoDB
             return this.teachMode;
         }
 
-        //public async Task IncrementUserSchedule(int completedSchedule)
-        //{
-
-        //    await GetUserSchedule();
-
-        //    int scheduleToAdd = MIN_SCHEDULE_INDEX;
-        //    if (schedule.Any())
-        //    {
-        //        scheduleToAdd = schedule[schedule.Count - 1] + 1;
-        //    }
-
-        //    if (scheduleToAdd > MAX_SCHEDULE_INDEX)
-        //    {
-        //        // User reached the end of allowed schedules
-        //        scheduleToAdd = MIN_SCHEDULE_INDEX;
-        //    }
-
-        //    log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Removing Schedule: " + completedSchedule);
-        //    if (await RemoveSchedule(completedSchedule))
-        //    {
-        //        log.INFO("UserProfileDB", "RemoveCompletedScheduleFromUserProfile", "Adding Schedule: " + scheduleToAdd.ToString());
-        //        await AppendSchedule(scheduleToAdd);
-        //    }
-        //}
-
-        public async Task DecrementUserSchedule(int completedSchedule)
-        {
-            var scheduleToAdd = completedSchedule - 1;
-
-            if (scheduleToAdd >= 1000)
-            {
-                await InsertScheduleFront(scheduleToAdd);
-            }
-        }
 
         private async Task<bool> CreateNewUser()
         {
@@ -126,95 +126,21 @@ namespace AWSInfrastructure.DynamoDB
             return await base.PutAttributes(putRequest);
         }
 
-        //private async Task<bool> RemoveSchedule(int scheduleToRemove)
-        //{
-        //    var scheduleIndex = schedule.IndexOf(scheduleToRemove);
 
-        //    if (schedule.Remove(scheduleToRemove))
-        //    {
-
-        //        var updateRequest = new UpdateItemRequest
-        //        {
-        //            TableName = UserProfileDB.TableName,
-        //            Key = new Dictionary<string, AttributeValue>
-        //            {
-        //                { UserProfileDB.PrimaryPartitionKey, new AttributeValue(this.UserID) }
-        //            },
-        //            UpdateExpression = "REMOVE Schedule[" + scheduleIndex + "]" //, SET Schedule = list_append(Schedule, :schedToAdd)"
-        //        };
-
-        //        return await SetItemsAttributeWithRequest(updateRequest);
-        //    }
-        //    else
-        //    {
-        //        return false;
-        //    }
-        //}
-
-        private async Task<bool> AppendSchedule(int scheduleToAdd)
+        private async Task<bool> UpdateSchedule()
         {
-            var newSchedule = new AttributeValue
-            {
-                N = scheduleToAdd.ToString()
-            };
-            var scheduleList = new List<AttributeValue> { newSchedule };
+            Dictionary<string, AttributeValue> attributes = new Dictionary<string, AttributeValue>();
+            // The primary key is required to determine which database entry to update
+            attributes[PrimaryPartitionKey] = new AttributeValue { S = this.UserID };
+            attributes[this.SCHEDULE_KEY] = new AttributeValue { N = this.schedule.ToString() };
 
-            var updateRequest = new UpdateItemRequest
+            var putRequest = new PutItemRequest
             {
-                TableName = UserProfileDB.TableName,
-                Key = new Dictionary<string, AttributeValue>
-                {
-                    { UserProfileDB.PrimaryPartitionKey, new AttributeValue(this.UserID) }
-                },
-                UpdateExpression = "SET #attrName = list_append(#attrName, :attrValue)",
-                ExpressionAttributeNames = new Dictionary<string, string>
-                {
-                    { "#attrName", SCHEDULE_KEY },
-                },
-                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
-                {
-                    { ":attrValue", new AttributeValue()
-                        {
-                            L = scheduleList
-                        }
-                    }
-                }
+                TableName = TableName,
+                Item = attributes
             };
 
-            return await SetItemsAttributeWithRequest(updateRequest);
-        }
-
-        private async Task<bool> InsertScheduleFront(int scheduleToAdd)
-        {
-            var newSchedule = new AttributeValue
-            {
-                N = scheduleToAdd.ToString()
-            };
-            var scheduleList = new List<AttributeValue> { newSchedule };
-
-            var updateRequest = new UpdateItemRequest
-            {
-                TableName = UserProfileDB.TableName,
-                Key = new Dictionary<string, AttributeValue>
-                {
-                    { UserProfileDB.PrimaryPartitionKey, new AttributeValue(this.UserID) }
-                },
-                UpdateExpression = "SET #attrName = list_append(:attrValue, #attrName)",
-                ExpressionAttributeNames = new Dictionary<string, string>
-                {
-                    { "#attrName", SCHEDULE_KEY },
-                },
-                ExpressionAttributeValues = new Dictionary<string, AttributeValue>
-                {
-                    { ":attrValue", new AttributeValue()
-                        {
-                            L = scheduleList
-                        }
-                    }
-                }
-            };
-
-            return await SetItemsAttributeWithRequest(updateRequest);
+            return await PutAttributes(putRequest);
         }
 
         public async Task SetQueueUrl(string queueURL)

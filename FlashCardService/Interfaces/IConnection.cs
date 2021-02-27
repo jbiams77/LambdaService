@@ -2,11 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace FlashCardService.Interfaces
 {
     public interface IConnection
     {
-        public SkillResponse Handle(string purchaseResult);
+        public Task<SkillResponse> Handle(string purchaseResult);
     }
 }
