@@ -4,12 +4,22 @@ using FlashCardService.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using FlashCardService.Connections.Purchase.Response;
+using Alexa.NET.Request;
+using System.Threading.Tasks;
 
-namespace FlashCardService.Responses.Purchase
+namespace FlashCardService.Connections.Purchase
 {
     public class Upsell : IConnection
     {
-        public SkillResponse Handle(string purchaseResult)
+        public SkillRequest skillRequest;
+
+        public Upsell(SkillRequest skillRequest)
+        {
+            this.skillRequest = skillRequest;
+        }
+
+        public async Task<SkillResponse> Handle(string purchaseResult)
         {
             LOGGER.log.INFO("Upsell", "Handle");
 
@@ -17,12 +27,13 @@ namespace FlashCardService.Responses.Purchase
             {
                 case PurchaseResult.Accepted:
                     LOGGER.log.INFO("Upsell", "Handle", "Purchase Result Accepted.");
-                    return AlexaResponse.Say(CommonPhrases.UpSellAccepted());
+                    return new Accepted().Handle();
                     
                 case PurchaseResult.Declined:
                     LOGGER.log.INFO("Upsell", "Handle", "Purchase Result Declined.");
-                    return AlexaResponse.Say(CommonPhrases.UpSellDeclined());
                     
+                    return await new Declined(skillRequest).Handle();
+
                 case PurchaseResult.AlreadyPurchased:
                     LOGGER.log.INFO("Upsell", "Handle", "Purchase Result Already Purchased.");
                     // purchase is detected on launch, so should not get here, respond appropriately

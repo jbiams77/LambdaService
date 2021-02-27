@@ -11,18 +11,15 @@ namespace FlashCardService.Requests.Intents
     public class Intent
     {
         protected UserProfileDB userProfile;
-        protected ScopeAndSequenceDB scopeAndSequence;
-        protected SkillResponse response;
-        protected string userId;
         protected SessionAttributes sessionAttributes;
         protected TeachMode teachMode;
         protected ProductInventory purchase;
         protected SkillRequest skillRequest;
-        protected IntentRequest derivedIntent;
 
         public Intent(SkillRequest request)
         {
             this.skillRequest = request;
+            this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, LOGGER.log);
             this.sessionAttributes = new SessionAttributes(LOGGER.log);
             this.sessionAttributes.UpdateSessionAttributes(skillRequest.Session.Attributes);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);

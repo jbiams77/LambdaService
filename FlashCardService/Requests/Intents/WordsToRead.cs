@@ -5,6 +5,7 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using AWSInfrastructure.GlobalConstants;
 using System.Linq;
+using AWSInfrastructure.DynamoDB;
 
 namespace FlashCardService.Requests.Intents
 {
@@ -42,7 +43,8 @@ namespace FlashCardService.Requests.Intents
 
                 if (sessionFinished)
                 {
-                    this.sessionAttributes.SessionState = STATE.Off;
+                    prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moyca Readers!";
+                    await this.userProfile.IncrementUserProfileSchedule();
                     return ResponseBuilder.Tell(prompt);
                 }
                 else

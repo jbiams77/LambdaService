@@ -5,7 +5,7 @@ using Alexa.NET.Request;
 using Alexa.NET.InSkillPricing.Responses;
 using Alexa.NET.InSkillPricing;
 using Alexa.NET.Request.Type;
-using FlashCardService.Responses.Purchase;
+using FlashCardService.Connections.Purchase;
 using FlashCardService.Requests.Intents;
 using FlashCardService.Interfaces;
 
@@ -28,10 +28,10 @@ namespace FlashCardService.Responses
             switch (paymentType)
             {
                 case PaymentType.Buy:
-                    return new Buy().Handle(purchaseResult);
+                    return await new Buy(skillRequest).Handle(purchaseResult);
 
                 case PaymentType.Upsell:
-                    return new Upsell().Handle(purchaseResult);
+                    return await new Upsell(skillRequest).Handle(purchaseResult);
 
                 case PaymentType.Cancel:
                     return new Cancel(this.skillRequest).HandleIntent();
