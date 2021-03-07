@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
-using AWSInfrastructure.GlobalConstants;
-using AWSInfrastructure.Logger;
+using Infrastructure.GlobalConstants;
+using Infrastructure.Interfaces;
+using Infrastructure.Lessons;
+using Infrastructure.Logger;
 
-namespace AWSInfrastructure.DynamoDB
+namespace Infrastructure.DynamoDB
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
@@ -17,8 +19,8 @@ namespace AWSInfrastructure.DynamoDB
         public List<string> WordsToRead { get; set; }
         public string TeachMode { get; set; }
         public string Skill { get; set; }
-        public string InSkillPurchase { get; set; }
-        public LESSON Lesson { get; set; }
+        public string ProductName { get; set; }
+        public ILesson Lesson { get; set; }
 
         private MoycaLogger log;
 
@@ -55,32 +57,13 @@ namespace AWSInfrastructure.DynamoDB
 
             if (item.TryGetValue("InSkillPurchase", out AttributeValue inSkillPurchase))
             {
-                this.InSkillPurchase = inSkillPurchase.S;
+                this.ProductName = inSkillPurchase.S;
             }
 
             // Determine lesson plan 
-            if (item.TryGetValue("Lesson", out AttributeValue lesson))
-            {               
-
-                switch (lesson.S)
-                {
-                    case "WF": 
-                        this.Lesson = LESSON.WordFamilies; 
-                        break;
-                    case "CVC": 
-                        this.Lesson = LESSON.CVC; 
-                        break;
-                    case "CD": 
-                        this.Lesson = LESSON.ConsonantDigraph; 
-                        break;
-                    case "CB": 
-                        this.Lesson = LESSON.ConsonantBlend; 
-                        break;
-                    defualt: 
-                        this.Lesson = LESSON.None;
-                        break;
-                }
-
+            if (item.TryGetValue("Lesson", out AttributeValue lessonType))
+            {
+                this.Lesson = LessonFactory.GetLesson(lessonType.S, log);
             }            
             
             log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Lesson: " + this.Lesson.ToString());

@@ -4,26 +4,88 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 
-namespace AWSInfrastructure.GlobalConstants
+namespace Infrastructure.GlobalConstants
 {
 
-    /// <summary>
-    /// Which lesson Alexa will teach
-    /// </summary>
-    public enum LESSON
+    public class SSML
     {
-        None,
-        WordFamilies,       
-        CVC,
-        ConsonantBlend,
-        ConsonantDigraph,
-        SightWords,
-        EControlledVowel,
-        RControlledVowel,
-        LControlledVowel,
-        VowelBlends
-    }
+        public static string PauseFor(double delay)
+        {
+            return @"<break time=""" + delay.ToString() + @"s""/>";
+        }
 
+        public static string Phoneme(string phoneme)
+        {
+            return @"<phoneme alphabet=""ipa"" ph=""" + phoneme + @""">" + phoneme + "</phoneme>";
+
+        }
+
+        public static string SayExtraSlow(string word)
+        {
+            return @"<prosody rate=""x-slow"">" + word + @"</prosody>";
+        }
+
+
+        public static string SpellOut(string word)
+        {
+            return @"<say-as interpret-as=""spell-out"">" + word + @"</say-as>";
+        }
+
+        public static readonly Dictionary<string, string> cdPhoneme = new Dictionary<string, string>
+        {
+         // sound | IPA
+            {"ch" , "tʃ" },
+            {"ck" , "k" },
+            {"ll" , "ɫ"},
+            {"sh" , "ʃ" },
+            {"th" , "θ" },
+            {"wh" , "hw" }
+        };
+
+        public static readonly Dictionary<string, string> cbPhoneme = new Dictionary<string, string>
+        {
+         // sound | IPA
+            {"bl" , "bɫ" },
+            {"br" , "bɹ" },
+            {"cl" , "kɫ"},
+            {"cr" , "kɹ" },
+            {"dr" , "dɹ" },
+            {"fl" , "fɫ" },
+            {"fr" , "fɹ" },
+            {"ft" , "ft" },
+            {"gl" , "ɡɫ" },
+            {"gr" , "ɡɹ" },
+            {"lt" , "ɫt" },
+            {"nd" , "nd" },
+            {"ng" , "ŋ" },
+            {"ngr", "ŋɡɹ" },
+            {"nt" , "nt" },
+            {"pl" , "pɫ" },
+            {"pr" , "pɹ" },
+            {"qu" , "kw" },
+            {"rk" , "ɹk" },
+            {"rm" , "ɹm" },
+            {"rt" , "ɹt" },
+            {"sc" , "sk" },
+            {"sch", "sk" },
+            {"scr", "skɹ" },
+            {"shr" , "ʃɹ" },
+            {"sk" , "sk" },
+            {"sl" , "sɫ" },
+            {"sm" , "sm" },
+            {"sn" , "sn" },
+            {"sp" , "sp" },
+            {"spl", "spɫ" },
+            {"spr", "spɹ" },
+            {"st" , "st" },
+            {"str" , "str" },
+            {"sw" , "sw" },
+            {"thr" , "θɹ" },
+            {"tr" , "tɹ" },
+            {"tw" , "tw" },
+            {"wr" , "ɹ" }
+        };
+    }
 
 
     /// <summary>

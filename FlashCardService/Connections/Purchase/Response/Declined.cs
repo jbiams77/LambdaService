@@ -1,5 +1,5 @@
 ﻿using Alexa.NET.Response;
-using AWSInfrastructure.DynamoDB;
+using Infrastructure.DynamoDB;
 using System;
 using System.Collections.Generic;
 using System.Text;

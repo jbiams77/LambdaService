@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
-using AWSInfrastructure.GlobalConstants;
-using AWSInfrastructure.Logger;
+using Infrastructure.GlobalConstants;
+using Infrastructure.Logger;
 
-namespace AWSInfrastructure.DynamoDB
+namespace Infrastructure.DynamoDB
 {
     
     using DatabaseItem = Dictionary<string, AttributeValue>;

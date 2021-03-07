@@ -6,7 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AWSInfrastructure.S3Policy
+namespace Infrastructure.S3Policy
 {
     class S3
     {

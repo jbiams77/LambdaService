@@ -3,7 +3,7 @@ using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
-using AWSInfrastructure.DynamoDB;
+using Infrastructure.DynamoDB;
 using FlashCardService.Requests.Intents;
 using FlashCardService.Interfaces;
 

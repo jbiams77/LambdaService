@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
-using AWSInfrastructure.Logger;
+using Infrastructure.Logger;
 
-namespace AWSInfrastructure.DynamoDB
+namespace Infrastructure.DynamoDB
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
     

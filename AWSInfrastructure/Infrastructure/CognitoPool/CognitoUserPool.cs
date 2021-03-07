@@ -7,9 +7,9 @@ using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
 using Amazon.Lambda.Core;
 using System.Threading.Tasks;
-using AWSInfrastructure.Logger;
+using Infrastructure.Logger;
 
-namespace AWSInfrastructure.CognitoPool
+namespace Infrastructure.CognitoPool
 {
     public class CognitoUserPool
     {

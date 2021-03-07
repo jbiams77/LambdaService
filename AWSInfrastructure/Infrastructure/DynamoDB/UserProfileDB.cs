@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
-using AWSInfrastructure.GlobalConstants;
-using AWSInfrastructure.Logger;
+using Infrastructure.GlobalConstants;
+using Infrastructure.Logger;
 
-namespace AWSInfrastructure.DynamoDB
+namespace Infrastructure.DynamoDB
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
@@ -19,7 +19,7 @@ namespace AWSInfrastructure.DynamoDB
         public string UserID { get; set; }
         public static int LastFreeIndex { get { return 1004; } }
 
-        public int schedule;
+        public int Schedule { get; set; }
         public MODE teachMode;
 
         // This is a temporary fix to prevent user schedule from going out of bounds
@@ -30,13 +30,15 @@ namespace AWSInfrastructure.DynamoDB
         private readonly string SCHEDULE_KEY = "Schedule";
         private readonly string TEACH_MODE_KEY = "TeachMode";
         private MoycaLogger log;
+        public ScopeAndSequenceDB scopeAndSequenceDB;
 
         public UserProfileDB(string userId, MoycaLogger logger) : base(UserProfileDB.TableName, UserProfileDB.PrimaryPartitionKey, logger)
         {
             this.UserID = userId;
             this.log = logger;
-            this.schedule = MIN_SCHEDULE_INDEX;
+            this.Schedule = MIN_SCHEDULE_INDEX;
             this.teachMode = MODE.Assess;
+            this.scopeAndSequenceDB = new ScopeAndSequenceDB(logger);
         }
 
         /// <summary>
@@ -57,13 +59,14 @@ namespace AWSInfrastructure.DynamoDB
                     this.teachMode = MODE.Assess;
                 }
 
-                this.schedule = int.Parse(dbSchedule.N);                
-                log.INFO("UserProfileDB", "GetUserSchedule", "User profile exist, start the user at: " + this.schedule);
+                this.Schedule = int.Parse(dbSchedule.N);
+                await this.scopeAndSequenceDB.GetSessionDataWithNumber(this.Schedule);
+                log.INFO("UserProfileDB", "GetUserSchedule", "User profile exist, start the user at: " + this.Schedule);
             }
             else
             {   
                 await CreateNewUser();
-                log.INFO("UserProfileDB", "GetUserSchedule", "User profile does not exist, start the user at: " + this.schedule);
+                log.INFO("UserProfileDB", "GetUserSchedule", "User profile does not exist, start the user at: " + this.Schedule);
             }
         }       
 
@@ -73,8 +76,8 @@ namespace AWSInfrastructure.DynamoDB
 
             if (items.TryGetValue(SCHEDULE_KEY, out AttributeValue dbSchedule))
             {
-                this.schedule = int.Parse(dbSchedule.N);
-                this.schedule -= 1;
+                this.Schedule = int.Parse(dbSchedule.N);
+                this.Schedule -= 1;
                 await UpdateSchedule();
             }
         }
@@ -86,21 +89,16 @@ namespace AWSInfrastructure.DynamoDB
 
             if (items.TryGetValue(SCHEDULE_KEY, out AttributeValue dbSchedule))
             {
-                this.schedule = int.Parse(dbSchedule.N);
-                this.schedule += 1;
-                log.DEBUG("UserProfileDB", "IncrementUserProfileSchedule", "Incremented Schedule to " + this.schedule);
+                this.Schedule = int.Parse(dbSchedule.N);
+                this.Schedule += 1;
+                log.DEBUG("UserProfileDB", "IncrementUserProfileSchedule", "Incremented Schedule to " + this.Schedule);
                 await UpdateSchedule();
             }
         }
 
         public bool RequiresPurchase()
         {
-            return (this.schedule > LastFreeIndex);
-        }
-
-        public int GetUserSchedule()
-        {
-            return this.schedule;
+            return (this.Schedule > LastFreeIndex);
         }
 
         public MODE GetMode()
@@ -114,7 +112,7 @@ namespace AWSInfrastructure.DynamoDB
             Dictionary<string, AttributeValue> attributes = new Dictionary<string, AttributeValue>();
             // The primary key is required to determine which database entry to update
             attributes[PrimaryPartitionKey] = new AttributeValue { S = this.UserID };
-            attributes[this.SCHEDULE_KEY] = new AttributeValue { N = this.schedule.ToString() };
+            attributes[this.SCHEDULE_KEY] = new AttributeValue { N = this.Schedule.ToString() };
             attributes[this.TEACH_MODE_KEY] = new AttributeValue { S = Enum.GetName(typeof(MODE), this.teachMode) };
 
             var putRequest = new PutItemRequest
@@ -132,7 +130,7 @@ namespace AWSInfrastructure.DynamoDB
             Dictionary<string, AttributeValue> attributes = new Dictionary<string, AttributeValue>();
             // The primary key is required to determine which database entry to update
             attributes[PrimaryPartitionKey] = new AttributeValue { S = this.UserID };
-            attributes[this.SCHEDULE_KEY] = new AttributeValue { N = this.schedule.ToString() };
+            attributes[this.SCHEDULE_KEY] = new AttributeValue { N = this.Schedule.ToString() };
 
             var putRequest = new PutItemRequest
             {

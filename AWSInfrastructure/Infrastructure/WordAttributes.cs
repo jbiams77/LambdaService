@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using Amazon.DynamoDBv2.Model;
-using AWSInfrastructure.DynamoDB;
+using Infrastructure.DynamoDB;
 using System.Threading.Tasks;
-using AWSInfrastructure.Logger;
+using Infrastructure.Logger;
 
-namespace FlashCardService
+namespace Infrastructure
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
@@ -25,19 +25,27 @@ namespace FlashCardService
         public string WordFamily { get; set; }
         public string Word { get; set; }
 
+        public static MoycaLogger Log { get; set; }
+
         DictionaryDB dictionaryDB;
 
         private WordAttributes() { }
 
-        async public static Task<WordAttributes> GetWordAttributes(string word)
+        async public static Task<WordAttributes> GetWordAttributes(string word, MoycaLogger log)
         {
+            Log = log;
+
             var wordAttributes = new WordAttributes();
             await wordAttributes.GetAttributes(word);
             return wordAttributes;
         }
+
         private async Task GetAttributes(string word)
         {
-            dictionaryDB = new DictionaryDB(LOGGER.log);
+            Log.INFO("WordAttributes", "GetAttributes", word);
+
+            dictionaryDB = new DictionaryDB(Log);
+
             DatabaseItem items = await dictionaryDB.GetWordAttributesFromDictionary(word);
 
             if (items.TryGetValue("ConsonantBlend", out AttributeValue cb))

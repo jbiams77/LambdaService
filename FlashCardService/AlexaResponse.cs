@@ -10,7 +10,7 @@ using Alexa.NET.Response.Directive;
 using Alexa.NET.InSkillPricing;
 using Alexa.NET.InSkillPricing.Directives;
 using Alexa.NET.Response.Directive.Templates;
-using AWSInfrastructure.Logger;
+using Infrastructure.Logger;
 
 namespace FlashCardService
 {

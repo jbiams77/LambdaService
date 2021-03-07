@@ -5,7 +5,7 @@ using Amazon.Lambda.Core;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
 using Amazon.DynamoDBv2.Model;
-using AWSInfrastructure.Logger;
+using Infrastructure.Logger;
 using Newtonsoft.Json;
 using Alexa.NET.InSkillPricing.Responses;
 using FlashCardService.Responses;

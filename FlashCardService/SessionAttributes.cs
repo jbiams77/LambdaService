@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using AWSInfrastructure.GlobalConstants;
+using Infrastructure.GlobalConstants;
 using System.Linq;
-using AWSInfrastructure.Logger;
+using Infrastructure.Logger;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using FlashCardService;
-using AWSInfrastructure.DynamoDB;
+using Infrastructure.DynamoDB;
 using Alexa.NET.Request;
+using Infrastructure.Interfaces;
 
 namespace FlashCardService
 {
     public class SessionAttributes
     {
         public STATE SessionState { get; set; }
-        public LESSON Lesson { get; set; }
+        public string LessonType { get; set; }
         public MODE LessonMode { get; set; }
         public SKILL LessonSkill { get; set; }
         public int Schedule { get; set; }
@@ -56,16 +57,16 @@ namespace FlashCardService
         /// <param name="scopeAndSequence">Schedule data from dynamoDb</param>
         /// <param name="schedule">Schedule number</param>
         /// <param name="mode">Teach or assess modes determined by user profile</param>
-        public void UpdateSessionAttributes(ScopeAndSequenceDB scopeAndSequence, int schedule, MODE mode)
+        public void UpdateSessionAttributes(UserProfileDB userProfile)
         {
             LOGGER.log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
-            this.WordsToRead = scopeAndSequence.WordsToRead;
+            this.WordsToRead = userProfile.scopeAndSequenceDB.WordsToRead;
             this.CurrentWord = GetCurrentWord();
-            this.LessonMode = mode;
-            this.LessonSkill = (SKILL)(int.Parse(scopeAndSequence.Skill));
-            this.Lesson = scopeAndSequence.Lesson;
-            this.Schedule = schedule;
-            this.TotalWordsInSession = scopeAndSequence.WordsToRead.Count();
+            this.LessonMode = userProfile.GetMode();
+            this.LessonSkill = (SKILL)(int.Parse(userProfile.scopeAndSequenceDB.Skill));
+            this.LessonType = userProfile.scopeAndSequenceDB.Lesson.LessonTypeName;
+            this.Schedule = userProfile.Schedule;
+            this.TotalWordsInSession = userProfile.scopeAndSequenceDB.WordsToRead.Count();
             this.FailedAttempts = 0;
             this.ProductName = "NOT PROVIDED";
         }
@@ -90,7 +91,7 @@ namespace FlashCardService
 
             CurrentWord = updatedSessionAttributes.CurrentWord;
             SessionState = updatedSessionAttributes.SessionState;
-            Lesson = updatedSessionAttributes.Lesson;
+            LessonType = updatedSessionAttributes.LessonType;
             LessonMode = updatedSessionAttributes.LessonMode;
             LessonSkill = updatedSessionAttributes.LessonSkill;
             Schedule = updatedSessionAttributes.Schedule;

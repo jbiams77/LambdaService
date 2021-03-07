@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy  /Y &quot;$(ProjectDir)bin\Debug\AWSInfrastructure.dll&quot; &quot;$(SolutionDir)FlashCardService\bin\Debug&quot;&#xD;&#xA;xcopy  /Y &quot;$(ProjectDir)bin\Debug\AWSInfrastructure.xml&quot; &quot;$(SolutionDir)FlashCardService\bin\Debug&quot;&#xD;&#xA;&#xD;&#xA;xcopy  /Y &quot;$(ProjectDir)bin\Debug\AWSInfrastructure.dll&quot; &quot;$(SolutionDir)SchedulerServices\bin\Debug&quot;&#xD;&#xA;xcopy  /Y &quot;$(ProjectDir)bin\Debug\AWSInfrastructure.xml&quot; &quot;$(SolutionDir)SchedulerServices\bin\Debug&quot;" />
+    <Exec Command="xcopy  /Y &quot;$(ProjectDir)bin\Debug\netcoreapp3.1\Infrastructure.dll&quot; &quot;$(SolutionDir)FlashCardService\bin\Debug&quot;&#xD;&#xA;&#xD;&#xA;xcopy  /Y &quot;$(ProjectDir)bin\Debug\netcoreapp3.1\Infrastructure.dll&quot; &quot;$(SolutionDir)SchedulerServices\bin\Debug&quot;&#xD;&#xA;" />
   </Target>
 
   <ItemGroup>

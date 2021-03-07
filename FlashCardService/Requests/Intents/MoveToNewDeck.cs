@@ -1,8 +1,8 @@
 ﻿using Alexa.NET;
 using Alexa.NET.Request;
 using Alexa.NET.Response;
-using AWSInfrastructure.GlobalConstants;
-using AWSInfrastructure.Lessons;
+using Infrastructure.GlobalConstants;
+using Infrastructure.Lessons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
