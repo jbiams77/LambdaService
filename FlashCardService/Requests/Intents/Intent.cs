@@ -12,7 +12,7 @@ namespace FlashCardService.Requests.Intents
     {
         protected UserProfileDB userProfile;
         protected SessionAttributes sessionAttributes;
-        protected ProductInventory purchase;
+        protected ProductInventory products;
         protected SkillRequest skillRequest;
 
         public Intent(SkillRequest request)
@@ -22,7 +22,7 @@ namespace FlashCardService.Requests.Intents
             this.sessionAttributes = new SessionAttributes(LOGGER.log);
             this.sessionAttributes.UpdateSessionAttributes(skillRequest.Session.Attributes);
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
-            this.purchase = new ProductInventory(request);
+            this.products = new ProductInventory(request);
         }
 
     }

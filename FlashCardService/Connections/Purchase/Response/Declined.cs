@@ -14,12 +14,17 @@ namespace FlashCardService.Connections.Purchase.Response
 
         public Declined(SkillRequest skillRequest)
         {
-            this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, LOGGER.log);
+            this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, LOGGER.log);            
         }
 
         public async Task<SkillResponse> Handle()
         {
-            await this.userProfile.DecrementUserProfileSchedule();            
+            await this.userProfile.GetUserProfileData();
+
+            if (this.userProfile.CurrentScheduleRequiresPurchase())
+            {
+                await this.userProfile.DecrementUserProfileSchedule();
+            }                     
 
             return AlexaResponse.Say(CommonPhrases.UpSellDeclined());
         }

@@ -49,6 +49,9 @@ namespace FlashCardService.Requests
                 case "MoveToNewLessonIntent":
                     return await new MoveToNewLesson(this.skillRequest).HandleIntent();
 
+                case "MakePurchaseIntent":
+                    return await new MakePurchase(this.skillRequest).HandleIntent();
+
                 case "AMAZON.FallbackIntent":
                     return await new Fallback(this.skillRequest).HandleIntent();
                     

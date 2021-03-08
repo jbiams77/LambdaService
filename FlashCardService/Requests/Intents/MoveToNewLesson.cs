@@ -18,7 +18,6 @@ namespace FlashCardService.Requests.Intents
 
         public async Task<SkillResponse> HandleIntent()
         {
-            LOGGER.log.INFO("MoveToNewLesson", "HandleIntent", "Deck to move to: " );
             var intentRequest = (Alexa.NET.Request.Type.IntentRequest)skillRequest.Request;
 
             string lessonType = GetSlotValue(intentRequest);

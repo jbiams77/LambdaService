@@ -97,6 +97,11 @@ namespace Infrastructure.DynamoDB
             }
         }
 
+        public bool CurrentScheduleRequiresPurchase()
+        {
+            return (this.Schedule > this.scopeAndSequenceDB.Lesson.FreeEndIndex);
+        }
+
         public bool RequiresPurchase()
         {            
             return (this.Schedule > this.scopeAndSequenceDB.Lesson.FreeEndIndex);

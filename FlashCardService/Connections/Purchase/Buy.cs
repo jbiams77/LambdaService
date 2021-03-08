@@ -38,6 +38,7 @@ namespace FlashCardService.Connections.Purchase
                     LOGGER.log.INFO("Buy", "Handle", "Purchase Result Error.");
                     // unsure of how this case is reached
                     break;
+                // add default to handle purchase pending
             }
             return AlexaResponse.Say(" You want to buy Something.");
         }

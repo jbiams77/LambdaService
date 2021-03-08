@@ -43,6 +43,7 @@ namespace FlashCardService.Connections.Purchase
                     LOGGER.log.INFO("Upsell", "Handle", "Purchase Result Error.");
                     // purchase is detected on launch, so should not get here, respond appropriately
                     break;
+                
             }
             return AlexaResponse.Say(" You want to buy Something.");
         }
