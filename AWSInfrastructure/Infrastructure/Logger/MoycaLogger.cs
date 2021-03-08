@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 
-namespace AWSInfrastructure.Logger
+namespace Infrastructure.Logger
 {
     [System.Flags]
     public enum LogLevel

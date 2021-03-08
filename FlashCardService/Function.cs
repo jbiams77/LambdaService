@@ -5,7 +5,7 @@ using Amazon.Lambda.Core;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
 using Amazon.DynamoDBv2.Model;
-using AWSInfrastructure.Logger;
+using Infrastructure.Logger;
 using Newtonsoft.Json;
 using Alexa.NET.InSkillPricing.Responses;
 using FlashCardService.Responses;
@@ -63,7 +63,7 @@ namespace FlashCardService
                 case "Connections.Response":
                     LOGGER.log.DEBUG("Function", "Connection Response ");
                     response = await new Connection(request).HandleRequest();
-                    break;                    
+                    break;
 
                 default:
                     LOGGER.log.DEBUG("Function", "Default Error Request");

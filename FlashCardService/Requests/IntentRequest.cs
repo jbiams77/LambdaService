@@ -3,7 +3,7 @@ using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
-using AWSInfrastructure.DynamoDB;
+using Infrastructure.DynamoDB;
 using FlashCardService.Requests.Intents;
 using FlashCardService.Interfaces;
 
@@ -45,6 +45,12 @@ namespace FlashCardService.Requests
 
                 case "WordsToReadIntent":
                     return await new WordsToRead(this.skillRequest).HandleIntent();
+
+                case "MoveToNewLessonIntent":
+                    return await new MoveToNewLesson(this.skillRequest).HandleIntent();
+
+                case "MakePurchaseIntent":
+                    return await new MakePurchase(this.skillRequest).HandleIntent();
 
                 case "AMAZON.FallbackIntent":
                     return await new Fallback(this.skillRequest).HandleIntent();

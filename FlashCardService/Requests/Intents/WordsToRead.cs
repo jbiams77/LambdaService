@@ -3,9 +3,11 @@ using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
-using AWSInfrastructure.GlobalConstants;
+using Infrastructure.GlobalConstants;
 using System.Linq;
-using AWSInfrastructure.DynamoDB;
+using Infrastructure.DynamoDB;
+using Infrastructure;
+using Infrastructure.Lessons;
 
 namespace FlashCardService.Requests.Intents
 {
@@ -64,8 +66,9 @@ namespace FlashCardService.Requests.Intents
 
             if (this.sessionAttributes.LessonMode == MODE.Teach)
             {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord);
-                return this.teachMode.TeachTheWord(prompt, wordAttributes);
+                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, LOGGER.log);
+                string lesson = LessonFactory.GetLesson(this.sessionAttributes.LessonType, LOGGER.log).Introduction(wordAttributes);
+                return AlexaResponse.PresentFlashCard(wordAttributes.Word, lesson, "Please say " + wordAttributes.Word);
             }
             else
             {

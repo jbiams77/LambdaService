@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Text.Json;
-using AWSInfrastructure.S3Policy;
+using Infrastructure.S3Policy;
 
-namespace AWSInfrastructure.SQS
+namespace Infrastructure.SQS
 {
     class SQS
     {

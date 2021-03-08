@@ -2,7 +2,7 @@
 using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
-using AWSInfrastructure.GlobalConstants;
+using Infrastructure.GlobalConstants;
 
 namespace FlashCardService.Requests.Intents
 {

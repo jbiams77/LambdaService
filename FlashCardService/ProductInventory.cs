@@ -9,10 +9,10 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Amazon.DynamoDBv2.Model;
 using Newtonsoft.Json;
-using AWSInfrastructure.DynamoDB;
-using AWSInfrastructure.GlobalConstants;
-using AWSInfrastructure.CognitoPool;
-using AWSInfrastructure.Logger;
+using Infrastructure.DynamoDB;
+using Infrastructure.GlobalConstants;
+using Infrastructure.CognitoPool;
+using Infrastructure.Logger;
 using Alexa.NET.InSkillPricing;
 using Alexa.NET.InSkillPricing.Directives;
 
