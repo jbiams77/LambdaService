@@ -11,7 +11,7 @@ namespace Infrastructure.Lessons
 {
     public class ConsonantDigraph : ILesson
     {
-        public string ProductName => "digraph blends";
+        public string ProductName => "Consonant Digraph";
         public string InSkillPurchaseName => "digraph_blends";
         public string LessonTypeName => "CD";
         public int FreeStartIndex => 1098;

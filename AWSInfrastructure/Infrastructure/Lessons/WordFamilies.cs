@@ -11,7 +11,7 @@ namespace Infrastructure.Lessons
 {
     public class WordFamilies : ILesson
     {
-        public string ProductName => "word families";
+        public string ProductName => "Word Families";
         public string InSkillPurchaseName => "word_family";
         public string LessonTypeName => "WF";
         public int FreeStartIndex => 1000;

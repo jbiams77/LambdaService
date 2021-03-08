@@ -4,10 +4,6 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy  /Y &quot;$(ProjectDir)bin\Debug\netcoreapp3.1\Infrastructure.dll&quot; &quot;$(SolutionDir)FlashCardService\bin\Debug&quot;&#xD;&#xA;&#xD;&#xA;xcopy  /Y &quot;$(ProjectDir)bin\Debug\netcoreapp3.1\Infrastructure.dll&quot; &quot;$(SolutionDir)SchedulerServices\bin\Debug&quot;&#xD;&#xA;" />
-  </Target>
-
   <ItemGroup>
     <PackageReference Include="Alexa.NET" Version="1.15.0" />
     <PackageReference Include="Alexa.NET.APL" Version="7.1.0" />

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 using Infrastructure.GlobalConstants;
+using Infrastructure.Interfaces;
 using Infrastructure.Logger;
 
 namespace Infrastructure.DynamoDB
@@ -97,8 +98,8 @@ namespace Infrastructure.DynamoDB
         }
 
         public bool RequiresPurchase()
-        {
-            return (this.Schedule > LastFreeIndex);
+        {            
+            return (this.Schedule > this.scopeAndSequenceDB.Lesson.FreeEndIndex);
         }
 
         public MODE GetMode()
@@ -106,6 +107,12 @@ namespace Infrastructure.DynamoDB
             return this.teachMode;
         }
 
+        public async Task ChangeLesson(ILesson lesson)
+        {
+            // change user profile schedule to user requested index
+           this.Schedule = lesson.FreeStartIndex;
+           await UpdateSchedule();
+        }
 
         private async Task<bool> CreateNewUser()
         {

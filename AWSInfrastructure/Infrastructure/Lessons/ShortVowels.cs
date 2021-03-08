@@ -11,7 +11,7 @@ namespace Infrastructure.Lessons
 {
     public class ShortVowels : ILesson
     {
-        public string ProductName => "short vowels";
+        public string ProductName => "Short Vowels";
         public string InSkillPurchaseName => "short_vowels";
         public string LessonTypeName => "CVC";
         public int FreeStartIndex => 1036;
