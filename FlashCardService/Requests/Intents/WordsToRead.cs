@@ -7,7 +7,8 @@ using Infrastructure.GlobalConstants;
 using System.Linq;
 using Infrastructure.DynamoDB;
 using Infrastructure;
-using Infrastructure.Lessons;
+using FlashCardService.Interfaces;
+using FlashCardService.Factories;
 
 namespace FlashCardService.Requests.Intents
 {
@@ -19,6 +20,7 @@ namespace FlashCardService.Requests.Intents
         {
             LOGGER.log.INFO("WordsToRead", "HandleIntent", "Current Schedule: " + this.sessionAttributes.Schedule);
 
+            ILesson lesson = LessonFactory.GetLesson(this.sessionAttributes.LessonType);
             this.sessionAttributes.SessionState = STATE.Assess;
 
             var request = (Alexa.NET.Request.Type.IntentRequest)skillRequest.Request;
@@ -27,53 +29,34 @@ namespace FlashCardService.Requests.Intents
 
             LOGGER.log.INFO("WordsToRead", "HandleIntent", "Current Word: " + currentWord);
 
-            string prompt = "Say the word";
-            string rePrompt = "Say the word";
-
             bool wordWasSaid = ReaderSaidTheWord(request);
 
             LOGGER.log.DEBUG("WordsToRead", "HandleIntent", "Reader said the word? " + wordWasSaid);
 
             if (wordWasSaid)
             {
-                prompt = CommonPhrases.ShortAffirmation;
-
-                this.sessionAttributes.RemoveCurrentWord();
-                bool sessionFinished = !this.sessionAttributes.WordsToRead.Any();
-
-                LOGGER.log.DEBUG("WordsToRead", "HandleIntent", "Session Finished? " + sessionFinished);
+                lesson.QuickReply = CommonPhrases.ShortAffirmation;
+                GradeBook.Passed(sessionAttributes);
+                bool sessionFinished = !sessionAttributes.WordsToRead.Any();
 
                 if (sessionFinished)
                 {
-                    prompt = CommonPhrases.LongAffirmation + "You're ready to move to the next lesson! Just say, Alexa, open Moyca Readers!";
+                    LOGGER.log.DEBUG("WordsToRead", "HandleIntent", "Session Finished");
+                    lesson.QuickReply = CommonPhrases.LongAffirmation + CommonPhrases.SessionFinished; 
                     await this.userProfile.IncrementUserProfileSchedule();
-                    return ResponseBuilder.Tell(prompt);
-                }
-                else
-                {
-                    currentWord = this.sessionAttributes.CurrentWord;
-                    this.sessionAttributes.SessionState = STATE.Assess;
+                    return ResponseBuilder.Tell(lesson.QuickReply);
                 }
             }
             else
             {
-                // Missed a word. Increment the attempts counter
-                this.sessionAttributes.FailedAttempts = this.sessionAttributes.FailedAttempts + 1;
+                lesson.QuickReply = CommonPhrases.ConstructiveCriticism;
+                GradeBook.Missed(sessionAttributes);
             }
 
-            LOGGER.log.DEBUG("Function", "HandleWordsToReadIntent", "Teach Mode: " + this.sessionAttributes.LessonMode.ToString());
-            LOGGER.log.DEBUG("Function", "HandleWordsToReadIntent", "Attempts Made: " + this.sessionAttributes.FailedAttempts.ToString());
+            WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, LOGGER.log);
 
-            if (this.sessionAttributes.LessonMode == MODE.Teach)
-            {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, LOGGER.log);
-                string lesson = LessonFactory.GetLesson(this.sessionAttributes.LessonType, LOGGER.log).Introduction(wordAttributes);
-                return AlexaResponse.PresentFlashCard(wordAttributes.Word, lesson, "Please say " + wordAttributes.Word);
-            }
-            else
-            {
-                return AlexaResponse.PresentFlashCard(currentWord, prompt, rePrompt);
-            }
+
+            return lesson.Dialogue(sessionAttributes.LessonMode, wordAttributes);
         }
 
         private bool ReaderSaidTheWord(Alexa.NET.Request.Type.IntentRequest input)

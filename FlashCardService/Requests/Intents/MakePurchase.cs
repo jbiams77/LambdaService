@@ -1,8 +1,8 @@
 ﻿using Alexa.NET.Request;
 using Alexa.NET.Response;
+using FlashCardService.Factories;
+using FlashCardService.Interfaces;
 using Infrastructure.GlobalConstants;
-using Infrastructure.Interfaces;
-using Infrastructure.Lessons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace FlashCardService.Requests.Intents
 
             string lessonName = GetSlotValue(intentRequest);
             LOGGER.log.INFO("MakePurchase", "HandleIntent", "Lesson to purcase to: " + lessonName);
-            ILesson lessonToPurchase = LessonFactory.GetLesson(lessonName, LOGGER.log);
+            ILesson lessonToPurchase = LessonFactory.GetLesson(lessonName);
             await base.products.GetAvailableProducts();
 
             if (base.products.IsUnpaid(lessonToPurchase.InSkillPurchaseName))

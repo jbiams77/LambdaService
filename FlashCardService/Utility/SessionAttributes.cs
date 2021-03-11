@@ -6,9 +6,6 @@ using Infrastructure.Logger;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using FlashCardService;
-using Infrastructure.DynamoDB;
-using Alexa.NET.Request;
-using Infrastructure.Interfaces;
 
 namespace FlashCardService
 {
@@ -22,7 +19,7 @@ namespace FlashCardService
         public List<string> WordsToRead { get; set; }
         public string CurrentWord { get; set; }
         public int TotalWordsInSession { get; set; }
-        public int FailedAttempts { get; set; }
+        public int Attempts { get; set; }
         public string ProductName { get; set; }
 
         private MoycaLogger logger;
@@ -64,10 +61,10 @@ namespace FlashCardService
             this.CurrentWord = GetCurrentWord();
             this.LessonMode = userProfile.GetMode();
             this.LessonSkill = (SKILL)(int.Parse(userProfile.scopeAndSequenceDB.Skill));
-            this.LessonType = userProfile.scopeAndSequenceDB.Lesson.LessonTypeName;
+            this.LessonType = userProfile.scopeAndSequenceDB.Lesson;
             this.Schedule = userProfile.Schedule;
             this.TotalWordsInSession = userProfile.scopeAndSequenceDB.WordsToRead.Count();
-            this.FailedAttempts = 0;
+            this.Attempts = 0;
             this.ProductName = "NOT PROVIDED";
         }
 
@@ -97,7 +94,7 @@ namespace FlashCardService
             Schedule = updatedSessionAttributes.Schedule;
             WordsToRead = updatedSessionAttributes.WordsToRead;
             TotalWordsInSession = updatedSessionAttributes.TotalWordsInSession;
-            FailedAttempts = updatedSessionAttributes.FailedAttempts;
+            Attempts = updatedSessionAttributes.Attempts;
         }
 
         public void RemoveCurrentWord()

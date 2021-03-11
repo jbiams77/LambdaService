@@ -4,8 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 using Infrastructure.GlobalConstants;
-using Infrastructure.Interfaces;
-using Infrastructure.Lessons;
 using Infrastructure.Logger;
 
 namespace Infrastructure.DynamoDB
@@ -20,7 +18,7 @@ namespace Infrastructure.DynamoDB
         public string TeachMode { get; set; }
         public string Skill { get; set; }
         public string ProductName { get; set; }
-        public ILesson Lesson { get; set; }
+        public string Lesson { get; set; }
 
         private MoycaLogger log;
 
@@ -63,7 +61,7 @@ namespace Infrastructure.DynamoDB
             // Determine lesson plan 
             if (item.TryGetValue("Lesson", out AttributeValue lessonType))
             {
-                this.Lesson = LessonFactory.GetLesson(lessonType.S, log);
+                this.Lesson = lessonType.S;
             }            
             
             log.INFO("ScopeAndSequenceDB", "GetSessionDataWithNumber", "Lesson: " + this.Lesson.ToString());

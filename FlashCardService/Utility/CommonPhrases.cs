@@ -48,6 +48,13 @@ namespace FlashCardService
             "too good"
         };
 
+        private static string[] shortCriticism =
+        {
+            "I'm sorry, let's try again",
+            "So close",
+            "Try again"
+        };
+
         public static string ShortAffirmation
         {
             get
@@ -57,7 +64,31 @@ namespace FlashCardService
                         @"</amazon:emotion></amazon:effect>";
             }
         }
+        public static string SessionFinished
+        {
+            get
+            {
+                return "You're ready to move to the next lesson! Just say, Alexa, open Moyca Readers!";
+            }
+        }
 
+        public static string TryAgain
+        {
+            get
+            {
+                return " Try again";
+            }
+        }
+
+        public static string ConstructiveCriticism
+        {
+            get
+            {
+                return @"<amazon:emotion name=""disappointed"" intensity=""medium"">" +
+                        shortCriticism[random.Next(shortCriticism.Length)] +
+                        @"</amazon:emotion>";
+            }
+        }
         private static string[] longAffirmation =
         {
             "Congratulation my little Moycan. ",

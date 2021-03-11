@@ -7,7 +7,7 @@ using Alexa.NET.Request.Type;
 using Infrastructure.DynamoDB;
 using FlashCardService.Requests.Intents;
 using Infrastructure;
-using Infrastructure.Lessons;
+using FlashCardService.Factories;
 
 namespace FlashCardService.Requests.Intents
 {
@@ -28,23 +28,11 @@ namespace FlashCardService.Requests.Intents
 
             base.sessionAttributes.SessionState = STATE.FirstWord;
 
-            string currentWord = this.sessionAttributes.CurrentWord;
-
-            string prompt = "Say the word ";
-
             LOGGER.log.DEBUG("Yes", "HandleIntent", "Current Word: " + base.sessionAttributes.CurrentWord);
+            WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, LOGGER.log);
 
+            return LessonFactory.GetLesson(this.sessionAttributes.LessonType).Dialogue(sessionAttributes.LessonMode, wordAttributes);
 
-            if (this.sessionAttributes.LessonMode == MODE.Teach)
-            {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, LOGGER.log);
-                string lesson = LessonFactory.GetLesson(this.sessionAttributes.LessonType, LOGGER.log).Introduction(wordAttributes);
-                return AlexaResponse.PresentFlashCard(wordAttributes.Word, lesson, "Please say " + wordAttributes.Word);
-            }
-            else
-            {
-                return AlexaResponse.PresentFlashCard(currentWord, prompt, prompt);
-            }
         }
 
     }

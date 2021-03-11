@@ -1,11 +1,14 @@
 ﻿using Infrastructure.Logger;
+using Infrastructure.GlobalConstants;
+using Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Alexa.NET.Response;
 
-namespace Infrastructure.Interfaces
+namespace FlashCardService.Interfaces
 {
     public interface ILesson
     {
@@ -16,10 +19,9 @@ namespace Infrastructure.Interfaces
         int FreeEndIndex { get; }
         int CostStartIndex { get; }
         int CostEndIndex { get; }
-        MoycaLogger Log { get; set; }
+        string QuickReply { get; set; }
 
-        string Introduction(WordAttributes wordAttributes);
-
-        string TeachTheWord(WordAttributes wordAttributes);
+        SkillResponse Introduction(WordAttributes wordAttributes);
+        SkillResponse Dialogue(MODE mode, WordAttributes wordAttributes);
     }
 }

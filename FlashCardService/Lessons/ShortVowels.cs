@@ -1,4 +1,4 @@
-﻿using Infrastructure.Interfaces;
+﻿using FlashCardService.Interfaces;
 using Infrastructure.GlobalConstants;
 using System;
 using System.Collections.Generic;
@@ -6,8 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Infrastructure.Logger;
+using Infrastructure;
+using Alexa.NET.Response;
+using Alexa.NET;
 
-namespace Infrastructure.Lessons
+namespace FlashCardService.Lessons
 {
     public class ShortVowels : ILesson
     {
@@ -18,16 +21,17 @@ namespace Infrastructure.Lessons
         public int FreeEndIndex => 1038;
         public int CostStartIndex => 1039;
         public int CostEndIndex => 1095;
-        public MoycaLogger Log { get; set; }
 
-        public ShortVowels(MoycaLogger log)
+        private string quickReply;
+        public string QuickReply
         {
-            Log = log;
+            set { quickReply = value; }
+            get { return quickReply + SSML.PauseFor(1) ?? (quickReply = ""); }
         }
 
-        public string Introduction(WordAttributes wordAttributes)
+        public SkillResponse Introduction(WordAttributes wordAttributes)
         {
-            Log.INFO("ShortVowels", "Introduction", "WORD: " + wordAttributes.Word);
+            LOGGER.log.INFO("ShortVowels", "Introduction", "WORD: " + wordAttributes.Word);
 
             string teachModel = "In the alphabet, there are two types of letters.";
             string vowel = wordAttributes.Vowel;
@@ -48,18 +52,32 @@ namespace Infrastructure.Lessons
             teachModel += SSML.PauseFor(1.0);
             teachModel += " Are your ready to learn some words with " + vowel;
 
-            return teachModel;
+            return AlexaResponse.Introduction(teachModel, " Please say yes to continue or no to quit");
 
         }
 
-        public string TeachTheWord(WordAttributes wordAttributes)
+        public SkillResponse Dialogue(MODE mode, WordAttributes wordAttributes)
         {
-            Log.INFO("ShortVowels", "TeachTheWord", "WORD: " + wordAttributes.Word);
+            switch (mode)
+            {
+                case MODE.Assess:
+                    return AssessTheWord(wordAttributes);
+                case MODE.Teach:
+                    return TeachTheWord(wordAttributes);
+                default:
+                    return ResponseBuilder.Tell("ERROR");
+            }
+        }
+
+        public SkillResponse TeachTheWord(WordAttributes wordAttributes)
+        {
+            LOGGER.log.INFO("ShortVowels", "TeachTheWord", "WORD: " + wordAttributes.Word);
 
             string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
             string vowelSound = wordAttributes.VowelPhoneme;
-            string teachModel = "";
-            teachModel += "The word is spelled ";
+            string teachModel = QuickReply;
+            teachModel += SSML.PauseFor(1);
+            teachModel += " The word is spelled ";
             foreach (string sound in decodedWord)
             {
                 teachModel += SSML.PauseFor(0.2) + SSML.SayExtraSlow(sound) + SSML.PauseFor(0.2);
@@ -72,7 +90,13 @@ namespace Infrastructure.Lessons
             teachModel += SSML.PauseFor(0.5);
             teachModel += "Now you try. Say the word ";
             
-            return teachModel;
+            return AlexaResponse.TeachFlashCard(wordAttributes.Word, teachModel);
+        }
+
+        private SkillResponse AssessTheWord(WordAttributes wordAttributes)
+        {
+            string output = QuickReply + " Say the word";
+            return AlexaResponse.PresentFlashCard(wordAttributes.Word, output, CommonPhrases.TryAgain);
         }
     }
 }

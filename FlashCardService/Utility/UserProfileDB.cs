@@ -5,10 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 using Infrastructure.GlobalConstants;
-using Infrastructure.Interfaces;
+using FlashCardService.Interfaces;
 using Infrastructure.Logger;
+using Infrastructure.DynamoDB;
+using FlashCardService.Factories;
 
-namespace Infrastructure.DynamoDB
+namespace FlashCardService
 {
     using DatabaseItem = Dictionary<string, AttributeValue>;
 
@@ -22,6 +24,7 @@ namespace Infrastructure.DynamoDB
 
         public int Schedule { get; set; }
         public MODE teachMode;
+        public ILesson lesson;
 
         // This is a temporary fix to prevent user schedule from going out of bounds
         public readonly int MIN_SCHEDULE_INDEX = 1000;
@@ -69,6 +72,7 @@ namespace Infrastructure.DynamoDB
                 await CreateNewUser();
                 log.INFO("UserProfileDB", "GetUserSchedule", "User profile does not exist, start the user at: " + this.Schedule);
             }
+            this.lesson = LessonFactory.GetLesson(this.scopeAndSequenceDB.Lesson);
         }       
 
         public async Task DecrementUserProfileSchedule()
@@ -99,12 +103,12 @@ namespace Infrastructure.DynamoDB
 
         public bool CurrentScheduleRequiresPurchase()
         {
-            return (this.Schedule > this.scopeAndSequenceDB.Lesson.FreeEndIndex);
+            return (this.Schedule > this.lesson.FreeEndIndex);
         }
 
         public bool RequiresPurchase()
         {            
-            return (this.Schedule > this.scopeAndSequenceDB.Lesson.FreeEndIndex);
+            return (this.Schedule > this.lesson.FreeEndIndex);
         }
 
         public MODE GetMode()

@@ -1,42 +1,42 @@
-﻿using Infrastructure.Interfaces;
-using Infrastructure.Lessons;
+﻿using FlashCardService.Interfaces;
+using FlashCardService.Lessons;
 using Infrastructure.Logger;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Infrastructure.Lessons
+namespace FlashCardService.Factories
 {
     public class LessonFactory
     {
-        public static ILesson GetLesson(string lessonType, MoycaLogger log)
+        public static ILesson GetLesson(string lessonType)
         {
-            log.INFO("LessonFactory", "GetLesson", "Lesson Type: " + lessonType);
+            LOGGER.log.INFO("LessonFactory", "GetLesson", "Lesson Type: " + lessonType);
             switch (lessonType)
             {
                 case "WF":
                 case "Word Families":
                 case "word families":
                 case "word_families":
-                    return new WordFamilies(log);
+                    return new WordFamilies();
                     
                 case "CVC":
                 case "Short Vowels":
                 case "short vowels":
                 case "short_vowels":
-                    return new ShortVowels(log);
+                    return new ShortVowels();
                     
                 case "CD":
                 case "Consonant Digraphs":
                 case "consonant digraphs":
                 case "consonant_digraphs":
-                    return new ConsonantDigraph(log);
+                    return new ConsonantDigraph();
 
                 case "CB":
                 case "Consonant Blends":
                 case "consonant blends":
                 case "consonant_blends":
-                    return new ConsonantBlend(log);
+                    return new ConsonantBlend();
             }
 
             throw new NotImplementedException("Lesson Type does not exist");

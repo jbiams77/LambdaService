@@ -1,9 +1,9 @@
 ﻿using Alexa.NET;
 using Alexa.NET.Request;
 using Alexa.NET.Response;
+using FlashCardService.Factories;
+using FlashCardService.Interfaces;
 using Infrastructure.GlobalConstants;
-using Infrastructure.Interfaces;
-using Infrastructure.Lessons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +22,7 @@ namespace FlashCardService.Requests.Intents
 
             string lessonType = GetSlotValue(intentRequest);
             LOGGER.log.INFO("MoveToNewLesson", "HandleIntent", "Deck to move to: " + lessonType);
-            ILesson lesson = LessonFactory.GetLesson(lessonType, LOGGER.log);
+            ILesson lesson = LessonFactory.GetLesson(lessonType);
             await base.userProfile.ChangeLesson(lesson);
 
             this.sessionAttributes.SessionState = STATE.Introduction;

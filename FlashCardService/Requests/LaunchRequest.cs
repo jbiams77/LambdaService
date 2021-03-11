@@ -6,8 +6,7 @@ using Infrastructure.DynamoDB;
 using Infrastructure.GlobalConstants;
 using FlashCardService.Interfaces;
 using Infrastructure;
-using Infrastructure.Interfaces;
-using Infrastructure.Lessons;
+using FlashCardService.Factories;
 
 namespace FlashCardService.Requests
 {
@@ -52,20 +51,11 @@ namespace FlashCardService.Requests
             this.sessionAttributes.UpdateSessionAttributes(userProfile);
             this.sessionAttributes.SessionState = STATE.Introduction;
 
+            WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, LOGGER.log);
+
             LOGGER.log.DEBUG("Launch", "HandleRequest", "Next word: " + sessionAttributes.CurrentWord);
-            LOGGER.log.DEBUG("Function", "HandleLaunchRequest", "Lesson: " + sessionAttributes.LessonType);
 
-            if (this.sessionAttributes.LessonMode == MODE.Teach)
-            {
-                WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, LOGGER.log);
-                string lesson = LessonFactory.GetLesson(this.sessionAttributes.LessonType, LOGGER.log).Introduction(wordAttributes);
-                return AlexaResponse.PresentFlashCard(wordAttributes.Word, lesson, "Please say " + wordAttributes.Word);
-            }
-            else
-            {
-                return AlexaResponse.Introduction("Greetings my fellow Moycan! Lets learn to read. Are you ready to begin ?", "Say yes or no to continue.");
-            }
-
+            return LessonFactory.GetLesson(this.sessionAttributes.LessonType).Introduction(wordAttributes);
         }
 
 

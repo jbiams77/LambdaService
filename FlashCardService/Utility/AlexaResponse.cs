@@ -130,8 +130,14 @@ namespace FlashCardService
             return response;
         }
 
+        public static SkillResponse TeachFlashCard(string flashCardWord, string teachOutput)
+        {
+            return HandleFlashCard(flashCardWord, teachOutput, teachOutput);
+        }
+
         public static SkillResponse PresentFlashCard(string flashCardWord, string output, string reprompt)
         {
+
             if (!DisplaySupported)
             {
                 reprompt = Slow(SpellOut(flashCardWord), "x-slow");
