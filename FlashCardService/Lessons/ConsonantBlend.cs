@@ -17,8 +17,8 @@ namespace FlashCardService.Lessons
         public string InSkillPurchaseName => "digraph_blends";
         public string LessonTypeName => "CB";
         public int FreeStartIndex => 1110;
-        public int FreeEndIndex => 1112;
-        public int CostStartIndex => 1113;
+        public int FreeEndIndex => 1111;
+        public int CostStartIndex => 1112;
         public int CostEndIndex => 1140;
 
         private string quickReply;
@@ -33,7 +33,7 @@ namespace FlashCardService.Lessons
             LOGGER.log.INFO("ConsonantBlend", "Introduction", "WORD: " + wordAttributes.Word);
 
             string[] cBLetters = wordAttributes.ConsonantBlend.Select(x => x.ToString()).ToArray();
-            string teachModel = "When consonants are stuck together, we call that a consonant blend.";
+            string teachModel = "When consonants are stuck together and both make their sounds, we call that a consonant blend.";
             teachModel += SSML.PauseFor(.5);
             teachModel += "The letters still make their individual sounds.";
             teachModel += SSML.PauseFor(1.5);

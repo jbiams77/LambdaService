@@ -9,6 +9,11 @@ namespace Infrastructure.GlobalConstants
 
     public class SSML
     {
+        public static string Excited(string word, string intensity = "medium")
+        {
+            return "<amazon:emotion name=\"excited\" intensity=\"" + intensity + "\">" + word + "</amazon:emotion>";
+        }
+
         public static string PauseFor(double delay)
         {
             return @"<break time=""" + delay.ToString() + @"s""/>";

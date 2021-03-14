@@ -37,9 +37,21 @@ namespace FlashCardService.Factories
                 case "consonant blends":
                 case "consonant_blends":
                     return new ConsonantBlend();
+
+                case "SW":
+                case "Sight Words":
+                case "sight words":
+                case "sight_words":
+                    return new SightWords();
+
+                case "E":
+                case "Long Vowels":
+                case "long vowels":
+                case "long_vowels":
+                    return new LongVowels();
             }
 
-            throw new NotImplementedException("Lesson Type does not exist");
+            throw new NotImplementedException("Lesson Type does not exist: " + lessonType);
         }
         
     }

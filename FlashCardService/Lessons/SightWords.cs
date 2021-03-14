@@ -12,19 +12,17 @@ namespace FlashCardService.Lessons
 {
     public class SightWords : ILesson
     {
-        public string ProductName => throw new NotImplementedException();
+        public string ProductName => "Sight Words";
+        public string InSkillPurchaseName => "sight_words";
+        public string LessonTypeName => "SW";
 
-        public int FreeStartIndex => throw new NotImplementedException();
+        public int FreeStartIndex => 1155;
 
-        public int FreeEndIndex => throw new NotImplementedException();
+        public int FreeEndIndex => 1156;
 
-        public int CostStartIndex => throw new NotImplementedException();
+        public int CostStartIndex => 1157;
 
-        public int CostEndIndex => throw new NotImplementedException();
-
-        public string InSkillPurchaseName => throw new NotImplementedException();
-
-        public string LessonTypeName => throw new NotImplementedException();
+        public int CostEndIndex => 1164;
 
         private string quickReply;
         public string QuickReply

@@ -36,7 +36,7 @@ namespace FlashCardService.Requests
                 LOGGER.log.DEBUG("LaunchRequest", "HandleRequest", "Schedule is premium content");
 
                 await productInventory.GetAvailableProducts();
-                string productName = this.userProfile.scopeAndSequenceDB.ProductName;
+                string productName = this.userProfile.lesson.InSkillPurchaseName;
 
                 if (productInventory.IsUnpaid(productName))
                 {

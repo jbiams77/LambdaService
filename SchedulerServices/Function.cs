@@ -19,14 +19,13 @@ namespace SchedulerService
     /// <summary>
     /// Outputs logs to labmda function
     /// </summary>
-    public class LOGGER
+    public static class LOGGER
     {
         public static MoycaLogger log;
     }
 
     public class Function
     {
-        public static MoycaLogger log;
         // Make logger static to give all classes access to it
         public static ILambdaLogger info;
         ScopeAndSequenceDB scopeAndSequence;
@@ -35,10 +34,10 @@ namespace SchedulerService
         public async Task FunctionHandler(DynamoDBEvent dynamoEvent, ILambdaContext context)
         {
             LOGGER.log = MoycaLogger.GetLogger(context, LogLevel.TRACE);
-            scopeAndSequence = new ScopeAndSequenceDB(log);
-            dictionary = new DictionaryDB(log);
+            scopeAndSequence = new ScopeAndSequenceDB(LOGGER.log);
+            dictionary = new DictionaryDB(LOGGER.log);
             int i;
-            for(i=1000; i<1140; i++)
+            for(i=1057; i<1058; i++)
             {                
                 await GetAndSetWords(i);
             }

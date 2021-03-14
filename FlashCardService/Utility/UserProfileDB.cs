@@ -107,7 +107,7 @@ namespace FlashCardService
         }
 
         public bool RequiresPurchase()
-        {            
+        {
             return (this.Schedule > this.lesson.FreeEndIndex);
         }
 

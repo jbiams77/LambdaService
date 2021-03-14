@@ -58,7 +58,6 @@ namespace FlashCardService
         public bool IsUnpaid(string productName)
         {
             var item = productsResponse.Products.FirstOrDefault(o => o.ReferenceName == productName);
-
             return (item != null && item.ActiveEntitlementCount == 0);
         }
 

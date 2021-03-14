@@ -42,9 +42,8 @@ namespace FlashCardService.Requests.Intents
                 if (sessionFinished)
                 {
                     LOGGER.log.DEBUG("WordsToRead", "HandleIntent", "Session Finished");
-                    lesson.QuickReply = CommonPhrases.LongAffirmation + CommonPhrases.SessionFinished; 
                     await this.userProfile.IncrementUserProfileSchedule();
-                    return ResponseBuilder.Tell(lesson.QuickReply);
+                    return ResponseBuilder.Tell(CommonPhrases.LongAffirmation + CommonPhrases.SessionFinished);
                 }
             }
             else

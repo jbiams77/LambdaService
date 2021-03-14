@@ -59,8 +59,7 @@ namespace FlashCardService
             LOGGER.log.INFO("Function", "PopulateSessionAttributes", "Transferring Data");
             this.WordsToRead = userProfile.scopeAndSequenceDB.WordsToRead;
             this.CurrentWord = GetCurrentWord();
-            this.LessonMode = userProfile.GetMode();
-            this.LessonSkill = (SKILL)(int.Parse(userProfile.scopeAndSequenceDB.Skill));
+            this.LessonMode = userProfile.GetMode();            
             this.LessonType = userProfile.scopeAndSequenceDB.Lesson;
             this.Schedule = userProfile.Schedule;
             this.TotalWordsInSession = userProfile.scopeAndSequenceDB.WordsToRead.Count();

@@ -18,8 +18,8 @@ namespace FlashCardService.Lessons
         public string InSkillPurchaseName => "digraph_blends";
         public string LessonTypeName => "CD";
         public int FreeStartIndex => 1098;
-        public int FreeEndIndex => 1100;
-        public int CostStartIndex => 1101;
+        public int FreeEndIndex => 1099;
+        public int CostStartIndex => 1100;
         public int CostEndIndex => 1109;
 
         private string quickReply;

@@ -51,7 +51,7 @@ namespace Infrastructure.DynamoDB
 
         // global secondary indexes specific to dictionary
         private CVC_WF_index cVC_WF_Index; 
-        private SW_VT_index  sW_VT_Index;
+        private SW_V_index  sW_V_Index;
         private CVC_V_index  cVC_V_Index;
         private BE_V_index   bE_V_Index;
         private CD_CB_index cD_CB_Index;
@@ -69,7 +69,7 @@ namespace Infrastructure.DynamoDB
         {
             cVC_WF_Index = new CVC_WF_index();
             cVC_V_Index = new CVC_V_index();
-            sW_VT_Index = new SW_VT_index();
+            sW_V_Index = new SW_V_index();
             bE_V_Index = new BE_V_index();
             cD_CB_Index = new CD_CB_index();
             wF_CD_Index = new WF_CD_index();
@@ -139,9 +139,9 @@ namespace Infrastructure.DynamoDB
             return ExtractWordsFromItem(databaseItem);
         }
 
-        private async Task<List<string>> GetSightWordWithVowelType(string vowelType)
+        private async Task<List<string>> GetSightWordWithVowel(string vowel)
         {
-            List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(sW_VT_Index, "TRUE", vowelType));
+            List<DatabaseItem> databaseItem = await base.GetItemsWithQueryRequest(GenerateQuery(sW_V_Index, "TRUE", vowel));
 
             return ExtractWordsFromItem(databaseItem);
         }
@@ -235,10 +235,15 @@ namespace Infrastructure.DynamoDB
                 order.TryGetValue("CD", out string cd);
                 this.wordsToRead = await GetWordFamilyWithConsonantDigraph(wf, cd);
             }
-            else if (useSW && useVT)
+            else if (useSW && useV)
             {
-                order.TryGetValue("VT", out string vt);
-                this.wordsToRead = await GetSightWordWithVowelType(vt);
+                order.TryGetValue("V", out string v);
+                this.wordsToRead = await GetSightWordWithVowel(v);
+            }
+            else if (useE && useV)
+            {
+                order.TryGetValue("V", out string v);
+                this.wordsToRead = await GetBossyEwithVowel(v);
             }
             this.filter = null;
         }
@@ -446,12 +451,12 @@ namespace Infrastructure.DynamoDB
             public WF_CB_index() { }
         }
 
-        private class SW_VT_index : GlobalIndex
+        private class SW_V_index : GlobalIndex
         {
-            public virtual string Name { get { return "SW-VT-index"; } }
+            public virtual string Name { get { return "SW-V-index"; } }
             public virtual string PartitionKey { get { return "SightWord"; } }
-            public virtual string SortKey { get { return "VowelType"; } }
-            public SW_VT_index() { }
+            public virtual string SortKey { get { return "Vowel"; } }
+            public SW_V_index() { }
         }
 
         private class CVC_V_index : GlobalIndex
