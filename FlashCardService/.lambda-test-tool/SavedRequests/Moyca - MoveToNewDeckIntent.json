@@ -1,0 +1,179 @@
+{
+	"version": "1.0",
+	"session": {
+		"new": false,
+		"sessionId": "amzn1.echo-api.session.58f2fa25-4eae-4a36-b43f-514946221329",
+		"application": {
+			"applicationId": "amzn1.ask.skill.942ffbb4-5c05-4bb8-be32-02b22136f84a"
+		},
+		"attributes": {
+			"SessionState": 2,
+			"CurrentWord": "ban",
+			"LessonMode": 1,
+			"Schedule": 1004,
+			"TotalWordsInSession": 7,
+			"FailedAttempts": 0,
+			"LessonSkill": 6,
+			"WordsToRead": [
+				"ban",
+				"can",
+				"fan",
+				"pan",
+				"ran",
+				"tan",
+				"van"
+			],
+			"Lesson": 1
+		},
+		"user": {
+			"userId": "amzn1.ask.account.AGGILCMFCTQAZ56WIP5FCSX3TRDEZ7XL5EXYZ73GUCMTYVRXEGTHCVP34WH72DZC2A2OL2QBY2LXE7MAQNELFK42KYTWHPNVHZOCYQZIAXASE3TRUINVYES6T6URSW4DX7BHFXJMBGN6A6FFZB7AZ6PNHPC4FD2FIPRJRRYOYIHMQ24FKTW6FPZST4B5DHIDJTYPNRWJXIW4EVY"
+		}
+	},
+	"context": {
+		"Viewports": [
+			{
+				"type": "APL",
+				"id": "main",
+				"shape": "RECTANGLE",
+				"dpi": 160,
+				"presentationType": "STANDARD",
+				"canRotate": false,
+				"configuration": {
+					"current": {
+						"mode": "HUB",
+						"video": {
+							"codecs": [
+								"H_264_42",
+								"H_264_41"
+							]
+						},
+						"size": {
+							"type": "DISCRETE",
+							"pixelWidth": 1024,
+							"pixelHeight": 600
+						}
+					}
+				}
+			}
+		],
+		"Viewport": {
+			"experiences": [
+				{
+					"arcMinuteWidth": 246,
+					"arcMinuteHeight": 144,
+					"canRotate": false,
+					"canResize": false
+				}
+			],
+			"mode": "HUB",
+			"shape": "RECTANGLE",
+			"pixelWidth": 1024,
+			"pixelHeight": 600,
+			"dpi": 160,
+			"currentPixelWidth": 1024,
+			"currentPixelHeight": 600,
+			"touch": [
+				"SINGLE"
+			],
+			"video": {
+				"codecs": [
+					"H_264_42",
+					"H_264_41"
+				]
+			}
+		},
+		"Extensions": {
+			"available": {
+				"aplext:backstack:10": {}
+			}
+		},
+		"System": {
+			"application": {
+				"applicationId": "amzn1.ask.skill.942ffbb4-5c05-4bb8-be32-02b22136f84a"
+			},
+			"user": {
+				"userId": "amzn1.ask.account.AGGILCMFCTQAZ56WIP5FCSX3TRDEZ7XL5EXYZ73GUCMTYVRXEGTHCVP34WH72DZC2A2OL2QBY2LXE7MAQNELFK42KYTWHPNVHZOCYQZIAXASE3TRUINVYES6T6URSW4DX7BHFXJMBGN6A6FFZB7AZ6PNHPC4FD2FIPRJRRYOYIHMQ24FKTW6FPZST4B5DHIDJTYPNRWJXIW4EVY"
+			},
+			"device": {
+				"deviceId": "amzn1.ask.device.AELOKBPM4VQT7QTLJ6GDMLN6FT42YBN4YXXSYSPKITIIG2USH57XYTC4VY3QKMYUFWHP67GYVG5NVNT6X6ER4CD6LIDOIGHBIBMNWJUBSP72GCNIVIWH7L57IUIRPY6CLTRFS6O34NKTGMRZJKXK6WQK7YRD6OPOBCBEV2N253N7RTHWEYLNU",
+				"supportedInterfaces": {
+					"Alexa.Presentation.APL": {
+						"runtime": {
+							"maxVersion": "1.5"
+						}
+					}
+				}
+			},
+			"apiEndpoint": "https://api.amazonalexa.com",
+			"apiAccessToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjEifQ.eyJhdWQiOiJodHRwczovL2FwaS5hbWF6b25hbGV4YS5jb20iLCJpc3MiOiJBbGV4YVNraWxsS2l0Iiwic3ViIjoiYW16bjEuYXNrLnNraWxsLjk0MmZmYmI0LTVjMDUtNGJiOC1iZTMyLTAyYjIyMTM2Zjg0YSIsImV4cCI6MTYxNDk4NjYzNywiaWF0IjoxNjE0OTg2MzM3LCJuYmYiOjE2MTQ5ODYzMzcsInByaXZhdGVDbGFpbXMiOnsiY29udGV4dCI6IkFBQUFBQUFBQUFBK3ByTTRtNnlSYUtiMGdESlhmRGdaS3dFQUFBQUFBQURRTU9HTW1JdkU0MWxNcjBQejdjdnNZMjlEdm93djNYS0JtalBQRTkwUklraVpNaXBhVzJsNXh4dVAxekE4MmpqcnlFNnlhZkpOMmZ1K2RDajU1TWtYcU1nOUlCVm4wR1ZnSlVYQlcweEJNQnczWFpPTDlRQ3VwR1dCbDRSa2h3Mm9xeEQyZUN0VHM2SmJsSTl1SktHTEhHNDA1UVF4V0ZJbEFaRWhicFZHMWFhMlNFbkI5bEVaeG52ellVazVFWTFEbWZzNVUrS3h4RVF3RnV0UlRVUjMwb3RVamlxSTBKcXBNQXVGeUFTU1V2VE5pRTQ1dDYrcjhNNHJRbWcxbWpSd1QwakFyZlk0YjIzNjJnV3FQZlk5MzdVdU1YT2J1dVBLVVlOcUozOHNYSHpHckd3eHJQY25Sd214UUJVdjhhSTZGWDVKclR1VFRnZm5rem5CeHVhZlFRR3czdStlVmZROFpEV2RzSCtUSGUzZlpaZUJoQUhQRE5SSThrMUpXSVlER3hwWEhmNk5PczZNK1E9PSIsImNvbnNlbnRUb2tlbiI6bnVsbCwiZGV2aWNlSWQiOiJhbXpuMS5hc2suZGV2aWNlLkFFTE9LQlBNNFZRVDdRVExKNkdETUxONkZUNDJZQk40WVhYU1lTUEtJVElJRzJVU0g1N1hZVEM0VlkzUUtNWVVGV0hQNjdHWVZHNU5WTlQ2WDZFUjRDRDZMSURPSUdIQklCTU5XSlVCU1A3MkdDTklWSVdIN0w1N0lVSVJQWTZDTFRSRlM2TzM0TktUR01SWkpLWEs2V1FLN1lSRDZPUE9CQ0JFVjJOMjUzTjdSVEhXRVlMTlUiLCJ1c2VySWQiOiJhbXpuMS5hc2suYWNjb3VudC5BR0dJTENNRkNUUUFaNTZXSVA1RkNTWDNUUkRFWjdYTDVFWFlaNzNHVUNNVFlWUlhFR1RIQ1ZQMzRXSDcyRFpDMkEyT0wyUUJZMkxYRTdNQVFORUxGSzQyS1lUV0hQTlZIWk9DWVFaSUFYQVNFM1RSVUlOVllFUzZUNlVSU1c0RFg3QkhGWEpNQkdONkE2RkZaQjdBWjZQTkhQQzRGRDJGSVBSSlJSWU9ZSUhNUTI0RktUVzZGUFpTVDRCNURISURKVFlQTlJXSlhJVzRFVlkifX0.j1h2BrabJCrxyiL6t4fEgDvuJ3q7Q5dNpJqrKnx2cwf3ldPCCpWhDe8LRZu-BitOR3-cozMhRI8WPAX2vtK4gBIXrdzFqqC13hA1nW62TBNmZtHbvpSx28RSvkxecyMBfREQ4lseQLDuADFfhuATWY75MuE4x1mwCKZCPM-vJzu1dS9XqgSdVJrSUvYVSNa4u4lN8SWtsdqvK0LU0HD9U094qNK_Ml9FBjmjTaYRCkyoAH02trAhLKmhK5QfwnrBFKYmGP96ZuMsbM547HlJxK4u_6xGVQo19wTwdWarkgc2zVndmWiZ-ia5oPZjM_TwXKEQk05A5ba76-wnEt3Dzg"
+		},
+		"Alexa.Presentation.APL": {
+			"token": "randomToken",
+			"version": "APL_WEB_RENDERER_GANDALF",
+			"componentsVisibleOnScreen": [
+				{
+					"uid": ":1002",
+					"position": "960x600+0+0:0",
+					"type": "mixed",
+					"tags": {
+						"viewport": {}
+					},
+					"children": [
+						{
+							"uid": ":1003",
+							"position": "961x600+00:0",
+							"type": "graphic",
+							"tags": {},
+							"visibility": 0.9979698061943054,
+							"entities": []
+						}
+					],
+					"entities": []
+				}
+			]
+		}
+	},
+	"request": {
+		"type": "IntentRequest",
+		"requestId": "amzn1.echo-api.request.e1756a09-77a5-49e1-94ca-fc28525b1f13",
+		"locale": "en-US",
+		"timestamp": "2021-03-05T23:18:57Z",
+		"intent": {
+			"name": "MoveToNewDeckIntent",
+			"confirmationStatus": "NONE",
+			"slots": {
+				"flashCardDecks": {
+					"name": "flashCardDecks",
+					"value": "word families",
+					"resolutions": {
+						"resolutionsPerAuthority": [
+							{
+								"authority": "amzn1.er-authority.echo-sdk.amzn1.ask.skill.942ffbb4-5c05-4bb8-be32-02b22136f84a.flashCardType",
+								"status": {
+									"code": "ER_SUCCESS_MATCH"
+								},
+								"values": [
+									{
+										"value": {
+											"name": "Word Families",
+											"id": "e4b41bf60bb64a426b14046e490809c2"
+										}
+									}
+								]
+							},
+							{
+								"authority": "amzn1.er-authority.echo-sdk.dynamic.amzn1.ask.skill.942ffbb4-5c05-4bb8-be32-02b22136f84a.flashCardType",
+								"status": {
+									"code": "ER_SUCCESS_NO_MATCH"
+								}
+							}
+						]
+					},
+					"confirmationStatus": "NONE",
+					"source": "USER"
+				}
+			}
+		},
+		"dialogState": "COMPLETED"
+	}
+}
