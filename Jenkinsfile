@@ -8,7 +8,7 @@ pipeline {
 
       steps {
         // execute commands on Jenkins server
-        echo 'building the applictaion...'
+        echo 'building the applictaion again...'
       }
     }
 
