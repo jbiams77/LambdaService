@@ -71,7 +71,7 @@ namespace FlashCardService
                     break;
             }
 
-            return response;
+            return aresponse;
         }
 
         private void LogSessionStart(SkillRequest request)
