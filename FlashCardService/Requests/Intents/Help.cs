@@ -20,10 +20,11 @@ namespace FlashCardService.Requests.Intents
             }
 
             this.sessionAttributes.SessionState = STATE.Help;
-
-            return ResponseBuilder.Tell("You can move to other flash card lessons. Lessons available are word families, " +
+            var prompt = new SsmlOutputSpeech("You can move to other flash card lessons. Lessons available are word families, " +
                                         "short vowels, consonant digraphs, consonant blends, long vowels, and sight words. Just say, " +
                                         "Alexa, move to word families");
+            string reprompt = "Try to say, Alexa, move to word families";
+            return AlexaResponse.SayWithReprompt(prompt, reprompt);
         }
 
     }

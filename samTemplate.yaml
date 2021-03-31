@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Reading Flashcards
+Resources:
+  CDDemoLambda:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: FlashCardService::FlashCardService.Function::FunctionHandler
+      Runtime: .NETCorev3.1
+      CodeUri: ./FlashCardService
+      Description: 'CI-CD pipeline for LambdaServices'
+      MemorySize: 512
+      Timeout: 15
+      Role: 'arn:aws:iam::151435209032:role/CloudFormationServiceRole'
+      Events:
+        getAZsAPI:
+          Type: Api
+          Properties:
+            Path: /getazs
+            Method: get
+      Environment:
+        Variables:
+          REGION: us-west-2
