@@ -6,6 +6,7 @@ using Infrastructure.Logger;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using FlashCardService;
+using Infrastructure.Interfaces;
 
 namespace FlashCardService
 {
@@ -67,7 +68,6 @@ namespace FlashCardService
             this.ProductName = "NOT PROVIDED";
         }
 
-
         /// <summary>
         /// Updates this object with the values in the sessionAttributeDict
         /// </summary>
@@ -114,6 +114,7 @@ namespace FlashCardService
                 return "";
             }
         }
+
     }
 }
 
