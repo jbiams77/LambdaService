@@ -12,7 +12,7 @@ namespace MoycaSubtraction.Requests.Intents
 
         public SkillResponse HandleIntent()
         {
-            return ResponseBuilder.Tell("If you would like to play again, 'Alexa, open Moyca subtraction'. Goodbye.");
+            return ResponseBuilder.Tell("If you would like to play again, say 'Alexa, open Moyca subtraction'. Goodbye.");
         }
 
     }
