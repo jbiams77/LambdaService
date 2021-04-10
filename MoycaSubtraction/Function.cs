@@ -9,13 +9,13 @@ using Infrastructure.Logger;
 using Newtonsoft.Json;
 using Alexa.NET.InSkillPricing.Responses;
 using Infrastructure.Alexa;
-using MoycaAddition.Requests;
+using MoycaSubtraction.Requests;
 using Alexa.NET;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
-namespace MoycaAddition
+namespace MoycaSubtraction
 {
     /// <summary>
     /// Outputs logs to labmda function

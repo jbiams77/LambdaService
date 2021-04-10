@@ -4,7 +4,7 @@ using Alexa.NET.Request;
 using Alexa.NET.Response;
 using Infrastructure.GlobalConstants;
 
-namespace MoycaAddition.Requests.Intents
+namespace MoycaSubtraction.Requests.Intents
 {
     public class Stop : Intent
     {
@@ -12,7 +12,7 @@ namespace MoycaAddition.Requests.Intents
 
         public SkillResponse HandleIntent()
         {
-            return ResponseBuilder.Tell("If you would like to play again, 'Alexa, open Moyca Addition'. Goodbye.");
+            return ResponseBuilder.Tell("If you would like to play again, 'Alexa, open Moyca subtraction'. Goodbye.");
         }
 
     }

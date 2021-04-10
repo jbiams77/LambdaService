@@ -6,7 +6,6 @@ using Infrastructure.Logger;
 using System.ComponentModel;
 using Newtonsoft.Json;
 using FlashCardService;
-using Infrastructure.Interfaces;
 
 namespace FlashCardService
 {

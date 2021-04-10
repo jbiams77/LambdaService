@@ -4,7 +4,7 @@ using Alexa.NET.Response;
 using Alexa.NET.Request;
 using Infrastructure.GlobalConstants;
 
-namespace MoycaAddition.Requests.Intents
+namespace MoycaSubtraction.Requests.Intents
 {
     public class Fallback : Intent
     {

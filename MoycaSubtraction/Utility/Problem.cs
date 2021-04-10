@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace MoycaAddition.Utility
+namespace MoycaSubtraction.Utility
 {
     public class Problem 
     {
@@ -11,7 +11,7 @@ namespace MoycaAddition.Utility
         public int answer;        
         public override string ToString()
         {
-            return "" + num1 + " + " + num2 + " = " + answer;
+            return "" + num1 + " - " + num2 + " = " + answer;
         }
     }
 }
