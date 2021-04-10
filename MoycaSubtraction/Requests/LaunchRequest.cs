@@ -20,7 +20,7 @@ namespace MoycaAddition.Requests
         {
             LOGGER.log.INFO("LaunchRequest", "HandleRequest");
 
-            var addition = new Addition();
+            var addition = new Subtraction();
             
             MoycaResponse.SetSessionAttribute(addition.problem);
             MoycaResponse.SetSessionPromptAndReprompt(addition.ProblemPompt);

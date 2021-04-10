@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaServices.Test", "Lamb
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoycaAddition", "MoycaAddition\MoycaAddition.csproj", "{FEC03F32-4D99-4CAC-A643-FA15620D7955}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoycaSubtraction", "MoycaSubtraction\MoycaSubtraction.csproj", "{889F425B-6992-43FE-8105-1BFA5E11F377}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{FEC03F32-4D99-4CAC-A643-FA15620D7955}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEC03F32-4D99-4CAC-A643-FA15620D7955}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEC03F32-4D99-4CAC-A643-FA15620D7955}.Release|Any CPU.Build.0 = Release|Any CPU
+		{889F425B-6992-43FE-8105-1BFA5E11F377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{889F425B-6992-43FE-8105-1BFA5E11F377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{889F425B-6992-43FE-8105-1BFA5E11F377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{889F425B-6992-43FE-8105-1BFA5E11F377}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

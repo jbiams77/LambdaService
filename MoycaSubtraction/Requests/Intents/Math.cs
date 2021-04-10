@@ -34,17 +34,17 @@ namespace MoycaAddition.Requests.Intents
             }
 
             string prompt = "";
-            Addition nextProblem = null;
+            Subtraction nextProblem = null;
 
             if (problemSolved)
             {
-                nextProblem = new Addition();
+                nextProblem = new Subtraction();
                 prompt = CommonPhrases.ShortAffirmation +  ". " +  nextProblem.ProblemPompt;
             }
             else
             {
                 
-                nextProblem = new Addition(currentProblem);
+                nextProblem = new Subtraction(currentProblem);
                 prompt = CommonPhrases.TryAgain + ". " + nextProblem.ProblemPompt;
             }
 

@@ -74,20 +74,22 @@ namespace Infrastructure.Alexa
 
             SkillResponse response = new SkillResponse { Version = "1.1" };
 
-            var directive = MoycaResponse.Create_DynamicEntityDirective(_slotName, _slotValue);
-
-            ResponseBody body = new ResponseBody
+            response.Response = new ResponseBody
             {
-                ShouldEndSession = false,
+                ShouldEndSession = _shouldEndSession,
                 OutputSpeech = new SsmlOutputSpeech(StartTag + _prompt + EndTag),
                 Reprompt = new Reprompt()
                 {
                     OutputSpeech = new SsmlOutputSpeech(StartTag + _reprompt + EndTag)
                 }
-            };
+            };            
 
-            response.Response = body;
-            response.Response.Directives.Add(directive);
+            if (_slotName != null)
+            {
+                var directive = MoycaResponse.Create_DynamicEntityDirective(_slotName, _slotValue);
+                response.Response.Directives.Add(directive);
+            }
+            
 
             if (_sessionAttribute != null) response.SessionAttributes = new Dictionary<string, object>()
             {
