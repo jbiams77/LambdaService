@@ -63,6 +63,8 @@ namespace MoycaSubtraction.Requests.Intents
         {
             switch (number)
             {
+                case "zero":
+                    return (0 == answer);
                 case "one":
                     return (1 == answer);
                 case "two":
