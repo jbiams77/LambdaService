@@ -2,13 +2,13 @@
 using Alexa.NET.Response;
 using Alexa.NET.Request;
 using System.Linq;
-using MoycaAddition;
-using MoycaAddition.Utility;
+using MoycaSubtraction;
+using MoycaSubtraction.Utility;
 using Infrastructure.Alexa;
 using Newtonsoft.Json;
 using System;
 
-namespace MoycaAddition.Requests.Intents
+namespace MoycaSubtraction.Requests.Intents
 {
     public class Math : Intent
     {

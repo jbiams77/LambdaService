@@ -1,7 +1,7 @@
 ﻿
 using Alexa.NET.Request;
 
-namespace MoycaAddition.Requests.Intents
+namespace MoycaSubtraction.Requests.Intents
 {
     public class Intent
     {

@@ -3,12 +3,11 @@ using Alexa.NET.Response;
 using Alexa.NET.Request;
 using Infrastructure.DynamoDB;
 using Infrastructure.GlobalConstants;
-using FlashCardService.Interfaces;
 using Infrastructure.Alexa;
-using MoycaAddition;
+using MoycaSubtraction;
 using Alexa.NET;
 
-namespace MoycaAddition.Requests
+namespace MoycaSubtraction.Requests
 {
     public class SessionEnded : IRequest
     {

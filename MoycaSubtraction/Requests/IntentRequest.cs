@@ -2,12 +2,11 @@
 using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
-using MoycaAddition.Requests.Intents;
-using FlashCardService.Interfaces;
-using MoycaAddition;
+using MoycaSubtraction.Requests.Intents;
+using MoycaSubtraction;
 using Infrastructure.Alexa;
 
-namespace MoycaAddition.Requests
+namespace MoycaSubtraction.Requests
 {
 
     public class IntentRequest : IRequest

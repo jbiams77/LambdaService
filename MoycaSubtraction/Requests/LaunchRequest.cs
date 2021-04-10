@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
-using FlashCardService.Interfaces;
 using Infrastructure.Alexa;
-using MoycaAddition;
-using MoycaAddition.Utility;
+using MoycaSubtraction;
+using MoycaSubtraction.Utility;
 
-namespace MoycaAddition.Requests
+namespace MoycaSubtraction.Requests
 {
     public class LaunchRequest : IRequest
     {
@@ -20,15 +19,15 @@ namespace MoycaAddition.Requests
         {
             LOGGER.log.INFO("LaunchRequest", "HandleRequest");
 
-            var addition = new Subtraction();
+            var subtraction = new Subtraction();
             
-            MoycaResponse.SetSessionAttribute(addition.problem);
-            MoycaResponse.SetSessionPromptAndReprompt(addition.ProblemPompt);
-            //MoycaResponse.SetSessionSlotTypeAndValue("mathProblemType", addition.Answer.ToString());
-            MoycaResponse.SetSessionDisplayValue(addition.ProblemDisplay);
+            MoycaResponse.SetSessionAttribute(subtraction.problem);
+            MoycaResponse.SetSessionPromptAndReprompt(subtraction.ProblemPompt);
+            //MoycaResponse.SetSessionSlotTypeAndValue("mathProblemType", subtraction.Answer.ToString());
+            MoycaResponse.SetSessionDisplayValue(subtraction.ProblemDisplay);
             MoycaResponse.ShouldEndSession(false);
 
-            LOGGER.log.DEBUG("Launch", "HandleRequest", "Math Problem: " + addition.ProblemDisplay);
+            LOGGER.log.DEBUG("Launch", "HandleRequest", "Math Problem: " + subtraction.ProblemDisplay);
 
             return MoycaResponse.Deliver();
         }
