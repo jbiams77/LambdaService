@@ -24,6 +24,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoycaSubtraction", "MoycaSu
 		{488B3F35-30BF-466F-BA6B-428CAC35A08D} = {488B3F35-30BF-466F-BA6B-428CAC35A08D}
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoycaWordFamilies", "MoycaWordFamilies\MoycaWordFamilies.csproj", "{65F151F9-92BE-4F8E-86DF-9E05E27697C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +56,10 @@ Global
 		{889F425B-6992-43FE-8105-1BFA5E11F377}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{889F425B-6992-43FE-8105-1BFA5E11F377}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{889F425B-6992-43FE-8105-1BFA5E11F377}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F151F9-92BE-4F8E-86DF-9E05E27697C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F151F9-92BE-4F8E-86DF-9E05E27697C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F151F9-92BE-4F8E-86DF-9E05E27697C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F151F9-92BE-4F8E-86DF-9E05E27697C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

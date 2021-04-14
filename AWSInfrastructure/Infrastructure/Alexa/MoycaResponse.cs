@@ -6,6 +6,7 @@ using Infrastructure.Logger;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Alexa.NET.Request;
+using Infrastructure.GlobalConstants;
 
 namespace Infrastructure.Alexa
 {
@@ -25,7 +26,7 @@ namespace Infrastructure.Alexa
         private static string _slotName;
         private static string _slotValue;
         private static string _displayValue;
-        
+
         public static void ShouldEndSession(bool shouldEndSession)
         {
             _shouldEndSession = shouldEndSession;
