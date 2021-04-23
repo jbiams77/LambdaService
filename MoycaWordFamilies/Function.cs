@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
-using Amazon.DynamoDBv2.Model;
 using Infrastructure.Logger;
 using Newtonsoft.Json;
 using Alexa.NET.InSkillPricing.Responses;
@@ -43,7 +42,7 @@ namespace MoycaWordFamilies
             MoycaResponse.SetDisplaySupported(request.APLSupported());
             LogSessionStart(request);
 
-
+            
             switch (requestType)
             {
                 case "LaunchRequest":

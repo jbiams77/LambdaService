@@ -8,6 +8,13 @@ namespace Infrastructure.Alexa
     {
         private static Random random = new Random(0);
 
+        public static string YesOrNo
+        {
+            get
+            {
+                return "Please say yes to continue or no to quit";
+            }
+        }
         
         public static string Help
         {

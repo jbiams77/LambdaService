@@ -8,43 +8,52 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using Infrastructure.Interfaces;
+using Infrastructure.Factories;
 
-namespace MoycaWordFamilies.Utility
+namespace Infrastructure.Alexa
 {
     [JsonObject("WordsToRead")]
     public class WordsToRead
     {
         [JsonProperty("CurrentWord")]
-        public string CurrentWord { get; set; }
+        protected string CurrentWord { get; set; }
 
         [JsonProperty("SessionIndex")]
-        public int SessionIndex { get; set; }
+        protected int SessionIndex { get; set; }
 
         [JsonProperty("ListOfSessionWords")]
-        List<WordEntry> ListOfSessionWords;
+        protected List<WordEntry> ListOfSessionWords;
 
         [JsonProperty("SessionState")]
-        public static STATE sessionState { get; set; }
+        protected static STATE sessionState { get; set; }
 
-        // TODO: these fields will be used in child class, above fields in parent class
-        private string Filelocation => System.IO.Directory.GetCurrentDirectory() + @"\word-families.json";
-        private int WordFamilySize => 36;
+        private string WORD_LIST_URL;
+
+        private int SIZE;
+
+        protected ILesson lesson;
 
         public WordsToRead(Session session)
         {
 
         }
 
-        public WordsToRead()
-        {   
+        public WordsToRead(int size, string url, string lesson_name)
+        {
+            this.SIZE = size;
+            this.WORD_LIST_URL = url;            
+            GetRandomSession();
+            lesson = LessonFactory.GetLesson(lesson_name);
         }
 
-        public async Task GetRandomSession()
-        {
+        public void GetRandomSession()
+        {            
             Random random = new Random();
-            SessionIndex = random.Next(WordFamilySize);
+            SessionIndex = random.Next(SIZE);
             ListOfSessionWords = new List<WordEntry>();
-            JObject jObject = await ReadJsonFile();
+            JObject jObject = ReadJsonFile();
 
             if (jObject.TryGetValue(SessionIndex.ToString(), out var wordsToRead))
             {
@@ -52,20 +61,18 @@ namespace MoycaWordFamilies.Utility
             }
             if (ListOfSessionWords.Count > 0)
             {
-                CurrentWord = ListOfSessionWords[0].Words;
+                CurrentWord = ListOfSessionWords[0].Word;
             }
         }
 
 
-        private async Task<JObject> ReadJsonFile()
+        private JObject ReadJsonFile()
         {
-            StreamReader sr = await S3.GetFile("moyca-lambda-dependancies", "word-families.json");
-            string test = sr.ReadToEnd();
-            JsonTextReader reader = new JsonTextReader(sr);
-            using (reader)
+            using (WebClient wc = new WebClient())
             {
-                return (JObject)JToken.ReadFrom(reader);
-            }
+                var json = wc.DownloadString(WORD_LIST_URL);
+                return JObject.Parse(json);
+            }            
         }
 
         private void ConvertWordsToRead(JToken wordsToRead)

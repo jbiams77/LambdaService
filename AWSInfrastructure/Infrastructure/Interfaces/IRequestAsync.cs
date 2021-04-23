@@ -8,7 +8,7 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Alexa.NET.InSkillPricing.Responses;
 
-namespace Infrastructure.Alexa
+namespace Infrastructure.Interfaces
 {
     public interface IRequestAsync
     {

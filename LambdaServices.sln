@@ -25,6 +25,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoycaSubtraction", "MoycaSu
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoycaWordFamilies", "MoycaWordFamilies\MoycaWordFamilies.csproj", "{65F151F9-92BE-4F8E-86DF-9E05E27697C7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{488B3F35-30BF-466F-BA6B-428CAC35A08D} = {488B3F35-30BF-466F-BA6B-428CAC35A08D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

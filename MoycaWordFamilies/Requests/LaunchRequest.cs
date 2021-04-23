@@ -5,6 +5,7 @@ using Alexa.NET.Request;
 using Infrastructure.Alexa;
 using MoycaWordFamilies.Utility;
 using Infrastructure.GlobalConstants;
+using Infrastructure.Interfaces;
 
 namespace MoycaWordFamilies.Requests
 {
@@ -19,15 +20,14 @@ namespace MoycaWordFamilies.Requests
         {
             LOGGER.log.INFO("LaunchRequest", "HandleRequest");
 
-            var currentWordsToRead = new WordsToRead();
-            await currentWordsToRead.GetRandomSession();
+            var wordSession = new WordFamilies();            
 
-            MoycaResponse.SetSessionAttribute(currentWordsToRead);
-            MoycaResponse.SetSessionPromptAndReprompt("TESTING");
-            MoycaResponse.SetSessionDisplayValue("TESTING");
+            MoycaResponse.SetSessionAttribute(wordSession);
+            MoycaResponse.SetSessionPromptAndReprompt(wordSession.Introduction());
+            MoycaResponse.SetSessionDisplayValue(wordSession.CurrentWord);
             MoycaResponse.ShouldEndSession(false);
 
-            //LOGGER.log.DEBUG("Launch", "HandleRequest", "Math Problem: " + addition.ProblemDisplay);
+            LOGGER.log.DEBUG("Launch", "HandleRequest", "Word to Read: " + wordSession.CurrentWord);
 
             return MoycaResponse.Deliver();
         }

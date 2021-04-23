@@ -17,18 +17,8 @@ namespace Infrastructure.S3
         public const string COGNITO_POOL_ID = "";
 
         private static AWSCredentials cognitoCredentials;
-        private static CognitoAWSCredentials Credentials
-        {
-            get
-            {
-                if (cognitoCredentials == null)
-                {
-                    cognitoCredentials = new CognitoAWSCredentials(COGNITO_POOL_ID, REGION);
-                }
-                return cognitoCredentials;
-            }
-        }
 
+            
         public static async Task<StreamReader> GetFile(string bucketName, string key)
         {
             IAmazonS3 S3Client = new AmazonS3Client();

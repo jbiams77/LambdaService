@@ -3,22 +3,22 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace MoycaWordFamilies.Utility
+namespace Infrastructure.Alexa
 {
     [JsonObject("wordEntry")]
     public class WordEntry
     {
         [JsonProperty("words")]
-        public string Words { get; set; }
+        public string Word { get; set; }
 
         [JsonProperty("wordfamily")]
-        public string Wordfamily{ get; set; }
+        public string WordFamily{ get; set; }
 
         [JsonProperty("cvc")]
         public string CVC{ get; set; }
 
         [JsonProperty("sightword")]
-        public string Sightword{ get; set; }
+        public string SightWord{ get; set; }
 
         [JsonProperty("e_controlled")]
         public string E_controlled{ get; set; }

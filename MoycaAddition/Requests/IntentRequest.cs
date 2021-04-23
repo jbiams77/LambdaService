@@ -6,6 +6,7 @@ using MoycaAddition.Requests.Intents;
 using FlashCardService.Interfaces;
 using MoycaAddition;
 using Infrastructure.Alexa;
+using Infrastructure.Interfaces;
 
 namespace MoycaAddition.Requests
 {

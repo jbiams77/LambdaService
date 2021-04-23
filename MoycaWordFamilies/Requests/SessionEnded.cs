@@ -1,10 +1,6 @@
-﻿using System.Threading.Tasks;
-using Alexa.NET.Response;
-using Alexa.NET.Request;
-using Infrastructure.DynamoDB;
-using Infrastructure.GlobalConstants;
-using Infrastructure.Alexa;
+﻿using Alexa.NET.Response;
 using Alexa.NET;
+using Infrastructure.Interfaces;
 
 namespace MoycaWordFamilies.Requests
 {

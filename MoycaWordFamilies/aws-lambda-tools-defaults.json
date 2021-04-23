@@ -6,7 +6,7 @@
         "dotnet lambda help",
         "All the command line options for the Lambda command can be specified in this file."
     ],
-    "profile"     : "jbiams77",
+    "profile"     : "default",
     "region"      : "us-west-2",
     "configuration" : "Debug",
     "framework"     : "netcoreapp3.1",

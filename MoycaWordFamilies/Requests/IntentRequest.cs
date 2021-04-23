@@ -3,8 +3,7 @@ using Alexa.NET;
 using Alexa.NET.Response;
 using Alexa.NET.Request;
 using MoycaWordFamilies.Requests.Intents;
-using Infrastructure.Alexa;
-using MoycaWordFamilies.Requests.Intents;
+using Infrastructure.Interfaces;
 
 namespace MoycaWordFamilies.Requests
 {

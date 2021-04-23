@@ -20,7 +20,7 @@ namespace MoycaWordFamilies.Requests.Intents
 
             var request = (Alexa.NET.Request.Type.IntentRequest)skillRequest.Request;
 
-            WordsToRead word = new WordsToRead(base.skillRequest.Session);
+            WordFamilies word = new WordFamilies(base.skillRequest.Session);
 
             bool problemSolved = false;
 
@@ -34,11 +34,11 @@ namespace MoycaWordFamilies.Requests.Intents
             }
 
             string prompt = "";
-            WordsToRead nextWord = null;
+            WordFamilies nextWord = null;
 
             if (problemSolved)
             {
-                nextWord = new WordsToRead();
+                nextWord = new WordFamilies();
                 prompt = CommonPhrases.ShortAffirmation + ". " + nextWord.ToString();
             }
             else

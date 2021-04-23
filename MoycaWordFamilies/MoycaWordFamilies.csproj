@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -8,13 +8,16 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Alexa.NET" Version="1.15.0" />
+    <PackageReference Include="Alexa.NET.APL" Version="7.1.0" />
+    <PackageReference Include="Alexa.NET.InSkillPricing" Version="3.0.0" />
     <PackageReference Include="Amazon.Lambda.Core" Version="1.2.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="2.1.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AWSInfrastructure\Infrastructure\Infrastructure.csproj" />
+    <Reference Include="Infrastructure">
+      <HintPath>..\AWSInfrastructure\Infrastructure\bin\Debug\netcoreapp3.1\Infrastructure.dll</HintPath>
+    </Reference>
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy /E /Y &quot;$(ProjectDir)\Utility\Dictionary&quot; &quot;$(OutDir)&quot;" />
-  </Target>
 </Project>
