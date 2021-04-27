@@ -1,4 +1,5 @@
-﻿using Alexa.NET.Request;
+﻿using Alexa.NET;
+using Alexa.NET.Request;
 using Alexa.NET.Response;
 using Infrastructure.Alexa;
 using System.Linq;
@@ -38,7 +39,8 @@ namespace MoycaWordFamilies.Requests.Intents
                 }
                 else if (sessionFinished && !words.Purchased && !words.Purchasable)
                 {
-
+                    prompt += CommonPhrases.LongAffirmation;
+                    return ResponseBuilder.Tell("If you would like to play again, say 'Alexa, open Moyca Word Families'. Goodbye.");
                 }
                 else
                 {
