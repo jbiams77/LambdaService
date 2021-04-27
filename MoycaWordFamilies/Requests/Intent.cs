@@ -8,17 +8,16 @@ using Infrastructure.Interfaces;
 namespace MoycaWordFamilies.Requests
 {
 
-    public class IntentRequest : IRequest
+    public class Intent : IRequest
     {
         private SkillRequest skillRequest;
 
-        public IntentRequest(SkillRequest skillRequest) 
+        public Intent(SkillRequest skillRequest) 
         {
             this.skillRequest = skillRequest;
         }
 
-
-        public SkillResponse HandleRequest()
+        public async Task<SkillResponse> HandleRequest()
         {
             string intentName = ((Alexa.NET.Request.Type.IntentRequest)skillRequest.Request).Intent.Name;            
 
@@ -30,7 +29,7 @@ namespace MoycaWordFamilies.Requests
                     return new Cancel(this.skillRequest).HandleIntent();
 
                 case "AMAZON.FallbackIntent":
-                    return new Fallback(this.skillRequest).HandleIntent();
+                    return await new Fallback(this.skillRequest).HandleIntent();
 
                 case "AMAZON.HelpIntent":
                     return new Help(this.skillRequest).HandleIntent();
@@ -39,8 +38,15 @@ namespace MoycaWordFamilies.Requests
                     return new Stop(this.skillRequest).HandleIntent();
 
                 case "ValidateUserResponseIntent":
-                    return new ValidateUserResponse(this.skillRequest).HandleIntent();
-                    
+                    return await new ValidateUserResponse(this.skillRequest).HandleIntent();
+
+                case "MakePurchaseIntent":
+                    return await new MakePurchase(this.skillRequest).HandleIntent();
+
+                case "RefundPurchaseIntent":
+                    return new RefundPurchase(this.skillRequest).HandleIntent();
+
+
                 default:                    
                     return ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moyca Readers'. Goodbye.");
             }

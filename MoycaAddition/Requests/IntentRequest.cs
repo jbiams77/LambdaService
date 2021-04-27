@@ -21,7 +21,7 @@ namespace MoycaAddition.Requests
         }
 
 
-        public SkillResponse HandleRequest()
+        public async Task<SkillResponse> HandleRequest()
         {
             string intentName = ((Alexa.NET.Request.Type.IntentRequest)skillRequest.Request).Intent.Name;            
 

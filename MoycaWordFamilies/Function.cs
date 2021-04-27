@@ -10,6 +10,7 @@ using Alexa.NET.InSkillPricing.Responses;
 using Infrastructure.Alexa;
 using MoycaWordFamilies.Requests;
 using Alexa.NET;
+using MoycaWordFamilies.Responses;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -39,31 +40,35 @@ namespace MoycaWordFamilies
 
             string requestType = request.Request.Type;
             LOGGER.log = MoycaLogger.GetLogger(context, LogLevel.TRACE);
-            MoycaResponse.SetDisplaySupported(request.APLSupported());
+            MoycaResponse.DisplaySupported = request.APLSupported();
+            MoycaResponse.Prompt = "";
             LogSessionStart(request);
-
+            
+            ///
+            /// FIX IX WORD FAMILY (SAYS 9) !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            ///
             
             switch (requestType)
             {
                 case "LaunchRequest":
                     LOGGER.log.DEBUG("Function", "Launch Request");
-                    response = await new LaunchRequest(request).HandleRequest();
+                    response = await new Launch(request).HandleRequest();
                     break;
 
                 case "IntentRequest":
                     LOGGER.log.DEBUG("Function", "Intent Request");
-                    response = new IntentRequest(request).HandleRequest();
+                    response = await new Requests.Intent(request).HandleRequest();
                     break;
 
                 case "SessionEndedRequest":
                     LOGGER.log.DEBUG("Function", "Session Ended Request");
-                    response = new SessionEnded().HandleRequest();
+                    response = await new SessionEnded().HandleRequest();
                     break;
 
-                //case "Connections.Response":
-                //    LOGGER.log.DEBUG("Function", "Connection Response ");
-                //    response = await new Connection(request).HandleRequest();
-                //    break;
+                case "Connections.Response":
+                    LOGGER.log.DEBUG("Function", "Connection Response ");
+                    response = await new Connection(request).HandleRequest();
+                    break;
 
                 default:
                     LOGGER.log.DEBUG("Function", "Default Error Request");

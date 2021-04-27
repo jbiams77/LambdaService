@@ -111,7 +111,6 @@ namespace Infrastructure.GlobalConstants
     {
         Off,
         Introduction,
-        FirstWord,
         Assess,
         MakingPurchase,
         Help

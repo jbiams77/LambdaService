@@ -11,30 +11,22 @@ using Infrastructure.Alexa;
 
 namespace Infrastructure.Lessons
 {
-    public class SightWords : ILesson
+    public class SightWordsLesson : ILesson
     {
         public string ProductName => "Sight Words";
         public string InSkillPurchaseName => "sight_words";
         public string LessonTypeName => "SW";
+        public bool Display { get; set; }
+        
 
-        private string quickReply;
-        public string QuickReply
+        public SightWordsLesson(bool display)
         {
-            set { quickReply = value; }
-            get { return quickReply + SSML.PauseFor(1) ?? (quickReply = ""); }
+            Display = display;
         }
 
-        public string Dialogue(MODE mode, WordEntry wordAttributes)
+        public string HelpWithWord(WordEntry wordAttributes)
         {
-            switch (mode)
-            {
-                case MODE.Assess:
-                    return AssessTheWord(wordAttributes);
-                case MODE.Teach:
-                    return TeachTheWord(wordAttributes);
-                default:
-                    return "ERROR";
-            }
+            throw new NotImplementedException();
         }
 
         public string Introduction(WordEntry wordAttributes)
@@ -53,10 +45,5 @@ namespace Infrastructure.Lessons
             throw new NotImplementedException();
         }
 
-        private string AssessTheWord(WordEntry wordAttributes)
-        {
-            string output = QuickReply + " Say the word";
-            return output;
-        }
     }
 }

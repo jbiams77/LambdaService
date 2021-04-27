@@ -16,6 +16,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AWSInfrastructure\Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="Infrastructure">
       <HintPath>..\AWSInfrastructure\Infrastructure\bin\Debug\netcoreapp3.1\Infrastructure.dll</HintPath>
     </Reference>

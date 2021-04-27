@@ -12,17 +12,20 @@ using Infrastructure.Alexa;
 
 namespace Infrastructure.Lessons
 {
-    public class ConsonantBlend : ILesson
+    public class ConsonantBlendLesson : ILesson
     {
         public string ProductName => "Consonant Blends";
         public string InSkillPurchaseName => "digraph_blends";
         public string LessonTypeName => "CB";
-
-        private string quickReply;
-        public string QuickReply
+        public bool Display { get; set; }
+        public ConsonantBlendLesson(bool display)
         {
-            set { quickReply = value; }
-            get { return quickReply + SSML.PauseFor(1) ?? (quickReply = ""); }
+            Display = display;
+        }
+
+        public string HelpWithWord(WordEntry wordAttributes)
+        {
+            throw new NotImplementedException();
         }
 
         public string Introduction(WordEntry wordAttributes)
@@ -46,25 +49,12 @@ namespace Infrastructure.Lessons
             return teachModel;
         }
 
-        public string Dialogue(MODE mode, WordEntry wordAttributes)
-        {
-            switch (mode)
-            {
-                case MODE.Assess:
-                    return AssessTheWord(wordAttributes);
-                case MODE.Teach:
-                    return TeachTheWord(wordAttributes);
-                default:
-                    return "ERROR";
-            }
-        }
-
         public string TeachTheWord(WordEntry wordAttributes)
         {            
 
             string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
             string vowelSound = wordAttributes.VowelPhoneme;
-            string teachModel = QuickReply;
+            string teachModel = "";
             teachModel += SSML.PauseFor(1);
             teachModel += " The word is spelled ";
             foreach (string sound in decodedWord)
@@ -79,10 +69,5 @@ namespace Infrastructure.Lessons
             return teachModel;
         }
 
-        private string AssessTheWord(WordEntry wordAttributes)
-        {
-            string output = QuickReply + " Say the word";
-            return output;
-        }
     }
 }

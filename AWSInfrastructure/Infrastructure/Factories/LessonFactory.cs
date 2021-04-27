@@ -8,7 +8,7 @@ namespace Infrastructure.Factories
 {
     public class LessonFactory
     {
-        public static ILesson GetLesson(string lessonType)
+        public static ILesson GetLesson(string lessonType, bool display)
         {            
 
             switch (lessonType)
@@ -17,37 +17,37 @@ namespace Infrastructure.Factories
                 case "Word Families":
                 case "word families":
                 case "word_families":
-                    return new WordFamilies();
+                    return new WordFamiliesLesson(display);
                     
                 case "CVC":
                 case "Short Vowels":
                 case "short vowels":
                 case "short_vowels":
-                    return new ShortVowels();
+                    return new ShortVowelsLesson(display);
                     
                 case "CD":
                 case "Consonant Digraphs":
                 case "consonant digraphs":
                 case "consonant_digraphs":
-                    return new ConsonantDigraph();
+                    return new ConsonantDigraphLesson(display);
 
                 case "CB":
                 case "Consonant Blends":
                 case "consonant blends":
                 case "consonant_blends":
-                    return new ConsonantBlend();
+                    return new ConsonantBlendLesson(display);
 
                 case "SW":
                 case "Sight Words":
                 case "sight words":
                 case "sight_words":
-                    return new SightWords();
+                    return new SightWordsLesson(display);
 
                 case "E":
                 case "Long Vowels":
                 case "long vowels":
                 case "long_vowels":
-                    return new LongVowels();
+                    return new LongVowelsLesson(display);
             }
 
             throw new NotImplementedException("Lesson Type does not exist: " + lessonType);

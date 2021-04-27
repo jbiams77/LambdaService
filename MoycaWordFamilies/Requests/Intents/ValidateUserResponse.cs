@@ -1,11 +1,8 @@
 ﻿using Alexa.NET.Request;
 using Alexa.NET.Response;
 using Infrastructure.Alexa;
-using MoycaWordFamilies.Utility;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace MoycaWordFamilies.Requests.Intents
 {
@@ -14,54 +11,73 @@ namespace MoycaWordFamilies.Requests.Intents
 
         public ValidateUserResponse(SkillRequest request) : base(request) { }
 
-        public SkillResponse HandleIntent()
+        public async Task<SkillResponse> HandleIntent()
         {
-            LOGGER.log.INFO("Math", "HandleIntent");
+            LOGGER.log.INFO("ValidateUserResponse", "HandleIntent");
 
             var request = (Alexa.NET.Request.Type.IntentRequest)skillRequest.Request;
-
-            WordFamilies word = new WordFamilies(base.skillRequest.Session);
-
-            bool problemSolved = false;
-
-            if (SaidTheWord(request, out string wordSaid))
-            {
-                problemSolved = (wordSaid.Equals(word.CurrentWord));
-            }
-            else
-            {
-                problemSolved = false;
-            }
+            bool wordSaid = SaidTheWord(request);
 
             string prompt = "";
-            WordFamilies nextWord = null;
 
-            if (problemSolved)
+            if (wordSaid)
             {
-                nextWord = new WordFamilies();
-                prompt = CommonPhrases.ShortAffirmation + ". " + nextWord.ToString();
+                // remove current word, grab next word
+                bool sessionFinished = base.words.RemoveCurrentWord();
+                words.Attempts = 1;
+
+                if (sessionFinished && words.Purchased)
+                {
+                    MoycaResponse.Prompt += CommonPhrases.LongAffirmation;
+                    return await new Launch(skillRequest).HandleRequest();
+                }
+                else if (sessionFinished && !words.Purchased && words.Purchasable)
+                {
+                    MoycaResponse.Prompt += CommonPhrases.LongAffirmation;
+                    return await new MakePurchase(this.skillRequest).HandleIntent();
+                }
+                else if (sessionFinished && !words.Purchased && !words.Purchasable)
+                {
+
+                }
+                else
+                {
+                    LOGGER.log.DEBUG("ValidateUserResponse", "HandleIntent", "Word was said");
+                    prompt += CommonPhrases.ShortAffirmation + ". " + base.words.SayTheWord();
+                }
+                
             }
             else
-            {
+            {               
 
-                nextWord = word;
-                prompt = CommonPhrases.TryAgain + ". " + nextWord.ToString();
+                if (base.words.Attempts > 1)
+                {
+                    prompt += base.words.Teach();       
+                }
+                else
+                {
+                    
+                    prompt += CommonPhrases.TryAgain + ". " + base.words.SayTheWord();
+                }
+
+                words.Attempts += 1;
             }
 
-            MoycaResponse.SetSessionAttribute(nextWord.ToString());
-            MoycaResponse.SetSessionPromptAndReprompt(prompt);
-            //MoycaResponse.SetSessionSlotTypeAndValue("mathProblemType", nextProblem.Answer.ToString());
-            MoycaResponse.SetSessionDisplayValue(nextWord.ToString());
-            MoycaResponse.ShouldEndSession(false);
-
-            LOGGER.log.DEBUG("Math", "HandleIntent", "Current Problem: " + nextWord.ToString());
+            MoycaResponse.SessionAttributes = base.words;
+            MoycaResponse.SlotName = "wordToReadType";
+            MoycaResponse.SlotWord = words.CurrentWord;
+            MoycaResponse.Prompt += prompt;
+            MoycaResponse.Reprompt = prompt;
+            MoycaResponse.DisplayValue = base.words.CurrentWord;
+            MoycaResponse.ShouldEndSession = false;
+            
+            LOGGER.log.DEBUG("ValidateUserResponse", "HandleIntent", "Current Word: " + base.words.CurrentWord);
 
             return MoycaResponse.Deliver();
         }
-                
 
 
-        private bool SaidTheWord(Alexa.NET.Request.Type.IntentRequest input, out string number)
+        private bool SaidTheWord(Alexa.NET.Request.Type.IntentRequest input)
         {
             if (input.Intent.Slots?.Any() ?? false)
             {
@@ -69,12 +85,11 @@ namespace MoycaWordFamilies.Requests.Intents
                 {
                     if (auth.Status.Code == ResolutionStatusCode.SuccessfulMatch)
                     {
-                        number = auth.Values[0].Value.Name;
                         return true;
                     }
                 }
             }
-            number = null;
+
             return false;
         }
 

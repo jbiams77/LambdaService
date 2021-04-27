@@ -41,7 +41,7 @@ namespace MoycaAddition
             string requestType = request.Request.Type;
             LOGGER.log = MoycaLogger.GetLogger(context, LogLevel.TRACE);
 
-            MoycaResponse.SetDisplaySupported(request.APLSupported());
+            MoycaResponse.DisplaySupported = request.APLSupported();
 
             LogSessionStart(request);
 
@@ -54,7 +54,7 @@ namespace MoycaAddition
 
                 case "IntentRequest":
                     LOGGER.log.DEBUG("Function", "Intent Request");
-                    response = new IntentRequest(request).HandleRequest();
+                    response = await new IntentRequest(request).HandleRequest();
                     break;
 
                 case "SessionEndedRequest":

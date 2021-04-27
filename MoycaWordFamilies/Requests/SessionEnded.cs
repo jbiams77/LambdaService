@@ -1,6 +1,7 @@
 ﻿using Alexa.NET.Response;
 using Alexa.NET;
 using Infrastructure.Interfaces;
+using System.Threading.Tasks;
 
 namespace MoycaWordFamilies.Requests
 {
@@ -8,7 +9,7 @@ namespace MoycaWordFamilies.Requests
     {
         public SessionEnded() {}
 
-        public SkillResponse HandleRequest()
+        public async Task<SkillResponse> HandleRequest()
         {
             LOGGER.log.INFO("SessionEnded", "HandleRequest");
             return ResponseBuilder.Tell("Goodbye Moycan!");

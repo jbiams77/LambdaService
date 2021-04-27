@@ -12,6 +12,6 @@ namespace Infrastructure.Interfaces
 {
     public interface IRequest
     {
-        public SkillResponse HandleRequest();
+        public Task<SkillResponse> HandleRequest();
     }
 }

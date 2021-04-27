@@ -16,9 +16,11 @@ namespace Infrastructure.Interfaces
         string ProductName { get; }
         string InSkillPurchaseName { get; }
         string LessonTypeName { get; }
-        string QuickReply { get; set; }
+        bool Display { get; set; }
 
-        string Introduction(WordEntry wordAttributes);
-        string Dialogue(MODE mode, WordEntry wordAttributes);
+        string Introduction(WordEntry wordAttributesy);
+        string TeachTheWord(WordEntry wordAttributes);
+        string HelpWithWord(WordEntry wordAttributes);
+        
     }
 }

@@ -12,7 +12,7 @@ namespace MoycaWordFamilies.Requests.Intents
 
         public SkillResponse HandleIntent()
         {
-            return ResponseBuilder.Tell("If you would like to play again, say 'Alexa, open Moyca Addition'. Goodbye.");
+            return ResponseBuilder.Tell("If you would like to play again, say 'Alexa, open Moyca Word Families'. Goodbye.");
         }
 
     }

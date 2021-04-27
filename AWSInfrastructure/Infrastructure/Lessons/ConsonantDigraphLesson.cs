@@ -13,30 +13,21 @@ using Infrastructure.Alexa;
 
 namespace Infrastructure.Lessons
 {
-    public class ConsonantDigraph : ILesson
+    public class ConsonantDigraphLesson : ILesson
     {
         public string ProductName => "Consonant Digraph";
         public string InSkillPurchaseName => "digraph_blends";
         public string LessonTypeName => "CD";
+        public bool Display { get; set; }
 
-        private string quickReply;
-        public string QuickReply
+        public ConsonantDigraphLesson(bool display)
         {
-            set { quickReply = value; }
-            get { return quickReply + SSML.PauseFor(1) ?? (quickReply = ""); }
+            Display = display;
         }
 
-        public string Dialogue(MODE mode, WordEntry wordAttributes)
+        public string HelpWithWord(WordEntry wordAttributes)
         {
-            switch (mode)
-            {
-                case MODE.Assess:
-                    return AssessTheWord(wordAttributes);
-                case MODE.Teach:
-                    return TeachTheWord(wordAttributes);
-                default:
-                    return "ERROR";
-            }
+            throw new NotImplementedException();
         }
 
         public string Introduction(WordEntry wordAttributes)
@@ -66,7 +57,7 @@ namespace Infrastructure.Lessons
 
             string[] decodedWord = wordAttributes.Word.Select(x => x.ToString()).ToArray();
             string vowelSound = wordAttributes.VowelPhoneme;
-            string teachModel = QuickReply;
+            string teachModel = "";
             teachModel += SSML.PauseFor(1);
             teachModel += " The word is spelled ";
             foreach (string sound in decodedWord)
@@ -81,10 +72,5 @@ namespace Infrastructure.Lessons
             return teachModel; 
         }
 
-        private string AssessTheWord(WordEntry wordAttributes)
-        {
-            string output = QuickReply + " Say the word";
-            return output;
-        }
     }
 }

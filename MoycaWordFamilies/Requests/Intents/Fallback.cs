@@ -10,9 +10,9 @@ namespace MoycaWordFamilies.Requests.Intents
     {
         public Fallback(SkillRequest request) : base(request) { }
 
-        public SkillResponse HandleIntent()
+        public async Task<SkillResponse> HandleIntent()
         {  
-            return new ValidateUserResponse(base.skillRequest).HandleIntent();
+            return await new ValidateUserResponse(base.skillRequest).HandleIntent();
         }
 
     }
