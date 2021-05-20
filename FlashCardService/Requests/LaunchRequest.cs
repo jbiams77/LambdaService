@@ -30,7 +30,7 @@ namespace FlashCardService.Requests
             LOGGER.log.INFO("LaunchRequest", "HandleRequest");
 
             await this.userProfile.GetUserProfileData();
-
+            await productInventory.GetAvailableProducts();
             if (userProfile.RequiresPurchase())
             {
                 LOGGER.log.DEBUG("LaunchRequest", "HandleRequest", "Schedule is premium content");
