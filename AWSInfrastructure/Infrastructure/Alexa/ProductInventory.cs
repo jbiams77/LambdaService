@@ -23,9 +23,9 @@ namespace Infrastructure.Alexa
         private SkillRequest input;
         private InSkillProductsClient client;
         private InSkillProductsResponse productsResponse;
-        public bool Purchasable { get; set; }
-        public bool Purchased { get; set; }
-        public string ProductId { get; set; }
+        public bool Purchasable { get; set; } = false;
+        public bool Purchased { get; set; } = false;
+        public string ProductId { get; set; } = "";
 
         public ProductInventory(SkillRequest input)
         {
@@ -34,23 +34,12 @@ namespace Infrastructure.Alexa
 
         public async Task UpdateProductInfo(string productName)
         {
-            
-            try
-            {
-                this.client = new InSkillProductsClient(this.input);
-                this.productsResponse = await client.GetProducts();
-                var item = productsResponse.Products.FirstOrDefault(o => o.ReferenceName == productName);
-                Purchasable = (item != null && item.Purchasable.Equals(PurchaseState.Purchasable));
-                Purchased = (item != null && item.ActiveEntitlementCount > 0);
-                ProductId = item.ProductId;
-            }
-            catch (Exception e)
-            {
-                Purchasable = false;
-                Purchased = false;
-                ProductId = "";
-            }
-            
+            this.client = new InSkillProductsClient(this.input);
+            this.productsResponse = await client.GetProducts();
+            var item = productsResponse.Products.FirstOrDefault(o => o.ReferenceName == productName);
+            Purchasable = (item != null && item.Purchasable.Equals(PurchaseState.Purchasable));
+            Purchased = (item != null && item.ActiveEntitlementCount > 0);
+            ProductId = item.ProductId;
         }
 
     }

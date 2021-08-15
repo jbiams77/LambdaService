@@ -23,7 +23,15 @@ namespace MoycaWordFamilies.Requests
             LOGGER.log.INFO("LaunchRequest", "HandleRequest");
 
             var productInventory = new ProductInventory(skillRequest);
-            await productInventory.UpdateProductInfo("word_families");
+
+            try
+            {
+                await productInventory.UpdateProductInfo("word_families");
+            }
+            catch (Exception e)
+            {
+                LOGGER.log.WARN("LaunchRequest", "HandleRequest::UpdateProductInfo", e.Message);
+            }
 
             var words = new WordFamilies(productInventory)
             {

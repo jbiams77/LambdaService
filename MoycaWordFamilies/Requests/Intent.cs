@@ -22,7 +22,7 @@ namespace MoycaWordFamilies.Requests
             string intentName = ((Alexa.NET.Request.Type.IntentRequest)skillRequest.Request).Intent.Name;            
 
             LOGGER.log.INFO("IntentRequest", "HandleRequest", intentName);
-            
+
             switch (intentName)
             {   
                 case "AMAZON.CancelIntent":
