@@ -67,7 +67,6 @@ namespace FlashCardService
             this.ProductName = "NOT PROVIDED";
         }
 
-
         /// <summary>
         /// Updates this object with the values in the sessionAttributeDict
         /// </summary>
@@ -114,6 +113,7 @@ namespace FlashCardService
                 return "";
             }
         }
+
     }
 }
 

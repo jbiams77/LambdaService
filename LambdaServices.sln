@@ -15,7 +15,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashCardService", "FlashCa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "AWSInfrastructure\Infrastructure\Infrastructure.csproj", "{488B3F35-30BF-466F-BA6B-428CAC35A08D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LambdaServices.Test", "LambdaServices.Test\LambdaServices.Test.csproj", "{FF634E12-E6EA-45DC-AF62-2B690391066C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LambdaServices.Test", "LambdaServices.Test\LambdaServices.Test.csproj", "{FF634E12-E6EA-45DC-AF62-2B690391066C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoycaAddition", "MoycaAddition\MoycaAddition.csproj", "{FEC03F32-4D99-4CAC-A643-FA15620D7955}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MoycaSubtraction", "MoycaSubtraction\MoycaSubtraction.csproj", "{889F425B-6992-43FE-8105-1BFA5E11F377}"
+	ProjectSection(ProjectDependencies) = postProject
+		{488B3F35-30BF-466F-BA6B-428CAC35A08D} = {488B3F35-30BF-466F-BA6B-428CAC35A08D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +46,14 @@ Global
 		{FF634E12-E6EA-45DC-AF62-2B690391066C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF634E12-E6EA-45DC-AF62-2B690391066C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF634E12-E6EA-45DC-AF62-2B690391066C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEC03F32-4D99-4CAC-A643-FA15620D7955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEC03F32-4D99-4CAC-A643-FA15620D7955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEC03F32-4D99-4CAC-A643-FA15620D7955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEC03F32-4D99-4CAC-A643-FA15620D7955}.Release|Any CPU.Build.0 = Release|Any CPU
+		{889F425B-6992-43FE-8105-1BFA5E11F377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{889F425B-6992-43FE-8105-1BFA5E11F377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{889F425B-6992-43FE-8105-1BFA5E11F377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{889F425B-6992-43FE-8105-1BFA5E11F377}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
