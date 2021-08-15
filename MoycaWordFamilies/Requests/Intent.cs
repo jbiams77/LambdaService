@@ -44,7 +44,7 @@ namespace MoycaWordFamilies.Requests
                     return await new MakePurchase(this.skillRequest).HandleIntent();
 
                 case "RefundPurchaseIntent":
-                    return new RefundPurchase(this.skillRequest).HandleIntent();
+                    return await new RefundPurchase(this.skillRequest).HandleIntent();
 
 
                 default:                    

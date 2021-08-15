@@ -5,6 +5,7 @@ using Infrastructure.Alexa;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace MoycaWordFamilies.Requests.Intents
 {
@@ -12,9 +13,17 @@ namespace MoycaWordFamilies.Requests.Intents
     {
         public RefundPurchase(SkillRequest request) : base(request) { }
 
-        public SkillResponse HandleIntent()
+        public async Task<SkillResponse> HandleIntent()
         {
-            return MoycaResponse.RefundPurchaseResponse(base.words.ProductId, "word_families");
+            if (!base.words.Purchased && !base.words.Purchasable)
+            {
+                MoycaResponse.Prompt += CommonPhrases.InvalidRefund();
+                return await new Launch(base.skillRequest).HandleRequest();
+            }
+            else
+            {
+                return MoycaResponse.RefundPurchaseResponse(base.words.ProductId, "word_families");
+            }
         }
 
     }

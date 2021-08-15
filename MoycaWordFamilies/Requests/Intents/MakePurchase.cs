@@ -20,7 +20,6 @@ namespace MoycaWordFamilies.Requests.Intents
 
         public async Task<SkillResponse> HandleIntent()
         {
-
             if (!base.words.Purchased && base.words.Purchasable)
             {
                 MoycaResponse.Prompt += CommonPhrases.Upsell(" Word Family ", " Word Families");
@@ -28,7 +27,7 @@ namespace MoycaWordFamilies.Requests.Intents
             }
             else if (!base.words.Purchased && !base.words.Purchasable)
             {
-                MoycaResponse.Prompt += CommonPhrases.NotPurchaseable(" Word Family ");
+                MoycaResponse.Prompt += CommonPhrases.NotPurchaseable();
                 return await new Launch(base.skillRequest).HandleRequest();
             }
 

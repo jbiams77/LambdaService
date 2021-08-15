@@ -118,10 +118,14 @@ namespace Infrastructure.Alexa
         {
             return "You only have access to one " + singularName + ". Would you like to hear how to unlock all the " + pluralName + "? ";
         }
-        public static string NotPurchaseable(string singularName)
+        public static string NotPurchaseable()
         {
-            return "You only have access to one " + singularName + ". Your account settings currently prevent you from making in app purchases. "
-                    + "The account owner will need to allow for in app purchases. ";
+            return "I'm sorry, that is not available. ";
+        }
+
+        public static string InvalidRefund()
+        {
+            return "I'm sorry, that is not available. ";
         }
 
         public static string UpSellDeclined()
