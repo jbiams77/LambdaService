@@ -95,5 +95,10 @@ namespace FlashCardService.Lessons
             string output = QuickReply + " Say the word";
             return AlexaResponse.PresentFlashCard(wordAttributes.Word, output, CommonPhrases.TryAgain);
         }
+
+        public SkillResponse Introduction(WordAttributes wordAttributes, bool display)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
