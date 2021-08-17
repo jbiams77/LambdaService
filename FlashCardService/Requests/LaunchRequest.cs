@@ -19,8 +19,8 @@ namespace FlashCardService.Requests
 
         public LaunchRequest(SkillRequest skillRequest)
         {
-            this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, LOGGER.log);
-            this.sessionAttributes = new SessionAttributes(LOGGER.log);                     
+            //this.userProfile = new UserProfileDB(skillRequest.Session.User.UserId, LOGGER.log);
+            //this.sessionAttributes = new SessionAttributes(LOGGER.log);                     
             this.productInventory = new ProductInventory(skillRequest);                        
             AlexaResponse.SetSessionAttributeHandler(sessionAttributes);
         }
@@ -29,7 +29,7 @@ namespace FlashCardService.Requests
         {
             LOGGER.log.INFO("LaunchRequest", "HandleRequest");
 
-            await this.userProfile.GetUserProfileData();
+            //await this.userProfile.GetUserProfileData();
             await productInventory.GetAvailableProducts();
             if (userProfile.RequiresPurchase())
             {

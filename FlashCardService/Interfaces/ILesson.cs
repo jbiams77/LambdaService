@@ -21,7 +21,7 @@ namespace FlashCardService.Interfaces
         int CostEndIndex { get; }
         string QuickReply { get; set; }
 
-        SkillResponse Introduction(WordAttributes wordAttributes, bool display);
+        SkillResponse Introduction(WordAttributes wordAttributes);
         SkillResponse Dialogue(MODE mode, WordAttributes wordAttributes);
     }
 }

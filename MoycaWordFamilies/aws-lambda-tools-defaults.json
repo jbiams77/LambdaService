@@ -14,7 +14,7 @@
     "function-memory-size" : 512,
     "function-timeout"     : 15,
     "function-handler"     : "MoycaWordFamilies::MoycaWordFamilies.Function::FunctionHandler",
-    "function-name"        : "moyca-word-families-developer-service",
+    "function-name"        : "moyca-word-families-service",
     "function-description" : "",
     "package-type"         : "Zip",
     "tracing-mode"         : "PassThrough",
