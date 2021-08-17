@@ -6,6 +6,7 @@ using MoycaAddition.Requests.Intents;
 using FlashCardService.Interfaces;
 using MoycaAddition;
 using Infrastructure.Alexa;
+using Infrastructure.Interfaces;
 
 namespace MoycaAddition.Requests
 {
@@ -20,7 +21,7 @@ namespace MoycaAddition.Requests
         }
 
 
-        public SkillResponse HandleRequest()
+        public async Task<SkillResponse> HandleRequest()
         {
             string intentName = ((Alexa.NET.Request.Type.IntentRequest)skillRequest.Request).Intent.Name;            
 

@@ -1,4 +1,6 @@
-﻿using Amazon.S3;
+﻿using Amazon;
+using Amazon.Runtime;
+using Amazon.S3;
 using Amazon.S3.Model;
 using System;
 using System.Collections.Generic;
@@ -6,30 +8,30 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.S3Policy
-{
-    class S3
+namespace Infrastructure.S3
+{    
+
+    public class S3
     {
-        private string BucketName { get { return "moyca-policies"; } }
+        public static RegionEndpoint REGION = RegionEndpoint.USEast1;
+        public const string COGNITO_POOL_ID = "";
 
-        AmazonS3Client client = new AmazonS3Client();
-        public S3()
-        {            
-        }
+        private static AWSCredentials cognitoCredentials;
 
-        public async Task<string> GetFile(string key)
+            
+        public static async Task<StreamReader> GetFile(string bucketName, string key)
         {
+            IAmazonS3 S3Client = new AmazonS3Client();
+
             GetObjectRequest request = new GetObjectRequest
             {
-                BucketName = this.BucketName,
+                BucketName = bucketName,
                 Key = key
             };
 
-            using (GetObjectResponse response = await client.GetObjectAsync(request))
+            using (GetObjectResponse response = await S3Client.GetObjectAsync(request))
             {
-                // convert stream to string
-                StreamReader reader = new StreamReader(response.ResponseStream);
-                return reader.ReadToEnd();
+                return new StreamReader(response.ResponseStream);
             }
 
         }

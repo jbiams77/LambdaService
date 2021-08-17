@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Infrastructure.GlobalConstants;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,6 +9,13 @@ namespace Infrastructure.Alexa
     {
         private static Random random = new Random(0);
 
+        public static string YesOrNo
+        {
+            get
+            {
+                return "Please say yes to continue or no to quit";
+            }
+        }
         
         public static string Help
         {
@@ -64,13 +72,12 @@ namespace Infrastructure.Alexa
                         @"</amazon:emotion></amazon:effect>";
             }
         }
-        public static string SessionFinished
+
+        public static string SessionFinished(string appName)
         {
-            get
-            {
-                return "You're ready to move to the next lesson! Just say, Alexa, open Moyca Readers!";
-            }
+            return "You're ready to move to the next lesson! Just say, Alexa, open Moyca " + appName + ".";
         }
+
 
         public static string TryAgain
         {
@@ -107,21 +114,30 @@ namespace Infrastructure.Alexa
             }
         }
 
-        public static string Upsell()
+        public static string Upsell(string singularName, string pluralName)
         {
-            return "You currently do not have access to these flash cards. Would you like to hear how to get it?";
+            return "You only have access to one " + singularName + ". Would you like to hear how to unlock all the " + pluralName + "? ";
+        }
+        public static string NotPurchaseable()
+        {
+            return "I'm sorry, that is not available. ";
+        }
+
+        public static string InvalidRefund()
+        {
+            return "I'm sorry, that is not available. ";
         }
 
         public static string UpSellDeclined()
         {
-                return "If you change your mind, at any time just say, Alexa I would like to buy " + 
-                         "an expansion. Meanwhile, you can continue using the free flash cards.";
+                return "If you change your mind, at any time just say, Alexa I would like to purchase " + 
+                         "content. Meanwhile, you can continue using the free flash cards. " + SSML.PauseFor(0.5);
             
         }
 
-        public static string UpSellAccepted()
+        public static string UpSellAccepted(string pluralName)
         {   
-            return "Great. You now have the more flash cards. Opening the next session will continue with the purchased content.";       
+            return "You now have all the " + pluralName + " flash cards. ";       
         }
 
     }

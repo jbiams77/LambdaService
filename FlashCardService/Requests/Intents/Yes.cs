@@ -25,8 +25,7 @@ namespace FlashCardService.Requests.Intents
                 WordsToRead wordsToRead = new WordsToRead(this.skillRequest);
                 return await wordsToRead.HandleIntent();
             }
-
-            base.sessionAttributes.SessionState = STATE.FirstWord;
+                       
 
             LOGGER.log.DEBUG("Yes", "HandleIntent", "Current Word: " + base.sessionAttributes.CurrentWord);
             WordAttributes wordAttributes = await WordAttributes.GetWordAttributes(this.sessionAttributes.CurrentWord, LOGGER.log);

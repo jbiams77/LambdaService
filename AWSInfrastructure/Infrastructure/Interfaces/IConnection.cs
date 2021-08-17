@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Alexa
+namespace Infrastructure.Interfaces
 {
     public interface IConnection
     {

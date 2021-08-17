@@ -7,6 +7,7 @@ using FlashCardService.Interfaces;
 using Infrastructure.Alexa;
 using MoycaAddition;
 using Alexa.NET;
+using Infrastructure.Interfaces;
 
 namespace MoycaAddition.Requests
 {
@@ -14,10 +15,10 @@ namespace MoycaAddition.Requests
     {
         public SessionEnded() {}
 
-        public SkillResponse HandleRequest()
+        public Task<SkillResponse> HandleRequest()
         {
             LOGGER.log.INFO("SessionEnded", "HandleRequest");
-            return ResponseBuilder.Tell("Goodbye Moycan!");
+            return Task.FromResult(ResponseBuilder.Tell("Goodbye Moycan!"));
         }
     }
 }

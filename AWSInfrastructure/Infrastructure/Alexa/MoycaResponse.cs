@@ -6,6 +6,8 @@ using Infrastructure.Logger;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Alexa.NET.Request;
+using Infrastructure.GlobalConstants;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Alexa
 {
@@ -17,57 +19,14 @@ namespace Infrastructure.Alexa
 
         private static readonly AlexaDisplay alexaDisplay = new AlexaDisplay();
 
-        private static object _sessionAttribute;
-        private static bool _shouldEndSession;
-        private static bool _displaySupported;
-        private static string _prompt;
-        private static string _reprompt;
-        private static string _slotName;
-        private static string _slotValue;
-        private static string _displayValue;
-        
-        public static void ShouldEndSession(bool shouldEndSession)
-        {
-            _shouldEndSession = shouldEndSession;
-        }
-
-        public static void SetSessionDisplayValue(string value)
-        {
-            _displayValue = value;
-        }
-
-        public static void SetSessionSlotTypeAndValue(string SlotName, string slotValue)
-        {
-            _slotName = SlotName;
-            _slotValue = slotValue;
-        }
-
-        public static void SetSessionPromptAndReprompt(string prompt, string reprompt)
-        {
-            _prompt = prompt;
-            _reprompt = reprompt;
-        }
-        public static void SetSessionPromptAndReprompt(string prompt)
-        {
-            _prompt = prompt;
-            _reprompt = prompt;
-        }
-
-        public static void SetSessionPrompt(string prompt)
-        {
-            _prompt = prompt;
-            _reprompt = prompt;
-        }
-
-        public static void SetSessionAttribute(object sessionAttribute)
-        {
-            _sessionAttribute = sessionAttribute;
-        }
-
-        public static void SetDisplaySupported(bool displaySupported)
-        {
-            _displaySupported = displaySupported;
-        }
+        public static object SessionAttributes { get; set; }
+        public static bool ShouldEndSession { get; set; }
+        public static bool DisplaySupported { get; set; }
+        public static string Prompt { get; set; }
+        public static string Reprompt { get; set; }
+        public static string SlotName { get; set; }
+        public static string SlotWord { get; set; }
+        public static string DisplayValue { get; set; }
 
         public static SkillResponse Deliver()
         {
@@ -76,54 +35,76 @@ namespace Infrastructure.Alexa
 
             response.Response = new ResponseBody
             {
-                ShouldEndSession = _shouldEndSession,
-                OutputSpeech = new SsmlOutputSpeech(StartTag + _prompt + EndTag),
+                ShouldEndSession = ShouldEndSession,
+                OutputSpeech = new SsmlOutputSpeech(StartTag + Prompt + EndTag),
                 Reprompt = new Reprompt()
                 {
-                    OutputSpeech = new SsmlOutputSpeech(StartTag + _reprompt + EndTag)
+                    OutputSpeech = new SsmlOutputSpeech(StartTag + Reprompt + EndTag)
                 }
             };            
 
-            if (_slotName != null)
+            if (SlotName != null)
             {
-                var directive = MoycaResponse.Create_DynamicEntityDirective(_slotName, _slotValue);
+                var directive = MoycaResponse.Create_DynamicEntityDirective(SlotName, SlotWord);
                 response.Response.Directives.Add(directive);
             }
             
 
-            if (_sessionAttribute != null) response.SessionAttributes = new Dictionary<string, object>()
+            if (SessionAttributes != null) response.SessionAttributes = new Dictionary<string, object>()
             {
                 {
                     "SessionAttribute",
-                    _sessionAttribute
+                    SessionAttributes
                 }
             };
 
-            if (_displaySupported)
+            if (DisplaySupported)
             {
-                var displayDirective = alexaDisplay.GetCurrentWordDirective(_displayValue);
+                var displayDirective = alexaDisplay.GetCurrentWordDirective(DisplayValue);
                 response.Response.Directives.Add(displayDirective);
             }
 
             return response;
         }
 
-
-        public static SkillResponse PurchaseContentUpsell(string productId, string upsellPrompt, string productName, object obj)
+        public static SkillResponse PurchaseContentUpsell(string productId, string productName)
         {
             var response = ResponseBuilder.Empty();
             response.Response.ShouldEndSession = false;
-            response.Response.Directives.Add(new UpsellDirective(productId, "correlationToken", upsellPrompt));
+            response.Response.Directives.Add(new UpsellDirective(productId, "correlationToken", Prompt));
 
-            if (_sessionAttribute != null) response.SessionAttributes = new Dictionary<string, object>()
+            if (SessionAttributes != null) response.SessionAttributes = new Dictionary<string, object>()
             {
                 {
                     "SessionAttribute",
-                    _sessionAttribute
+                    SessionAttributes
                 }
             };
 
-            if (_displaySupported)
+            if (DisplaySupported)
+            {
+                var displayDirective = alexaDisplay.GetUpsellDirective(productName);
+                response.Response.Directives.Add(displayDirective);
+            }
+
+            return response;
+        }
+
+        public static SkillResponse RefundPurchaseResponse(string productId, string productName)
+        {
+            var response = ResponseBuilder.Empty();
+            response.Response.ShouldEndSession = false;
+            response.Response.Directives.Add(new CancelDirective(productId, "correlationToken"));
+
+            if (SessionAttributes != null) response.SessionAttributes = new Dictionary<string, object>()
+            {
+                {
+                    "SessionAttribute",
+                    SessionAttributes
+                }
+            };
+
+            if (DisplaySupported)
             {
                 var displayDirective = alexaDisplay.GetUpsellDirective(productName);
                 response.Response.Directives.Add(displayDirective);

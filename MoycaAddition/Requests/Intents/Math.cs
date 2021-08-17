@@ -48,11 +48,11 @@ namespace MoycaAddition.Requests.Intents
                 prompt = CommonPhrases.TryAgain + ". " + nextProblem.ProblemPompt;
             }
 
-            MoycaResponse.SetSessionAttribute(nextProblem.problem);
-            MoycaResponse.SetSessionPromptAndReprompt(prompt);
-            //MoycaResponse.SetSessionSlotTypeAndValue("mathProblemType", nextProblem.Answer.ToString());
-            MoycaResponse.SetSessionDisplayValue(nextProblem.ProblemDisplay);
-            MoycaResponse.ShouldEndSession(false);
+            MoycaResponse.SessionAttributes = nextProblem.problem;
+            MoycaResponse.Prompt = prompt;
+            MoycaResponse.Reprompt = prompt;
+            MoycaResponse.DisplayValue = nextProblem.ProblemDisplay;
+            MoycaResponse.ShouldEndSession = false;
 
             LOGGER.log.DEBUG("Math", "HandleIntent", "Current Problem: " + nextProblem.problem.ToString());
 

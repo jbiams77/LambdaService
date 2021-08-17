@@ -1,0 +1,96 @@
+{
+    "interactionModel": {
+        "languageModel": {
+            "invocationName": "moyca word families",
+            "modelConfiguration": {
+                "fallbackIntentSensitivity": {
+                    "level": "HIGH"
+                }
+            },
+            "intents": [
+                {
+                    "name": "AMAZON.CancelIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.HelpIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.StopIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.NavigateHomeIntent",
+                    "samples": []
+                },
+                {
+                    "name": "AMAZON.FallbackIntent",
+                    "samples": []
+                },
+                {
+                    "name": "ValidateUserResponseIntent",
+                    "slots": [
+                        {
+                            "name": "wordToRead",
+                            "type": "wordToReadType"
+                        }
+                    ],
+                    "samples": [
+                        "try {wordToRead}",
+                        "is the word {wordToRead}",
+                        "{wordToRead}"
+                    ]
+                },
+                {
+                    "name": "MakePurchaseIntent",
+                    "slots": [],
+                    "samples": [
+                        "want to purchase content",
+                        "like to purhcase content",
+                        "would like to purchase content",
+                        "I would like to purchase content",
+                        "what can I buy",
+                        "add more flash cards",
+                        "purchase more content",
+                        "buy content",
+                        "purchase content",
+                        "buy expansion",
+                        "buy word families",
+                        "purchase",
+                        "buy more",
+                        "buy",
+                        "unlock",
+                        "unlock more content",
+                        "purchase lesson",
+                        "buy flash card"
+                    ]
+                },
+                {
+                    "name": "RefundPurchaseIntent",
+                    "slots": [],
+                    "samples": [
+                        "refund flash cards",
+                        "refund content",
+                        "i want a refund",
+                        "refund my purchase",
+                        "refund word families",
+                        "refund"
+                    ]
+                }
+            ],
+            "types": [
+                {
+                    "name": "wordToReadType",
+                    "values": [
+                        {
+                            "name": {
+                                "value": "DynamicSlot"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

@@ -7,21 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Alexa.NET.Response;
+using Infrastructure.Alexa;
 
-namespace Infrastructure.Alexa
+namespace Infrastructure.Interfaces
 {
     public interface ILesson
     {
         string ProductName { get; }
         string InSkillPurchaseName { get; }
         string LessonTypeName { get; }
-        int FreeStartIndex { get; }
-        int FreeEndIndex { get; }
-        int CostStartIndex { get; }
-        int CostEndIndex { get; }
-        string QuickReply { get; set; }
+        bool Display { get; set; }
 
-        SkillResponse Introduction(WordAttributes wordAttributes);
-        SkillResponse Dialogue(MODE mode, WordAttributes wordAttributes);
+        string Introduction(WordEntry wordAttributesy);
+        string TeachTheWord(WordEntry wordAttributes);
+        string HelpWithWord(WordEntry wordAttributes);
+        
     }
 }
