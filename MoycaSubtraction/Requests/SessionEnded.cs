@@ -6,6 +6,7 @@ using Infrastructure.GlobalConstants;
 using Infrastructure.Alexa;
 using MoycaSubtraction;
 using Alexa.NET;
+using Infrastructure.Interfaces;
 
 namespace MoycaSubtraction.Requests
 {
@@ -13,10 +14,10 @@ namespace MoycaSubtraction.Requests
     {
         public SessionEnded() {}
 
-        public SkillResponse HandleRequest()
+        public Task<SkillResponse> HandleRequest()
         {
             LOGGER.log.INFO("SessionEnded", "HandleRequest");
-            return ResponseBuilder.Tell("Goodbye Moycan!");
+            return Task.FromResult(ResponseBuilder.Tell("Goodbye Moycan!"));
         }
     }
 }

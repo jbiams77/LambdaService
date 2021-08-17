@@ -9,10 +9,10 @@ namespace MoycaWordFamilies.Requests
     {
         public SessionEnded() {}
 
-        public async Task<SkillResponse> HandleRequest()
+        public Task<SkillResponse> HandleRequest()
         {
             LOGGER.log.INFO("SessionEnded", "HandleRequest");
-            return ResponseBuilder.Tell("Goodbye Moycan!");
+            return Task.FromResult(ResponseBuilder.Tell("Goodbye Moycan!"));
         }
     }
 }

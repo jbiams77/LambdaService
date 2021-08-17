@@ -49,7 +49,7 @@ namespace MoycaAddition
             {
                 case "LaunchRequest":
                     LOGGER.log.DEBUG("Function", "Launch Request");
-                    response = new LaunchRequest(request).HandleRequest();
+                    response = await new Launch(request).HandleRequest();
                     break;
 
                 case "IntentRequest":
@@ -59,7 +59,7 @@ namespace MoycaAddition
 
                 case "SessionEndedRequest":
                     LOGGER.log.DEBUG("Function", "Session Ended Request");
-                    response = new SessionEnded().HandleRequest();
+                    response = await new SessionEnded().HandleRequest();
                     break;
 
                 default:

@@ -5,6 +5,7 @@ using Alexa.NET.Request;
 using MoycaSubtraction.Requests.Intents;
 using MoycaSubtraction;
 using Infrastructure.Alexa;
+using Infrastructure.Interfaces;
 
 namespace MoycaSubtraction.Requests
 {
@@ -19,14 +20,20 @@ namespace MoycaSubtraction.Requests
         }
 
 
-        public SkillResponse HandleRequest()
+        public Task<SkillResponse> HandleRequest()
         {
-            string intentName = ((Alexa.NET.Request.Type.IntentRequest)skillRequest.Request).Intent.Name;            
+            string intentName = ((Alexa.NET.Request.Type.IntentRequest)skillRequest.Request).Intent.Name;
 
             LOGGER.log.INFO("IntentRequest", "HandleRequest", intentName);
-            
+
+            return Task.FromResult(ResponseToIntent(intentName));
+
+        }
+
+        private SkillResponse ResponseToIntent(string intentName)
+        {
             switch (intentName)
-            {   
+            {
                 case "AMAZON.CancelIntent":
                     return new Cancel(this.skillRequest).HandleIntent();
 
@@ -41,12 +48,10 @@ namespace MoycaSubtraction.Requests
 
                 case "MathIntent":
                     return new Math(this.skillRequest).HandleIntent();
-                    
-                default:                    
+
+                default:
                     return ResponseBuilder.Tell("When you are ready to begin say, 'Alexa, open Moyca Readers'. Goodbye.");
             }
-
         }
-
     }
 }

@@ -19,10 +19,11 @@ namespace MoycaAddition.Requests.Intents
                 SSML.SayExtraSlow("or") + " tell me stop to finish.  Lets try this.  ";
             var addition = new Addition();
             prompt += addition.ProblemPompt;
-            MoycaResponse.SetSessionAttribute(null);
-            MoycaResponse.SetSessionPromptAndReprompt(prompt);
-            MoycaResponse.SetSessionSlotTypeAndValue("mathProblemType", addition.Answer.ToString());
-            MoycaResponse.SetSessionDisplayValue(addition.ProblemDisplay);
+
+            MoycaResponse.SessionAttributes = null;
+            MoycaResponse.Prompt = prompt;
+            MoycaResponse.Reprompt = MoycaResponse.Prompt;
+            MoycaResponse.DisplayValue = addition.ProblemDisplay;
 
             return MoycaResponse.Deliver();
         }

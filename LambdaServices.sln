@@ -4,14 +4,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchedulerService", "SchedulerServices\SchedulerService.csproj", "{AF41C146-612E-4E81-9F2C-E7A830C84E10}"
-	ProjectSection(ProjectDependencies) = postProject
-		{EE762DA5-3803-45CF-A025-BCC53A812DD2} = {EE762DA5-3803-45CF-A025-BCC53A812DD2}
-	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlashCardService", "FlashCardService\FlashCardService.csproj", "{EE762DA5-3803-45CF-A025-BCC53A812DD2}"
-	ProjectSection(ProjectDependencies) = postProject
-		{488B3F35-30BF-466F-BA6B-428CAC35A08D} = {488B3F35-30BF-466F-BA6B-428CAC35A08D}
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "AWSInfrastructure\Infrastructure\Infrastructure.csproj", "{488B3F35-30BF-466F-BA6B-428CAC35A08D}"
 EndProject
@@ -39,10 +31,6 @@ Global
 		{AF41C146-612E-4E81-9F2C-E7A830C84E10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF41C146-612E-4E81-9F2C-E7A830C84E10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF41C146-612E-4E81-9F2C-E7A830C84E10}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EE762DA5-3803-45CF-A025-BCC53A812DD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EE762DA5-3803-45CF-A025-BCC53A812DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EE762DA5-3803-45CF-A025-BCC53A812DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EE762DA5-3803-45CF-A025-BCC53A812DD2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{488B3F35-30BF-466F-BA6B-428CAC35A08D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{488B3F35-30BF-466F-BA6B-428CAC35A08D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{488B3F35-30BF-466F-BA6B-428CAC35A08D}.Release|Any CPU.ActiveCfg = Release|Any CPU
